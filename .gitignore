@@ -1,5 +1,36 @@
+# Dependencies
 node_modules/
-dist/
+
+# Environment
+.env
 .env.local
-.DS_Store
+.env.*.local
+
+# Build output
+dist/
+out/
+build/
+release/
+
+# Logs
 *.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Electron
+electron-builder-effective-config.yaml
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Package locks (decidir en equipo si commitear o no)
+# package-lock.json
