@@ -6,14 +6,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm:dev:main\" \"npm:dev:renderer\"",
-    "dev:main": "cross-env NODE_ENV=development ts-node packages/main/src/index.ts",
     "dev:renderer": "vite --config packages/renderer/vite.config.ts",
-    "build": "npm run build:main && npm run build:renderer",
+    "dev:main": "tsc -p packages/main/tsconfig.json && cross-env NODE_ENV=development electron packages/main/dist/index.js",
+    "dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:5173 && npm run dev:main\"",
     "build:main": "tsc -p packages/main/tsconfig.json",
     "build:renderer": "vite build --config packages/renderer/vite.config.ts",
-    "electron": "electron packages/main/dist/index.js",
-    "electron:dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:5173 && npm run electron\"",
+    "build": "npm run build:main && npm run build:renderer",
+    "electron": "cross-env NODE_ENV=production electron packages/main/dist/index.js",
+    "electron:dev": "npm run build:main && concurrently \"npm run dev:renderer\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron packages/main/dist/index.js\"",
     "lint": "eslint packages/*/src --ext .ts,.tsx",
     "format": "prettier --write \"packages/*/src/**/*.{ts,tsx,json,css}\"",
     "test": "vitest"
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "concurrently": "^8.0.0",
     "cross-env": "^7.0.0",
@@ -35,9 +36,25 @@
     "wait-on": "^7.0.0"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "electron": "^27.0.0",
-    "mongoose": "^8.0.0"
+    "react-router-dom": "^6.22.0"
+  },
+  "build": {
+    "appId": "com.eduplatform.app",
+    "productName": "EduPlatform",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "packages/main/dist/**/*",
+      "packages/renderer/dist/**/*",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "packages/main/dist/index.js"
+    }
   }
 }

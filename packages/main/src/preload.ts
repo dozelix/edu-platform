@@ -1,10 +1,40 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+// ======================================================
+// Preload Script — IPC Bridge
+// Expone de forma segura el canal IPC al renderer (React)
+// contextIsolation = true protege el renderer de Node.js
+// ======================================================
+
 contextBridge.exposeInMainWorld('api', {
-  invoke: (channel: string, ...args: any[]) => {
+  /**
+   * Llama a un handler IPC en el proceso main y devuelve la respuesta.
+   * Uso: window.api.invoke('user:get-all')
+   */
+  invoke: (channel: string, ...args: unknown[]) => {
+    const allowedChannels = [
+      'user:get-all',
+      'user:get-by-id',
+      'user:create',
+      'user:update',
+      'user:delete',
+      'db:status',
+    ]
+    if (!allowedChannels.includes(channel)) {
+      return Promise.reject(new Error(`Canal IPC no permitido: ${channel}`))
+    }
     return ipcRenderer.invoke(channel, ...args)
   },
-  on: (channel: string, callback: Function) => {
-    ipcRenderer.on(channel, (event, ...args) => callback(...args))
+
+  /**
+   * Suscribe a eventos emitidos desde el proceso main.
+   * Devuelve una función para cancelar la suscripción (cleanup).
+   */
+  on: (channel: string, callback: (...args: unknown[]) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, ...args: unknown[]) =>
+      callback(...args)
+    ipcRenderer.on(channel, handler)
+    // Retorna función de cleanup
+    return () => ipcRenderer.removeListener(channel, handler)
   },
 })
