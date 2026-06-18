@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
+
 import Sidebar from './components/Sidebar'
 import TechStack from './components/TechStack'
 import StatsGrid from './components/StatsGrid'
 import Checklist from './components/Checklist'
 import DbTester from './components/DbTester'
+import Dashboard from './components/Dashboard'
+import LoginRegister from './components/LoginRegister'
 
 function App() {
   const [dbStatus, setDbStatus] = useState('idle')
