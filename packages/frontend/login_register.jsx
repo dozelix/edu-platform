@@ -3,4 +3,4 @@
 // Re-export del componente de autenticación
 // ======================================================
 
-export { LoginRegister } from './LoginRegister'
+export { LoginRegister } from './features/auth/LoginRegister'
