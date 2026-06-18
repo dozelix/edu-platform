@@ -1,10 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'url'
+import path from 'path'
 
-// https://vitejs.dev/config/
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 export default defineConfig({
+  root: __dirname,
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@shared': path.resolve(__dirname, '../shared/src')
+    }
+  },
   server: {
-    port: 5173 // Asegura el puerto que espera tu script wait-on
+    port: 5173
   }
 })

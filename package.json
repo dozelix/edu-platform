@@ -7,13 +7,13 @@
   ],
   "scripts": {
     "dev:frontend": "vite --config packages/frontend/vite.config.js",
-    "dev:main": "tsc -p packages/main/tsconfig.json && cross-env NODE_ENV=development electron packages/main/dist/index.js",
+    "dev:main": "cross-env NODE_ENV=development electron packages/main/src/index.js",
     "dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && npm run dev:main\"",
-    "build:main": "tsc -p packages/main/tsconfig.json",
+    "build:main": "echo 'No build step for main process'",
     "build:frontend": "vite build --config packages/frontend/vite.config.js",
     "build": "npm run build:main && npm run build:frontend",
-    "electron": "cross-env NODE_ENV=production electron packages/main/dist/index.js",
-    "electron:dev": "npm run build:main && concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron packages/main/dist/index.js\"",
+    "electron": "cross-env NODE_ENV=production electron packages/main/src/index.js",
+    "electron:dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron packages/main/src/index.js\"",
     "lint": "eslint packages/*/src --ext .js,.jsx",
     "format": "prettier --write \"packages/*/src/**/*.{js,jsx,json,css}\"",
     "test": "vitest"
@@ -46,12 +46,12 @@
       "output": "release"
     },
     "files": [
-      "packages/main/dist/**/*",
+      "packages/main/src/**/*",
       "packages/frontend/dist/**/*",
       "package.json"
     ],
     "extraMetadata": {
-      "main": "packages/main/dist/index.js"
+      "main": "packages/main/src/index.js"
     }
   }
 }

@@ -1,7 +1,6 @@
 import React from 'react'
 
 export default function DbTester({ isElectron, dbStatus, setDbStatus, result, setResult }) {
-  
   const testGetUsers = async () => {
     if (!window.api) {
       setResult('⚠️ window.api no disponible. ¿Estás corriendo fuera de Electron?')
@@ -33,6 +32,7 @@ export default function DbTester({ isElectron, dbStatus, setDbStatus, result, se
       const testUser = {
         name: `Test User ${Date.now()}`,
         email: `test.${Date.now()}@eduplatform.com`,
+        password: 'password123',
         role: 'student',
       }
       const response = await window.api.invoke('user:create', testUser)
@@ -75,7 +75,9 @@ export default function DbTester({ isElectron, dbStatus, setDbStatus, result, se
           aria-label="Obtener todos los usuarios de la base de datos"
         >
           {dbStatus === 'loading' ? (
-            <><span className="spinner" aria-hidden="true" /> Consultando...</>
+            <>
+              <span className="spinner" aria-hidden="true" /> Consultando...
+            </>
           ) : (
             '👥 GET todos los usuarios'
           )}

@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { User } from '../db/models/User'
+import { User } from '../db/models/User.js'
 
 // ======================================================
 // IPC User Handlers
@@ -8,14 +8,8 @@ import { User } from '../db/models/User'
 // Canales: user:*, auth:*
 // ======================================================
 
-type IpcResponse<T = unknown> = { success: true; data: T } | { success: false; error: string }
-
-// ======================================================
-// AUTHENTICATION HANDLERS
-// ======================================================
-
 // REGISTER
-ipcMain.handle('auth:register', async (_, registerData: any): Promise<IpcResponse> => {
+ipcMain.handle('auth:register', async (_, registerData) => {
   try {
     const { name, email, password, confirmPassword, role = 'student' } = registerData
 
@@ -57,13 +51,13 @@ ipcMain.handle('auth:register', async (_, registerData: any): Promise<IpcRespons
     const { password: _, ...userWithoutPassword } = userObj
 
     return { success: true, data: userWithoutPassword }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message || 'Error en el registro' }
   }
 })
 
 // LOGIN
-ipcMain.handle('auth:login', async (_, loginData: any): Promise<IpcResponse> => {
+ipcMain.handle('auth:login', async (_, loginData) => {
   try {
     const { email, password } = loginData
 
@@ -87,70 +81,70 @@ ipcMain.handle('auth:login', async (_, loginData: any): Promise<IpcResponse> => 
     const { password: _, ...userWithoutPassword } = userObj
 
     return { success: true, data: userWithoutPassword }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message || 'Error en el login' }
   }
 })
 
 // LOGOUT (simplemente mensaje de confirmación)
-ipcMain.handle('auth:logout', async (): Promise<IpcResponse> => {
+ipcMain.handle('auth:logout', async () => {
   return { success: true, data: { message: 'Sesión cerrada' } }
 })
 
 // ======================================================
-// CRUD HANDLERS (existentes, sin cambios mayores)
+// CRUD HANDLERS
 // ======================================================
 
 // GET all users
-ipcMain.handle('user:get-all', async (): Promise<IpcResponse> => {
+ipcMain.handle('user:get-all', async () => {
   try {
     const users = await User.find().lean()
     return { success: true, data: users }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message }
   }
 })
 
 // GET user by ID
-ipcMain.handle('user:get-by-id', async (_, id: string): Promise<IpcResponse> => {
+ipcMain.handle('user:get-by-id', async (_, id) => {
   try {
     const user = await User.findById(id).lean()
     if (!user) return { success: false, error: 'Usuario no encontrado' }
     return { success: true, data: user }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message }
   }
 })
 
 // CREATE user
-ipcMain.handle('user:create', async (_, userData: any): Promise<IpcResponse> => {
+ipcMain.handle('user:create', async (_, userData) => {
   try {
     const user = new User(userData)
     const saved = await user.save()
     return { success: true, data: saved.toObject() }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message }
   }
 })
 
 // UPDATE user
-ipcMain.handle('user:update', async (_, id: string, userData: any): Promise<IpcResponse> => {
+ipcMain.handle('user:update', async (_, id, userData) => {
   try {
     const updated = await User.findByIdAndUpdate(id, userData, { new: true }).lean()
     if (!updated) return { success: false, error: 'Usuario no encontrado' }
     return { success: true, data: updated }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message }
   }
 })
 
 // DELETE user
-ipcMain.handle('user:delete', async (_, id: string): Promise<IpcResponse> => {
+ipcMain.handle('user:delete', async (_, id) => {
   try {
     const deleted = await User.findByIdAndDelete(id).lean()
     if (!deleted) return { success: false, error: 'Usuario no encontrado' }
     return { success: true, data: { id } }
-  } catch (error: any) {
+  } catch (error) {
     return { success: false, error: error.message }
   }
 })
