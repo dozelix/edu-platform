@@ -1,281 +1,151 @@
+
+
 # 👥 Reglas de Colaboración - Equipo de 3 Desarrolladores
 
-## 🔀 Git Workflow (GitHub Flow Simplificado)
+## 🔀 Git Workflow (GitHub Flow Estricto)
 
-### Ramas Principales
+### Ramas de Desarrollo
+
 ```
-main                    # Producción (protegida)
-├── feature/*          # Nuevas features
-├── bugfix/*           # Correcciones de bugs
-├── refactor/*         # Mejoras de código
-└── docs/*             # Documentación
-```
+main                  # Rama de producción protegida (NUNCA escribir código aquí)
+├── feature/* # Nuevas funcionalidades (ej: feature/dashboard-ui)
+├── bugfix/* # Corrección de errores (ej: bugfix/auth-jwt-error)
+├── refactor/* # Optimización de lógica (ej: refactor/db-queries)
+└── docs/* # Cambios en manuales (ej: docs/setup-guide)
 
-### Convención de Nombrado de Ramas
-```
-feature/user-authentication
-feature/dashboard-ui
-bugfix/login-error-handling
-refactor/database-queries
-docs/api-documentation
-
-# NO PERMITIDO
-✗ feature/john-work
-✗ fix/stuff
-✗ new-code
-```
-
-### Flujo por Tarea
-
-1. **Crear rama desde `main`**
-   ```bash
-   git checkout main
-   git pull origin main
-   git checkout -b feature/mi-feature
-   ```
-
-2. **Desarrollar en tu rama**
-   - Commits descriptivos y frecuentes
-   - Un commit = una unidad lógica de trabajo
-
-3. **Hacer Push**
-   ```bash
-   git push origin feature/mi-feature
-   ```
-
-4. **Crear Pull Request (PR)**
-   - Incluir descripción clara
-   - Referenciar issues relacionados (#123)
-   - Esperar al menos 1 aprobación de compañero
-
-5. **Code Review**
-   - Todos deben revisar PRs de otros
-   - Sugerencias constructivas
-   - Aprobar solo si está listo para merge
-
-6. **Merge y Delete**
-   ```bash
-   git merge feature/mi-feature
-   git push origin main
-   git branch -d feature/mi-feature
-   ```
-
----
-
-## 📝 Convención de Commits
-
-### Formato Recomendado
-```
-<tipo>(<scope>): <descripción breve>
-
-<descripción detallada (opcional)>
-
-<footer (opcional)>
-```
-
-### Tipos
-- `feat`: Nueva funcionalidad
-- `fix`: Corrección de bug
-- `docs`: Cambios en documentación
-- `style`: Cambios de formato/eslint
-- `refactor`: Refactorización sin cambios funcionales
-- `perf`: Mejoras de rendimiento
-- `test`: Agregar o actualizar tests
-- `chore`: Cambios en build, deps, etc.
-
-### Ejemplos
-```
-✓ feat(auth): agregar autenticación con JWT
-✓ fix(db): resolver error de conexión a MongoDB
-✓ docs(setup): actualizar instrucciones de instalación
-✓ refactor(components): simplificar lógica de renderizado
-✓ test(user-service): agregar tests unitarios
-
-✗ fixed stuff
-✗ wip
-✗ asdasd
 ```
 
 ---
 
-## 🔒 Reglas Principales
+## 🔒 Las 3 Reglas de Oro contra Merges Directos
 
-### 1️⃣ NUNCA trabajar directamente en `main`
-- `main` es solo para código probado y revisado
-- Todas las features van por PR
+### 1️⃣ main es Sagrada y Protegida
 
-### 2️⃣ Una rama = Una feature/bugfix
+Está **estrictamente prohibido** hacer `git commit` o `git merge` local directamente sobre `main`. El código solo entra a `main` a través de Pull Requests en la interfaz de GitHub, tras superar la revisión del linter y la aprobación del equipo.
+
+### 2️⃣ Flujo Obligatorio por Tarea (Sin excepciones)
+
+1. **Sincronizar y crear rama local:**
 ```bash
-✓ git checkout -b feature/user-dashboard
-✗ git checkout -b feature/user-dashboard-and-sidebar-and-auth
-```
-
-### 3️⃣ Commits pequeños y descriptivos
-```
-✓ git commit -m "feat(users): add user profile page"
-✓ git commit -m "fix(auth): handle expired tokens"
-
-✗ git commit -m "updates"
-✗ git commit -m "asdsada"
-```
-
-### 4️⃣ Antes de hacer Push, actualizar desde main
-```bash
-git fetch origin
-git rebase origin/main
-# Si hay conflictos, resolverlos y continuar
-git rebase --continue
-git push origin feature/mi-feature --force-with-lease
-```
-
-### 5️⃣ Código siempre pasa linter antes de Push
-```bash
-npm run lint
-npm run format
-npm run test
-```
-
-### 6️⃣ No mergear tu propio PR
-- Esperar aprobación de al menos 1 compañero
-- Si es urgent, informar en el equipo
-
-### 7️⃣ Mantener branch sincronizado
-- Actualizar cada mañana antes de trabajar
-- Si vemos que hay cambios en main, hacer merge
-```bash
+git checkout main
 git pull origin main
-# Resolver conflictos si hay
+git checkout -b feature/nombre-de-la-tarea
+
 ```
 
----
 
-## 🗨️ Comunicación en Equipo
+2. **Hacer Push de la rama al servidor remoto:**
+```bash
+git push origin feature/nombre-de-la-tarea
 
-### Canales
-- **Código/PRs**: GitHub (comentarios, reviews)
-- **Decisiones arquitectura**: Documentar en `/docs`
-- **Urgencias**: Chat directo (Teams/Discord/Slack)
-
-### Antes de Escribir Código
-- Si es feature grande, crear issue primero
-- Discutir con el equipo (evitar duplicar trabajo)
-- Documentar decisiones de diseño
-
-### Pull Requests
-- **Título claro**: `feat: agregar validación de email`
-- **Descripción**: Por qué, qué cambios, cómo testear
-- **Link a issue**: `Closes #42`
-- **Screenshots**: Si es UI, incluir captures
-
-Plantilla sugerida:
-```markdown
-## Descripción
-Breve resumen de qué cambios se hicieron y por qué.
-
-## Tipo de Cambio
-- [ ] Bug fix
-- [ ] Nueva feature
-- [ ] Breaking change
-- [ ] Documentación
-
-## Cambios
-- Punto 1
-- Punto 2
-
-## Cómo Testear
-Pasos para verificar que funciona.
-
-## Screenshots (si aplica)
-Capturas de UI changes.
-
-## Checklist
-- [ ] Código sigue la convención del proyecto
-- [ ] Tests agregados/actualizados
-- [ ] Documentación actualizada
-- [ ] Sin conflictos con main
 ```
 
----
 
-## 🏗️ Estructura de Trabajo Paralelo
+3. **Crear Pull Request (PR) en GitHub:**
+* No puedes mergear tu propio código.
+* Se requiere obligatoriamente **al menos 1 aprobación** de un compañero de equipo.
 
-### Cómo Dividir Tareas (Evitar Conflictos)
 
-**Mala distribución:**
-```
-Dev A: Trabajando en src/renderer/components/ ← conflictos
-Dev B: Trabajando en src/renderer/components/ ← conflictos
-Dev C: Trabajando en src/db/models/          ← ok
-```
 
-**Buena distribución:**
-```
-Dev A: Features de USUARIOS (frontend + backend)
-  └─ src/renderer/features/users/
-  └─ src/db/models/User.ts
-  └─ src/main/services/UserService.ts
+### 3️⃣ Integrar cambios mediante Rebase (Evita "Merge Commits" sucios)
 
-Dev B: Features de PRODUCTOS (frontend + backend)
-  └─ src/renderer/features/products/
-  └─ src/db/models/Product.ts
-  └─ src/main/services/ProductService.ts
-
-Dev C: Infraestructura + UI compartida
-  └─ src/renderer/components/common/
-  └─ src/shared/
-  └─ CI/CD, Configuración
-```
-
-### Regla de Oro
-**Cada developer es dueño de una feature vertical completa** (UI + Backend + DB)
-- Menos conflictos de merge
-- Responsabilidad clara
-- Fácil de testear
-
----
-
-## 🔍 Checklist Antes de hacer Push
+Para mantener un historial lineal y limpio, antes de solicitar la revisión de tu PR, integra los últimos cambios de `main` en tu rama usando `rebase`:
 
 ```bash
-# 1. Actualizar desde main
 git fetch origin
 git rebase origin/main
 
-# 2. Linter y format
-npm run lint
-npm run format
+# Si hay conflictos, se resuelven y luego:
+git rebase --continue
 
-# 3. Tests
-npm run test
+# Subir los cambios limpios a tu PR de forma segura
+git push origin feature/nombre-de-la-tarea --force-with-lease
 
-# 4. Build
-npm run build
-
-# 5. Review propio código antes de push
-# Lee tu código como si lo escribiera otro
-
-# 6. Push
-git push origin feature/mi-feature
 ```
 
 ---
 
-## 🚨 En Caso de Conflictos
+## 📝 Convención de Commits Semánticos
 
-1. **No entrar en pánico**
-2. Comunicar al equipo inmediatamente
-3. Coordinar quién resuelve
-4. Actualizar documentación de cambios si es necesario
-5. Testear bien después de resolver
+Cada commit debe representar una unidad lógica de trabajo usando JavaScript puro. El formato es: `<tipo>(<scope>): <descripción breve>`
+
+### Tipos Permitidos
+
+* `feat`: Nueva funcionalidad (ej: `feat(auth): agregar login con cookies`)
+* `fix`: Corrección de un fallo (ej: `fix(ipc): resolver cuelgue en userHandlers`)
+* `style`: Formateo estético, ESLint o Prettier (ej: `style(frontend): formatear Dashboard.css`)
+* `refactor`: Cambios de código sin alterar su comportamiento (ej: `refactor(db): simplificar esquema de mongoose`)
+* `chore`: Tareas de mantenimiento o dependencias (ej: `chore(root): actualizar version de electron`)
+
+```
+✓ feat(dashboard): renderizar tarjetas de métricas analíticas
+✓ fix(db): corregir timeout al conectar con Mongoose
+✗ fixed bug and added styles
+✗ wip
+
+```
 
 ---
 
-## 📅 Reuniones Recomendadas
+## 🏗️ Estructura de Trabajo Paralelo (Vertical Slicing)
 
-- **Daily standup** (5-10 min): Qué hice, qué voy a hacer, qué me bloquea
-- **Code review** (2-3 veces por semana): Revisar PRs juntos
-- **Planning** (semanal): Planificar sprints, asignar tareas
+Para evitar conflictos de fusión (merge conflicts) en un equipo de 3 desarrolladores, trabajaremos bajo el principio de **Features Verticales Completas**. Cada desarrollador es dueño absoluto de su módulo de punta a punta.
+
+**Estrategia de asignación:**
+
+* **Desarrollador A (Feature Módulo Usuarios):**
+* `packages/frontend/src/features/users/`
+* `packages/main/src/db/models/User.js`
+* `packages/main/src/services/userService.js`
+
+
+* **Desarrollador B (Feature Módulo Productos):**
+* `packages/frontend/src/features/products/`
+* `packages/main/src/db/models/Product.js`
+* `packages/main/src/services/productService.js`
+
+
+* **Desarrollador C (Componentes Comunes y Layout Estructural):**
+* `packages/frontend/src/components/` (Sidebar, Topbar, Icons)
+* `packages/frontend/src/styles/`
+* `packages/shared/`
+
+
 
 ---
 
-**Recuerda:** La comunicación clara evita 90% de los conflictos de código.
+## 🗨️ Protocolo para Pull Requests (PR)
+
+Al abrir un PR en GitHub, utiliza la siguiente plantilla simplificada en la descripción:
+
+```markdown
+## 📝 Descripción
+Breve resumen del propósito de este cambio.
+
+## 🧱 Cambios Realizados
+- [frontend] Modificación o creación de componentes `.jsx`
+- [main] Nuevos endpoints e IPC handlers `.js` o modelos de Mongoose
+
+## 🧪 Pruebas Realizadas
+- [ ] Ejecutado `npm run lint` sin advertencias.
+- [ ] Ejecutado `npm run dev`, levantando frontend y Electron correctamente.
+
+```
+
+---
+
+## 🔍 Checklist Obligatorio Antes del Push
+
+Antes de empujar tu rama para revisión, ejecuta la suite de validación local desde la raíz del proyecto:
+
+```bash
+# 1. Asegurar código limpio y con estilo unificado
+npm run format
+npm run lint
+
+# 2. Verificar que no rompa la compilación nativa ni el empaquetado
+npm run dev
+
+```
+
+Si todo responde correctamente en verde, puedes enviar tu código a revisión en GitHub confiando en que mantendrás la estabilidad del monorepo.
