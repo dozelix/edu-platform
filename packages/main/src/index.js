@@ -29,7 +29,7 @@ function createWindow() {
   // Si estamos en producción, descarga el bundle web directamente desde GitHub Pages.
   const url = isDev
     ? 'http://localhost:5173'
-    : 'https://dozelix.github.io/clinic-pc/' // 👈 REEMPLAZA CON TU ENLACE DE GH-PAGES
+    : 'https://dozelix.github.io/EduPlataform/' // 👈 REEMPLAZA CON TU ENLACE DE GH-PAGES
 
   mainWindow.loadURL(url)
 
