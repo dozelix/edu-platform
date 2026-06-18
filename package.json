@@ -2,7 +2,7 @@
   "name": "clinic-pc",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://tu-usuario-github.github.io/clinic-pc", 
+  "homepage": "https://dozelix.github.io/EduPlataform", 
   "workspaces": [
     "packages/*"
   ],
@@ -19,7 +19,7 @@
     "format": "prettier --write \"packages/*/src/**/*.{js,jsx,json,css}\"",
     "test": "vitest",
 
-    /* 🚀 NUEVOS SCRIPTS PARA GH-PAGES */
+
     "predeploy": "vite build --config packages/frontend/vite.config.js --outDir ../../dist-gh",
     "deploy": "gh-pages -d dist-gh"
   },
