@@ -2,254 +2,228 @@
 
 ## 🎯 Arquitectura General (Monorepo)
 
-```
+```text
 proyecto-clinic/
 ├── packages/
-│   ├── main/                   # Electron main process + Mongoose
+│   ├── main/                   # Backend: Electron main process + Mongoose
 │   │   ├── src/
-│   │   │   ├── index.ts        # App entry point
-│   │   │   ├── preload.ts      # IPC bridge seguro
-│   │   │   ├── ipc/            # IPC handlers
-│   │   │   │   ├── userHandlers.ts
-│   │   │   │   ├── productHandlers.ts
+│   │   │   ├── index.js        # Punto de entrada de la aplicación
+│   │   │   ├── preload.js      # IPC bridge seguro
+│   │   │   ├── ipc/            # IPC handlers nativos
+│   │   │   │   ├── userHandlers.js
+│   │   │   │   ├── productHandlers.js
 │   │   │   │   └── ...
-│   │   │   ├── db/             # Mongoose configuration
+│   │   │   ├── db/             # Configuración de Mongoose
 │   │   │   │   ├── models/
-│   │   │   │   │   ├── User.ts
-│   │   │   │   │   ├── Product.ts
+│   │   │   │   │   ├── User.js
+│   │   │   │   │   ├── Product.js
 │   │   │   │   │   └── ...
 │   │   │   │   ├── migrations/
 │   │   │   │   ├── seeds/
-│   │   │   │   └── connection.ts
-│   │   │   └── services/       # Lógica de negocio
-│   │   │       ├── userService.ts
-│   │   │       ├── productService.ts
+│   │   │   │   └── connection.js
+│   │   │   └── services/       # Lógica de negocio (Servicios)
+│   │   │       ├── userService.js
+│   │   │       ├── productService.js
 │   │   │       └── ...
-│   │   ├── package.json
-│   │   └── tsconfig.json
+│   │   └── package.json
 │   │
-│   ├── frontend/               # React + Vite Frontend
+│   ├── frontend/               # Frontend: React + Vite
 │   │   ├── src/
-│   │   │   ├── components/
-│   │   │   │   ├── common/     # Componentes reutilizables
-│   │   │   │   ├── layouts/    # Layouts principales
-│   │   │   │   └── features/   # Componentes por feature
-│   │   │   ├── features/       # Feature-based modules
-│   │   │   │   ├── users/
-│   │   │   │   ├── products/
+│   │   │   ├── components/     # Componentes atómicos estructurados por SRP
+│   │   │   │   ├── icons/
+│   │   │   │   │   └── Icons.jsx   # Colección unificada de SVGs
+│   │   │   │   ├── Sidebar.jsx     # Navegación lateral
+│   │   │   │   ├── Topbar.jsx      # Barra superior dinámica
 │   │   │   │   └── ...
-│   │   │   ├── hooks/          # Custom hooks + API communication
-│   │   │   ├── stores/         # Estado global (Zustand)
-│   │   │   ├── types/          # TypeScript interfaces
-│   │   │   ├── styles/         # CSS/SCSS globales
-│   │   │   ├── utils/          # Utilidades
-│   │   │   ├── App.tsx
-│   │   │   └── main.tsx
+│   │   │   ├── features/       # Módulos basados en vistas de la aplicación
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   └── Dashboard.jsx
+│   │   │   │   ├── auth/
+│   │   │   │   │   └── LoginRegister.jsx
+│   │   │   │   └── ...
+│   │   │   ├── styles/         # Arquitectura modular de diseño en CSS
+│   │   │   │   ├── base/
+│   │   │   │   │   ├── reset.css
+│   │   │   │   │   └── variables.css
+│   │   │   │   ├── components/
+│   │   │   │   │   └── Dashboard.css
+│   │   │   │   └── styles.css  # Importador central de estilos
+│   │   │   └── App.jsx         # Punto de entrada e inicio de React
 │   │   ├── public/             # Assets estáticos
-│   │   ├── package.json
-│   │   ├── vite.config.ts
-│   │   └── tsconfig.json
+│   │   ├── index.html          # Punto de montaje de la aplicación web
+│   │   ├── vite.config.js      # Configuración de Vite nativa
+│   │   └── package.json
 │   │
-│   └── shared/                 # Código compartido entre packages
+│   └── shared/                 # Código común e independiente entre paquetes
 │       ├── src/
-│       │   ├── types/          # Tipos compartidos (User, Product, etc)
-│       │   ├── constants/      # Constantes globales
-│       │   ├── utils/          # Funciones compartidas
-│       │   ├── validation/     # Esquemas Zod
-│       │   └── ipc/            # Tipos de IPC channels
-│       ├── package.json
-│       └── tsconfig.json
+│       │   ├── constants/      # Constantes globales (Canales IPC, Roles)
+│       │   └── utils/          # Validaciones y utilidades compartidas
+│       └── package.json
 │
-├── tests/
-│   ├── unit/                   # Tests unitarios
-│   ├── integration/            # Tests de integración
-│   └── e2e/                   # Tests end-to-end
-├── docs/
-│   ├── ARQUITECTURA.md        # Decisiones de arquitectura
-│   ├── IPC_API.md            # Documentación de canales IPC
-│   └── WORKFLOW.md           # Workflow de desarrollo
+├── docs/                       # Documentación del proyecto
+│   ├── ARQUITECTURA.md
+│   ├── IPC_API.md
+│   └── WORKFLOW.md
 ├── .github/
-│   ├── workflows/            # CI/CD
 │   └── PULL_REQUEST_TEMPLATE.md
-├── package.json              # Root package.json (workspaces)
-├── pnpm-workspace.yaml       # O package-lock.json si usas npm
-├── tsconfig.json             # TypeScript config raíz
-├── eslint.config.js
-├── prettier.config.js
+├── package.json                # Root package.json (npm workspaces)
+├── package-lock.json           # Lockfile de dependencias unificado
+├── eslint.config.js            # Auditoría de código para JS y JSX
+├── prettier.config.js          # Formateador de código JavaScript
 └── .gitignore
-```
 
-## 🔄 Flujo de Datos en Monorepo
-
-```
-┌─────────────────────────────────────────────────────┐
-│           ELECTRON MAIN PROCESS                     │
-│  (packages/main - Node.js con Mongoose)            │
-│                                                     │
-│  ┌──────────────────────────────────────┐          │
-│  │ IPC Handlers                         │          │
-│  │  • userHandlers.ts                   │          │
-│  │  • productHandlers.ts                │          │
-│  └──────────────────────────────────────┘          │
-│              ↕ (operaciones DB)                    │
-│  ┌──────────────────────────────────────┐          │
-│  │ Services (Lógica de negocio)        │          │
-│  │  • userService.ts                    │          │
-│  │  • productService.ts                 │          │
-│  └──────────────────────────────────────┘          │
-│              ↕ (queries/updates)                   │
-│  ┌──────────────────────────────────────┐          │
-│  │ Mongoose Models                      │          │
-│  │  • User, Product, etc                │          │
-│  └──────────────────────────────────────┘          │
-│              ↕ (read/write)                        │
-│  ┌──────────────────────────────────────┐          │
-│  │      MongoDB Local                   │          │
-│  └──────────────────────────────────────┘          │
-└─────────────────────────────────────────────────────┘
-           ↕ (IPC eventos)
-┌─────────────────────────────────────────────────────┐
-│     FRONTEND PROCESS (React + Vite)                │
-│     (packages/frontend)                            │
-│                                                     │
-│  Components → Hooks → Services (IPC calls)         │
-│         ↓        ↓         ↓                       │
-│    Zustand Store ← IPC response listeners          │
-│         ↓                                           │
-│    Re-render UI                                    │
-└─────────────────────────────────────────────────────┘
-
-packages/shared → Tipos, constantes, validaciones compartidas
-```
-
-## 🔑 Principios de Diseño
-
-### Separación de Responsabilidades en Monorepo
-- **Main Process** (`packages/main`): Mongoose, operaciones DB, lógica de negocio
-- **frontend Process** (`packages/frontend`): UI, estado local, llamadas IPC
-- **Shared** (`packages/shared`): Tipos, constantes, validaciones, esquemas IPC
-
-### IPC Bridge Seguro
-- Comunicación controlada entre main y frontend
-- Preload script valida tipos
-- Sin acceso directo a Node.js desde React
-
-### Sin Backend Separado
-- No hay servidor Node.js externo
-- MongoDB corre en la máquina local (proceso separado)
-- Electron main process se conecta a MongoDB vía Mongoose
-- React accede a DB solo a través de IPC handlers
-- **Componentes**: `PascalCase.tsx` (ej: `UserCard.tsx`)
-- **Hooks**: `camelCase.ts` (ej: `useUserStore.ts`)
-- **Utils**: `camelCase.ts` (ej: `formatDate.ts`)
-- **Constantes**: `UPPER_SNAKE_CASE.ts` (ej: `API_ENDPOINTS.ts`)
-- **Modelos DB**: `PascalCase.ts` (ej: `User.ts`)
-
-### Importaciones
-```typescript
-// ✅ Correcto
-import { UserCard } from '@/components/common/UserCard';
-import { useUserStore } from '@/hooks/useUserStore';
-import { API_BASE_URL } from '@/shared/constants/API_ENDPOINTS';
-
-// ❌ Evitar
-import UserCard from '../../../../components/common/UserCard';
-```
-
-## 🗂️ Feature-Based Organization (Recomendado para escalabilidad)
-
-```
-packages/frontend/src/features/
-├── users/
-│   ├── components/         # UI components
-│   ├── pages/             # Page components
-│   ├── hooks/             # useUsers.ts, useUserForm.ts
-│   ├── stores/            # useUserStore.ts (Zustand)
-│   ├── services/          # userService.ts (IPC calls)
-│   ├── types/             # User types
-│   └── index.ts           # Export público
-
-├── products/
-│   ├── components/
-│   ├── pages/
-│   ├── hooks/
-│   ├── stores/
-│   ├── services/
-│   ├── types/
-│   └── index.ts
-
-└── ...
-
-packages/main/src/
-├── ipc/
-│   ├── userHandlers.ts    # IPC: get-users, create-user, update-user, delete-user
-│   └── productHandlers.ts # IPC: get-products, etc
-├── services/
-│   ├── userService.ts     # Lógica de negocio
-│   └── productService.ts
-└── db/models/
-    ├── User.ts
-    └── Product.ts
-```
-
-## 🔗 IPC Communication Pattern
-
-El frontend comunica con main vía IPC (Inter-Process Communication):
-
-```typescript
-// En frontend (React component)
-const response = await window.api.invoke('user:get-all')
-
-// En main (IPC handler)
-ipcMain.handle('user:get-all', async () => {
-  return userService.getAllUsers()
-})
-```
-
-## 🚫 .gitignore Recomendado
-
-```
-# Dependencies
-node_modules/
-package-lock.json
-yarn.lock
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Build output
-dist/
-out/
-build/
-
-# Logs
-*.log
-logs/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Electron
-electron-builder-effective-config.yaml
-
-# Database
-*.db
-data/
-!data/.gitkeep
 ```
 
 ---
 
-**Próximos pasos:**
-1. Revisar `REGLAS_COLABORACION.md`
-2. Revisar `SETUP_INICIAL.md`
-3. Comenzar con la configuración del proyecto
+## 🔄 Flujo de Datos en Monorepo
+
+```text
+┌─────────────────────────────────────────────────────┐
+│               ELECTRON MAIN PROCESS                 │
+│         (packages/main - Node.js + Mongoose)        │
+│                                                     │
+│   ┌──────────────────────────────────────┐          │
+│   │ IPC Handlers (Canales String)        │          │
+│   │  • userHandlers.js                   │          │
+│   │  • productHandlers.js                │          │
+│   └──────────────────────────────────────┘          │
+│               ↕ (Llamadas directas)                 │
+│   ┌──────────────────────────────────────┐          │
+│   │ Services (Lógica de Negocio)         │          │
+│   │  • userService.js                    │          │
+│   │  • productService.js                 │          │
+│   └──────────────────────────────────────┘          │
+│               ↕ (Consultas/Mutaciones)              │
+│   ┌──────────────────────────────────────┐          │
+│   │ Mongoose Models                      │          │
+│   │  • User, Product, etc.               │          │
+│   └──────────────────────────────────────┘          │
+│               ↕ (Lectura y Escritura)               │
+│   ┌──────────────────────────────────────┐          │
+│   │            MongoDB Local             │          │
+│   └──────────────────────────────────────┘          │
+└─────────────────────────────────────────────────────┘
+                    ↕ (Puente IPC)
+┌─────────────────────────────────────────────────────┐
+│          FRONTEND PROCESS (React + Vite)            │
+│                (packages/frontend)                  │
+│                                                     │
+│   Componentes JSX → Orquestadores de Vista (.jsx)   │
+│         ↓                  ↓                        │
+│   Eventos de Usuario → window.api.invoke()          │
+│         ↓                  ↓                        │
+│   Actualización de UI ← Resoluciones Asíncronas     │
+└─────────────────────────────────────────────────────┐
+
+packages/shared → Constantes globales y validaciones comunes del ecosistema
+
+```
+
+---
+
+## 🔑 Principios de Diseño
+
+### Separación de Responsabilidades en Monorepo
+
+* **Main Process** (`packages/main`): Acceso a la base de datos a través de Mongoose, procesamiento de payloads pesados, encriptación en backend y lógica de negocio centralizada.
+* **Frontend Process** (`packages/frontend`): Renderizado semántico de interfaces de usuario, encapsulamiento de estilos CSS estructurados e invocación asíncrona de eventos de sistema.
+* **Shared** (`packages/shared`): Centralización de variables constantes del negocio y utilidades funcionales compartidas.
+
+### IPC Bridge Seguro
+
+* La capa web externa no posee acceso directo al backend de Node.js ni a los módulos internos de Electron.
+* El script `preload.js` expone un objeto seguro y controlado (`window.api`) utilizando `contextBridge.exposeInMainWorld`.
+* Las llamadas se ejecutan mediante canales semánticos basados en texto evitando fugas de memoria o vulnerabilidades críticas de ejecución.
+
+### Sin Backend Separado
+
+* No se requiere el despliegue de servidores HTTP o REST externos (como Express o Fastify).
+* El motor de MongoDB se ejecuta localmente en la máquina del cliente como un proceso independiente del sistema operativo.
+* El proceso principal de Electron actúa como el servidor interno monolítico, comunicándose de manera nativa mediante Mongoose.
+
+---
+
+## 🏷️ Convenciones de Nomenclatura
+
+* **Componentes de Interfaz**: `PascalCase.jsx` (ej: `Sidebar.jsx`, `CourseCard.jsx`).
+* **Vistas y Controladores**: `PascalCase.jsx` (ej: `Dashboard.jsx`, `LoginRegister.jsx`).
+* **Estilos CSS Relacionados**: `PascalCase.css` (ej: `Dashboard.css`).
+* **Ficheros de Lógica de Backend**: `camelCase.js` (ej: `userHandlers.js`, `connection.js`).
+* **Constantes de Negocio**: `UPPER_SNAKE_CASE.js` (ej: `IPC_CHANNELS.js`).
+* **Modelos de Datos**: `PascalCase.js` (ej: `User.js`, `Product.js`).
+
+### Enrutamiento de Módulos (Alias Nativo)
+
+```javascript
+// ✅ Correcto (Uso de alias limpios configurados en la herramienta de empaquetado)
+import { Sidebar } from '@/components/Sidebar.jsx'
+import { IPC_CHANNELS } from '@shared/constants/channels.js'
+
+// ❌ Evitar (Rutas relativas profundas que degradan la legibilidad)
+import { Sidebar } from '../../../../components/Sidebar.jsx'
+
+```
+
+---
+
+## 🔗 Patrón de Comunicación IPC
+
+El flujo asíncronizado de datos entre la UI de React y el núcleo de Electron se rige bajo la estructura nativa de promesas:
+
+```javascript
+// Desde un componente o vista del Frontend (React)
+const cargarUsuarios = async () => {
+  const usuarios = await window.api.invoke('user:get-all')
+  console.log(usuarios)
+}
+
+// Registro del manejador en el Proceso Principal (Electron)
+import { ipcMain } from 'electron'
+import { userService } from '../services/userService.js'
+
+ipcMain.handle('user:get-all', async () => {
+  return await userService.obtenerTodos()
+})
+
+```
+
+---
+
+## 🚫 .gitignore Recomendado
+
+```text
+# Dependencias de Node
+node_modules/
+package-lock.json
+
+# Variables de Entorno del Entorno de Desarrollo
+.env
+.env.local
+.env.*.local
+
+# Salidas de Compilación y Empaquetado final
+dist/
+out/
+build/
+
+# Logs del Sistema
+*.log
+logs/
+
+# Configuraciones locales de Editores e IDEs
+.vscode/
+.idea/
+*.swp
+
+# Archivos temporales de Sistemas Operativos
+.DS_Store
+Thumbs.db
+
+# Configuración generada por Electron Builder
+electron-builder-effective-config.yaml
+
+# Almacenamiento local de la Base de Datos (Si se monta en la raíz)
+data/
+
+```
