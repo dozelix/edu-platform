@@ -1,4 +1,4 @@
-import { contextBridge, ipcfrontend } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
 // ======================================================
 // Preload Script — IPC Bridge
@@ -13,17 +13,24 @@ contextBridge.exposeInMainWorld('api', {
    */
   invoke: (channel: string, ...args: unknown[]) => {
     const allowedChannels = [
+      // Auth channels
+      'auth:register',
+      'auth:login',
+      'auth:logout',
+      'auth:get-current',
+      // User channels
       'user:get-all',
       'user:get-by-id',
       'user:create',
       'user:update',
       'user:delete',
+      // DB status
       'db:status',
     ]
     if (!allowedChannels.includes(channel)) {
       return Promise.reject(new Error(`Canal IPC no permitido: ${channel}`))
     }
-    return ipcFrontend.invoke(channel, ...args)
+    return ipcRenderer.invoke(channel, ...args)
   },
 
   /**
@@ -31,7 +38,7 @@ contextBridge.exposeInMainWorld('api', {
    * Devuelve una función para cancelar la suscripción (cleanup).
    */
   on: (channel: string, callback: (...args: unknown[]) => void) => {
-    const handler = (_event: Electron.IpcFrontendEvent, ...args: unknown[]) =>
+    const handler = (_event: Electron.IpcRendererEvent, ...args: unknown[]) =>
       callback(...args)
     ipcRenderer.on(channel, handler)
     // Retorna función de cleanup
