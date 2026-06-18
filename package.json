@@ -2,6 +2,7 @@
   "name": "clinic-pc",
   "version": "1.0.0",
   "private": true,
+  "homepage": "https://tu-usuario-github.github.io/clinic-pc", 
   "workspaces": [
     "packages/*"
   ],
@@ -16,7 +17,11 @@
     "electron:dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron packages/main/src/index.js\"",
     "lint": "eslint packages/*/src --ext .js,.jsx",
     "format": "prettier --write \"packages/*/src/**/*.{js,jsx,json,css}\"",
-    "test": "vitest"
+    "test": "vitest",
+
+    /* 🚀 NUEVOS SCRIPTS PARA GH-PAGES */
+    "predeploy": "vite build --config packages/frontend/vite.config.js --outDir ../../dist-gh",
+    "deploy": "gh-pages -d dist-gh"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -26,6 +31,7 @@
     "electron": "^39.8.5",
     "electron-builder": "^26.15.2",
     "eslint": "^10.5.0",
+    "gh-pages": "^6.3.0", 
     "prettier": "^3.0.0",
     "ts-node": "^10.0.0",
     "vite": "^8.0.16",
