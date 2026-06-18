@@ -4,10 +4,102 @@ import { User } from '../db/models/User'
 // ======================================================
 // IPC User Handlers
 // Operaciones CRUD para usuarios vía Electron IPC
-// Canales: user:get-all | user:get-by-id | user:create | user:update | user:delete
+// Incluye autenticación (login/register)
+// Canales: user:*, auth:*
 // ======================================================
 
 type IpcResponse<T = unknown> = { success: true; data: T } | { success: false; error: string }
+
+// ======================================================
+// AUTHENTICATION HANDLERS
+// ======================================================
+
+// REGISTER
+ipcMain.handle('auth:register', async (_, registerData: any): Promise<IpcResponse> => {
+  try {
+    const { name, email, password, confirmPassword, role = 'student' } = registerData
+
+    // Validaciones básicas
+    if (!name || !email || !password) {
+      return { success: false, error: 'Todos los campos son requeridos' }
+    }
+
+    if (password !== confirmPassword) {
+      return { success: false, error: 'Las contraseñas no coinciden' }
+    }
+
+    if (password.length < 6) {
+      return { success: false, error: 'La contraseña debe tener al menos 6 caracteres' }
+    }
+
+    // Validar email básico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return { success: false, error: 'Email inválido' }
+    }
+
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ email: email.toLowerCase() })
+    if (existingUser) {
+      return { success: false, error: 'El email ya está registrado' }
+    }
+
+    // Crear nuevo usuario
+    const user = new User({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      password,
+      role,
+    })
+
+    const saved = await user.save()
+    const userObj = saved.toObject()
+    const { password: _, ...userWithoutPassword } = userObj
+
+    return { success: true, data: userWithoutPassword }
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Error en el registro' }
+  }
+})
+
+// LOGIN
+ipcMain.handle('auth:login', async (_, loginData: any): Promise<IpcResponse> => {
+  try {
+    const { email, password } = loginData
+
+    if (!email || !password) {
+      return { success: false, error: 'Email y contraseña requeridos' }
+    }
+
+    // Buscar usuario (incluir password para comparar)
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password')
+    if (!user) {
+      return { success: false, error: 'Email o contraseña incorrectos' }
+    }
+
+    // Comparar contraseña
+    const isPasswordValid = await user.comparePassword(password)
+    if (!isPasswordValid) {
+      return { success: false, error: 'Email o contraseña incorrectos' }
+    }
+
+    const userObj = user.toObject()
+    const { password: _, ...userWithoutPassword } = userObj
+
+    return { success: true, data: userWithoutPassword }
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Error en el login' }
+  }
+})
+
+// LOGOUT (simplemente mensaje de confirmación)
+ipcMain.handle('auth:logout', async (): Promise<IpcResponse> => {
+  return { success: true, data: { message: 'Sesión cerrada' } }
+})
+
+// ======================================================
+// CRUD HANDLERS (existentes, sin cambios mayores)
+// ======================================================
 
 // GET all users
 ipcMain.handle('user:get-all', async (): Promise<IpcResponse> => {
