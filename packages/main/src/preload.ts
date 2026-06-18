@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('api', {
    * Llama a un handler IPC en el proceso main y devuelve la respuesta.
    * Uso: window.api.invoke('user:get-all')
    */
-  invoke: (channel: string, ...args: unknown[]) => {
+  invoke: (channel, ...args) => {
     const allowedChannels = [
       // Auth channels
       'auth:register',
@@ -37,9 +37,8 @@ contextBridge.exposeInMainWorld('api', {
    * Suscribe a eventos emitidos desde el proceso main.
    * Devuelve una función para cancelar la suscripción (cleanup).
    */
-  on: (channel: string, callback: (...args: unknown[]) => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, ...args: unknown[]) =>
-      callback(...args)
+  on: (channel, callback) => {
+    const handler = (_event, ...args) => callback(...args)
     ipcRenderer.on(channel, handler)
     // Retorna función de cleanup
     return () => ipcRenderer.removeListener(channel, handler)
