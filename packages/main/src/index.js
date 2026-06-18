@@ -18,15 +18,18 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.cjs'),
+      preload: path.join(__dirname, 'preload.cjs'), // 👈 Inyecta el puente IPC seguro window.api
       nodeIntegration: false,
       contextIsolation: true,
     },
   })
 
+  // 🌐 EL TRUCO MAGISTRAL:
+  // Si estamos en desarrollo, consume el servidor local caliente de Vite (localhost:5173).
+  // Si estamos en producción, descarga el bundle web directamente desde GitHub Pages.
   const url = isDev
     ? 'http://localhost:5173'
-    : `file://${path.join(__dirname, '../../frontend/dist/index.html')}`
+    : 'https://dozelix.github.io/clinic-pc/' // 👈 REEMPLAZA CON TU ENLACE DE GH-PAGES
 
   mainWindow.loadURL(url)
 
@@ -40,10 +43,10 @@ function createWindow() {
 }
 
 app.on('ready', async () => {
-  await connectDB()
+  await connectDB() // Conexión a MongoDB Local nativa
   createWindow()
 
-  // Dynamic loading of IPC modules
+  // Carga dinámica de handlers IPC nativos
   await import('./ipc/userHandlers.js')
 })
 

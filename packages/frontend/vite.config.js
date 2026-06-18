@@ -6,6 +6,7 @@ import path from 'path'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
+  base: './', // 👈 OBLIGATORIO: Fuerza a Vite a usar rutas relativas para GitHub Pages
   root: __dirname,
   plugins: [react()],
   resolve: {
