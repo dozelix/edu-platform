@@ -1,8 +1,3 @@
-// ======================================================
-// SHARED TYPES — IPC Channels
-// Tipos de canales IPC compartidos entre main y frontend
-// ======================================================
-
 export const IPC_CHANNELS = {
   // Auth channels
   AUTH_REGISTER: 'auth:register',
@@ -19,6 +14,4 @@ export const IPC_CHANNELS = {
 
   // DB status
   DB_STATUS: 'db:status',
-} as const
-
-export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
+}

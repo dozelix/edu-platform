@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import './auth.css'
 
 // ======================================================
 // LoginRegister Component
@@ -129,7 +128,8 @@ export function LoginRegister() {
               <strong>Email:</strong> {currentUser.email}
             </p>
             <p>
-              <strong>Rol:</strong> <span className={`role-badge role-${currentUser.role}`}>{currentUser.role}</span>
+              <strong>Rol:</strong>{' '}
+              <span className={`role-badge role-${currentUser.role}`}>{currentUser.role}</span>
             </p>
           </div>
           <button className="btn btn-logout" onClick={handleLogout} disabled={loading}>

@@ -90,7 +90,7 @@
 }
 
 .sidebar__nav-item.active {
-  background: rgba(124,58,237,0.15);
+  background: rgba(124, 58, 237, 0.15);
   color: var(--color-primary-light);
 }
 
@@ -127,8 +127,12 @@
   transition: background var(--transition);
 }
 
-.sidebar__status-dot.connected { background: var(--color-success); }
-.sidebar__status-dot.error     { background: var(--color-danger); }
+.sidebar__status-dot.connected {
+  background: var(--color-success);
+}
+.sidebar__status-dot.error {
+  background: var(--color-danger);
+}
 
 /* ── Main content ────────────────────────────────── */
 .main-content {
@@ -184,7 +188,9 @@
   flex-direction: column;
   gap: 8px;
   animation: fadeUp 0.5s ease forwards;
-  transition: transform var(--transition), box-shadow var(--transition);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
 }
 
 .stat-card:hover {
@@ -216,7 +222,7 @@
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 20px;
-  background: rgba(16,185,129,0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--color-success);
   width: fit-content;
   margin-top: 2px;
@@ -237,7 +243,9 @@
 .setup-card::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 3px;
   background: var(--gradient-brand);
 }
@@ -266,15 +274,15 @@
   color: var(--color-text-muted);
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.02);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--color-border);
   transition: all var(--transition);
 }
 
 .checklist-item.done {
   color: var(--color-text);
-  border-color: rgba(16,185,129,0.3);
-  background: rgba(16,185,129,0.05);
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .checklist-item__icon {
@@ -330,12 +338,12 @@
 .btn-primary {
   background: var(--gradient-brand);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(124,58,237,0.45);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
 }
 
 .btn-secondary {
@@ -349,13 +357,13 @@
 }
 
 .btn-danger {
-  background: rgba(239,68,68,0.12);
+  background: rgba(239, 68, 68, 0.12);
   color: var(--color-danger);
-  border: 1px solid rgba(239,68,68,0.3);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: rgba(239,68,68,0.2);
+  background: rgba(239, 68, 68, 0.2);
 }
 
 /* ── Result output ───────────────────────────────── */
@@ -372,14 +380,20 @@
   word-break: break-all;
 }
 
-.result-output.success { border-color: rgba(16,185,129,0.4); color: var(--color-success); }
-.result-output.error   { border-color: rgba(239,68,68,0.4); color: var(--color-danger); }
+.result-output.success {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: var(--color-success);
+}
+.result-output.error {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: var(--color-danger);
+}
 
 /* ── Spinner ─────────────────────────────────────── */
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -404,8 +418,28 @@
   border: 1px solid;
 }
 
-.stack-pill.react    { background: rgba(97,218,251,0.1);  color: #61dafb; border-color: rgba(97,218,251,0.3); }
-.stack-pill.vite     { background: rgba(189,52,254,0.1);  color: #bd34fe; border-color: rgba(189,52,254,0.3); }
-.stack-pill.electron { background: rgba(47,213,255,0.1);  color: #2fd5ff; border-color: rgba(47,213,255,0.3); }
-.stack-pill.mongo    { background: rgba(0,237,100,0.1);   color: #00ed64; border-color: rgba(0,237,100,0.3); }
-.stack-pill.ts       { background: rgba(49,120,198,0.1);  color: #3178c6; border-color: rgba(49,120,198,0.3); }
+.stack-pill.react {
+  background: rgba(97, 218, 251, 0.1);
+  color: #61dafb;
+  border-color: rgba(97, 218, 251, 0.3);
+}
+.stack-pill.vite {
+  background: rgba(189, 52, 254, 0.1);
+  color: #bd34fe;
+  border-color: rgba(189, 52, 254, 0.3);
+}
+.stack-pill.electron {
+  background: rgba(47, 213, 255, 0.1);
+  color: #2fd5ff;
+  border-color: rgba(47, 213, 255, 0.3);
+}
+.stack-pill.mongo {
+  background: rgba(0, 237, 100, 0.1);
+  color: #00ed64;
+  border-color: rgba(0, 237, 100, 0.3);
+}
+.stack-pill.ts {
+  background: rgba(49, 120, 198, 0.1);
+  color: #3178c6;
+  border-color: rgba(49, 120, 198, 0.3);
+}

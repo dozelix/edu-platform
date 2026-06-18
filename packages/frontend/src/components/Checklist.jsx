@@ -23,7 +23,9 @@ export default function Checklist() {
             <span className="checklist-item__icon" aria-hidden="true">
               {item.done ? '✅' : '⏳'}
             </span>
-            <span>{item.icon} {item.label}</span>
+            <span>
+              {item.icon} {item.label}
+            </span>
           </li>
         ))}
       </ul>

@@ -10,7 +10,11 @@ const STATUS_LABELS = {
 export default function CourseCard({ course, index }) {
   return (
     <article className="db-course-card" style={{ animationDelay: `${index * 0.05}s` }}>
-      <div className="db-course-card__thumb" style={{ background: course.accent }} aria-hidden="true">
+      <div
+        className="db-course-card__thumb"
+        style={{ background: course.accent }}
+        aria-hidden="true"
+      >
         <span className={`db-course-card__status ${course.status}`}>
           {STATUS_LABELS[course.status]}
         </span>

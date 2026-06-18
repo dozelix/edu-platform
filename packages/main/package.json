@@ -1,10 +1,11 @@
 {
   "name": "main",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch"
+    "build": "echo 'No build step required'",
+    "build:watch": "echo 'No build:watch step required'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

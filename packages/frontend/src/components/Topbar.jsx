@@ -8,7 +8,11 @@ export default function Topbar({ user, setSidebarOpen }) {
   return (
     <header className="db-topbar">
       <div className="db-topbar__left">
-        <button className="db-topbar__hamburger" onClick={() => setSidebarOpen(true)} aria-label="Abrir menú">
+        <button
+          className="db-topbar__hamburger"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Abrir menú"
+        >
           <IconMenu />
         </button>
         <div className="db-topbar__greeting">
@@ -20,7 +24,9 @@ export default function Topbar({ user, setSidebarOpen }) {
       <div className="db-topbar__actions">
         <button className="db-topbar__icon-btn" aria-label="Notificaciones">
           <IconBell />
-          <span className="db-topbar__badge" aria-hidden="true">3</span>
+          <span className="db-topbar__badge" aria-hidden="true">
+            3
+          </span>
         </button>
         <div className="db-topbar__avatar" title={`Perfil de ${user.name}`}>
           {user.initials}
