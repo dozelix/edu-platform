@@ -1,10 +1,10 @@
 # 🎨 Guía de Código y Estándares
 
-## TypeScript + React Best Practices
+## JScript + React Best Practices
 
 ### ✅ Componentes Funcionales
 
-```typescript
+```javaScript
 // ✓ CORRECTO
 import React, { ReactNode } from 'react'
 
@@ -35,7 +35,7 @@ export const UserCard: React.FC<UserCardProps> = ({
 
 ### ❌ NO Hagas Esto
 
-```typescript
+```javaScript
 // ✗ Componentes con clases (obsoleto)
 class UserCard extends React.Component { }
 
