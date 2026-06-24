@@ -66,7 +66,7 @@ export default function AllCourses() {
 
         {filtered.length > 0 ? (
           <div className="lp-courses__grid">
-            {filtered.map((course, i) => (
+            {filtered.map((course) => (
               <article className="lp-course-card" key={course.title}>
 
                 <div
