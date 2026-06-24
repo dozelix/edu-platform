@@ -1,6 +1,5 @@
 import React from 'react'
 import { IconArrowRight, IconPlayCircle, IconStar } from '../../components/icons/Icons'
-import { HERO_STATS } from '../../data/stats'
 
 const HERO_CARDS = [
   {
