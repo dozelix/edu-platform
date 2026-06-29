@@ -35,7 +35,7 @@ Crear panel de administración con:
 - [ ] Implementar tabla de usuarios con filtros
 - [ ] Crear API handlers: admin:get-users, admin:delete-user, admin:update-role
 - [ ] Diseñar interfaz con CSS modular
-- [ ] Agregar validaciones de permisos en preload.js
+- [ ] Agregar validaciones de permisos en preload.cjs
 
 **Archivos Afectados**:
 - `packages/frontend/src/features/admin/Admin.jsx` (crear)
@@ -56,13 +56,13 @@ Aplicar whitelist de canales IPC para evitar vulnerabilidades. (Ver [SECURITY.md
 
 **Tareas Secundarias**:
 - [ ] Definir lista de canales permitidos
-- [ ] Actualizar preload.js con validación
+- [ ] Actualizar preload.cjs con validación
 - [ ] Implementar validación de origen en mainHandlers
 - [ ] Agregar logging de intentos bloqueados
 - [ ] Tests de seguridad
 
 **Archivos Afectados**:
-- `packages/main/src/preload.js`
+- `packages/main/src/preload.cjs`
 - `packages/shared/src/constants/channels.js`
 - `packages/main/src/ipc/` (todos los handlers)
 

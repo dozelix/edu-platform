@@ -29,6 +29,9 @@ Thumbs.db
 # Electron
 electron-builder-effective-config.yaml
 
+# Claude Code
+claude.md
+
 # TypeScript cache
 *.tsbuildinfo
 
