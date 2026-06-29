@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 
 // ======================================================
 // LoginRegister Component
-// Componente para login y registro con diseño en tonos grises
+// Login y registro contra la colección `usuarios` del Caso 3 (auth:*).
+// Vocabulario del caso: nombre, tipo (estudiante | instructor).
 // ======================================================
 
 export function LoginRegister({ onSuccess }) {
@@ -17,11 +18,11 @@ export function LoginRegister({ onSuccess }) {
   const [loginPassword, setLoginPassword] = useState('')
 
   // Form state - Register
-  const [registerName, setRegisterName] = useState('')
+  const [registerNombre, setRegisterNombre] = useState('')
   const [registerEmail, setRegisterEmail] = useState('')
   const [registerPassword, setRegisterPassword] = useState('')
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
-  const [registerRole, setRegisterRole] = useState('student')
+  const [registerTipo, setRegisterTipo] = useState('estudiante')
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -31,7 +32,7 @@ export function LoginRegister({ onSuccess }) {
 
     try {
       if (!window.api) {
-        setError('⚠️ API no disponible')
+        setError('API no disponible')
         setLoading(false)
         return
       }
@@ -43,17 +44,17 @@ export function LoginRegister({ onSuccess }) {
 
       if (response.success) {
         setCurrentUser(response.data)
-        setSuccess(`✅ ¡Bienvenido ${response.data.name}!`)
+        setSuccess(`Bienvenido ${response.data.nombre}`)
         setLoginEmail('')
         setLoginPassword('')
         setTimeout(() => {
           onSuccess?.(response.data)
         }, 1200)
       } else {
-        setError(`❌ ${response.error}`)
+        setError(response.error)
       }
     } catch (err) {
-      setError(`❌ Error: ${err.message}`)
+      setError(`Error: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -67,22 +68,22 @@ export function LoginRegister({ onSuccess }) {
 
     try {
       if (!window.api) {
-        setError('⚠️ API no disponible')
+        setError('API no disponible')
         setLoading(false)
         return
       }
 
       const response = await window.api.invoke('auth:register', {
-        name: registerName,
+        nombre: registerNombre,
         email: registerEmail,
         password: registerPassword,
         confirmPassword: registerConfirmPassword,
-        role: registerRole,
+        tipo: registerTipo,
       })
 
       if (response.success) {
-        setSuccess(`✅ ¡Cuenta creada! ${response.data.name} registrado como ${response.data.role}`)
-        setRegisterName('')
+        setSuccess(`Cuenta creada: ${response.data.nombre} (${response.data.tipo})`)
+        setRegisterNombre('')
         setRegisterEmail('')
         setRegisterPassword('')
         setRegisterConfirmPassword('')
@@ -91,10 +92,10 @@ export function LoginRegister({ onSuccess }) {
           setSuccess('')
         }, 2000)
       } else {
-        setError(`❌ ${response.error}`)
+        setError(response.error)
       }
     } catch (err) {
-      setError(`❌ Error: ${err.message}`)
+      setError(`Error: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -113,22 +114,22 @@ export function LoginRegister({ onSuccess }) {
     }
   }
 
-  // Si hay usuario autenticado, mostrar dashboard
+  // Si hay usuario autenticado, mostrar resumen
   if (currentUser) {
     return (
       <div className="auth-container auth-dashboard">
         <div className="auth-card">
-          <h1>🎓 EduPlatform</h1>
+          <h1>EduPlatform</h1>
           <div className="user-info">
             <p>
-              <strong>Nombre:</strong> {currentUser.name}
+              <strong>Nombre:</strong> {currentUser.nombre}
             </p>
             <p>
               <strong>Email:</strong> {currentUser.email}
             </p>
             <p>
-              <strong>Rol:</strong>{' '}
-              <span className={`role-badge role-${currentUser.role}`}>{currentUser.role}</span>
+              <strong>Tipo:</strong>{' '}
+              <span className={`role-badge role-${currentUser.tipo}`}>{currentUser.tipo}</span>
             </p>
           </div>
           <button className="btn btn-logout" onClick={handleLogout} disabled={loading}>
@@ -142,7 +143,7 @@ export function LoginRegister({ onSuccess }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>🎓 EduPlatform</h1>
+        <h1>EduPlatform</h1>
 
         {/* Selector de modo */}
         <div className="mode-selector">
@@ -195,7 +196,7 @@ export function LoginRegister({ onSuccess }) {
               <input
                 id="login-password"
                 type="password"
-                placeholder="••••••"
+                placeholder="Contraseña"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 required
@@ -204,7 +205,7 @@ export function LoginRegister({ onSuccess }) {
             </div>
 
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? '⏳ Entrando...' : '✓ Iniciar Sesión'}
+              {loading ? 'Entrando...' : 'Iniciar Sesión'}
             </button>
           </form>
         )}
@@ -213,13 +214,13 @@ export function LoginRegister({ onSuccess }) {
         {mode === 'register' && (
           <form onSubmit={handleRegister} className="auth-form">
             <div className="form-group">
-              <label htmlFor="register-name">Nombre Completo</label>
+              <label htmlFor="register-nombre">Nombre Completo</label>
               <input
-                id="register-name"
+                id="register-nombre"
                 type="text"
                 placeholder="Tu nombre"
-                value={registerName}
-                onChange={(e) => setRegisterName(e.target.value)}
+                value={registerNombre}
+                onChange={(e) => setRegisterNombre(e.target.value)}
                 required
                 disabled={loading}
               />
@@ -265,26 +266,25 @@ export function LoginRegister({ onSuccess }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="register-role">Rol</label>
+              <label htmlFor="register-tipo">Tipo</label>
               <select
-                id="register-role"
-                value={registerRole}
-                onChange={(e) => setRegisterRole(e.target.value)}
+                id="register-tipo"
+                value={registerTipo}
+                onChange={(e) => setRegisterTipo(e.target.value)}
                 disabled={loading}
               >
-                <option value="student">Estudiante</option>
-                <option value="teacher">Profesor</option>
-                <option value="admin">Administrador</option>
+                <option value="estudiante">Estudiante</option>
+                <option value="instructor">Instructor</option>
               </select>
             </div>
 
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? '⏳ Registrando...' : '✓ Crear Cuenta'}
+              {loading ? 'Registrando...' : 'Crear Cuenta'}
             </button>
           </form>
         )}
 
-        <p className="auth-footer">EduPlatform © 2024 - Plataforma Educativa</p>
+        <p className="auth-footer">EduPlatform - Plataforma Educativa</p>
       </div>
     </div>
   )

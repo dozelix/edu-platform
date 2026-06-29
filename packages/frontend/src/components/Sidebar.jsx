@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { id: 'dashboard', icon: <IconGrid />, label: 'Dashboard' },
   { id: 'users', icon: <IconUsers />, label: 'Usuarios / Auth' },
   { id: 'courses', icon: <IconBook />, label: 'Cursos' },
+  { id: 'learning', icon: <IconBarChart />, label: 'Mi Aprendizaje' },
   { id: 'grades', icon: <IconBarChart />, label: 'Calificaciones' },
   { id: 'settings', icon: <IconSettings />, label: 'Configuración' },
 ]

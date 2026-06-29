@@ -1,0 +1,131 @@
+/* ==========================================================================
+   Catalog.css — Vista Catálogo de Cursos (app autenticada, dark theme)
+   Prefijo: .cat-
+   ========================================================================== */
+
+.cat-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cat-search,
+.cat-filter {
+  height: 40px;
+  padding: 0 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.cat-search {
+  flex: 1 1 240px;
+}
+
+.cat-search:focus,
+.cat-filter:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.cat-msg {
+  color: var(--color-text-muted);
+  padding: 24px 0;
+}
+
+.cat-msg--error {
+  color: var(--color-danger);
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.cat-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--gradient-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.cat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.cat-card__thumb {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gradient-brand);
+}
+
+.cat-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.cat-card__title {
+  font-size: 16px;
+}
+
+.cat-card__instructor {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.cat-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.cat-card__price {
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.cat-card__rating {
+  color: var(--color-text-muted);
+}
+
+.cat-card__enroll {
+  margin-top: 8px;
+  height: 38px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-brand);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.cat-card__enroll:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.cat-card__enroll:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

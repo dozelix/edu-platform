@@ -7,6 +7,9 @@ import StatsGrid from './components/StatsGrid'
 import Checklist from './components/Checklist'
 import DbTester from './components/DBTester'
 import Dashboard from './features/dashboard/dashboard'
+import Catalog from './features/courses/Catalog'
+import MyLearning from './features/learning/MyLearning'
+import Lesson from './features/lesson/Lesson'
 import { LoginRegister } from './components/LoginRegister'
 import Landing from './features/landing/Landing'
 
@@ -18,6 +21,7 @@ function App() {
   const [dbStatus, setDbStatus] = useState('idle')
   const [result, setResult] = useState('')
   const [activeNav, setActiveNav] = useState('dashboard')
+  const [activeLeccionId, setActiveLeccionId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isElectron] = useState(() => typeof globalThis.window !== 'undefined' && !!globalThis.window.api)
 
@@ -40,8 +44,8 @@ function App() {
   // ── Authenticated app ───────────────────────────────
   const appUser = currentUser
     ? {
-        name: currentUser.name,
-        initials: currentUser.name
+        name: currentUser.nombre,
+        initials: currentUser.nombre
           .split(' ')
           .map((w) => w[0])
           .join('')
@@ -59,6 +63,27 @@ function App() {
     switch (activeNav) {
       case 'dashboard':
         return <Dashboard />
+      case 'courses':
+        return <Catalog user={currentUser} />
+      case 'learning':
+        return (
+          <MyLearning
+            user={currentUser}
+            onContinue={(leccionId) => {
+              setActiveLeccionId(leccionId)
+              setActiveNav('lesson')
+            }}
+          />
+        )
+      case 'lesson':
+        return (
+          <Lesson
+            leccionId={activeLeccionId}
+            user={currentUser}
+            onNavigate={(leccionId) => setActiveLeccionId(leccionId)}
+            onBack={() => setActiveNav('learning')}
+          />
+        )
       case 'users':
         return (
           <LoginRegister
