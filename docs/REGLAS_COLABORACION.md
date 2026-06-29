@@ -1,25 +1,19 @@
 # Reglas de Colaboración — EduPlatform
 
-<<<<<<< HEAD
+Referencia rápida del workflow del equipo de 3 desarrolladores.
 
-# 👥 Reglas de Colaboración - Equipo de 3 Desarrolladores
+## Git Workflow (GitHub Flow)
 
-## 🔀 Git Workflow (GitHub Flow Estricto)
-
-### Ramas de Desarrollo
+### Ramas de desarrollo
 
 ```
-main                  # Rama de producción protegida (NUNCA escribir código aquí)
-develop              # Rama de desarrollo principal
-├── feature/*        # Nuevas funcionalidades (ej: feature/dashboard-ui)
-├── bugfix/*         # Corrección de errores (ej: bugfix/auth-error)
-├── refactor/*       # Optimización de lógica (ej: refactor/ipc-security)
-└── docs/*           # Cambios en manuales (ej: docs/update-security)
-
+main                  # Rama de producción protegida (NUNCA commitear directo)
+develop               # Rama de desarrollo principal
+├── feature/*         # Nuevas funcionalidades (ej: feature/dashboard-ui)
+├── bugfix/*          # Corrección de errores (ej: bugfix/auth-error)
+├── refactor/*        # Optimización de lógica (ej: refactor/ipc-security)
+└── docs/*            # Cambios en documentación (ej: docs/update-security)
 ```
-=======
-Referencia rápida del workflow del equipo. La documentación completa está en [README.md](../README.md#9-flujo-de-trabajo-del-equipo).
->>>>>>> 2ccd77a0d0270e543d8a916fd4d713d0ee4a6a7e
 
 ---
 
