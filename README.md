@@ -28,12 +28,11 @@
 
 ### Características Principales
 
-- ✅ Autenticación de usuarios (Login/Register)
-- ✅ Panel de control (Dashboard) con estadísticas
-- ✅ Gestión de cursos
-- ✅ Sistema de calificaciones
-- ✅ Interfaz responsive dark-mode
-- 🔧 Herramienta de prueba de conexión BD
+- Login de estudiantes e instructores
+- Catálogo de cursos (filtro por instructor, búsqueda, inscribirse, precio en varias monedas)
+- Mi Aprendizaje (progreso por curso, última lección)
+- Lección (video, comentarios, marcar como completada, siguiente lección)
+- Interfaz tipo Udemy (tema claro, Tailwind)
 
 ---
 
@@ -41,14 +40,13 @@
 
 | Capa | Tecnologías |
 |------|-------------|
-| **Desktop** | Electron 39.8.5, Electron Builder 26.15.2 |
-| **Frontend** | React 18.2.0, Vite 8.0.16, React Router 6.22.0 |
-| **Styling** | CSS 3 (Dark Mode, CSS Variables) |
-| **Backend** | Node.js, Electron IPC |
-| **Base de Datos** | MongoDB, Mongoose 8.0.0 |
+| **Desktop** | Electron 39, Electron Builder |
+| **Frontend** | React 18 (JSX), Vite 8 |
+| **Styling** | Tailwind v4 + lucide-react (tema claro tipo Udemy) + CSS heredado |
+| **Backend** | Node.js, Electron IPC (pseudo-backend) |
+| **Base de Datos** | MongoDB, Mongoose 8 (base `eduplatform`) |
 | **Development** | Concurrently, Cross-env, ESLint, Prettier |
-| **Testing** | Vitest 4.1.8 |
-| **Deploy** | GitHub Pages, gh-pages |
+| **Testing** | Vitest |
 
 ---
 
@@ -57,25 +55,24 @@
 ```
 EduPlataform/
 ├── packages/
-│   ├── frontend/                 # Aplicación React
+│   ├── frontend/                 # Aplicación React (Vite + Tailwind)
 │   │   ├── src/
-│   │   │   ├── components/       # Componentes reutilizables
-│   │   │   ├── features/         # Módulos de funcionalidad
-│   │   │   ├── data/             # Datos estáticos
-│   │   │   ├── styles/           # Hojas de estilos
+│   │   │   ├── components/       # LoginRegister, Sidebar, Topbar, icons
+│   │   │   ├── features/         # courses/Catalog, learning/MyLearning, lesson/Lesson
+│   │   │   ├── styles/           # index, tailwind, main + CSS por vista
 │   │   │   ├── app.jsx           # Componente principal
 │   │   │   └── main.jsx          # Entry point
-│   │   └── vite.config.js        # Configuración Vite
-│   ├── main/                     # Proceso principal Electron
+│   │   └── vite.config.js        # Configuración Vite (+ plugin Tailwind)
+│   ├── main/                     # Proceso principal Electron (pseudo-backend)
 │   │   ├── src/
-│   │   │   ├── db/               # Conexión y modelos MongoDB
-│   │   │   ├── ipc/              # Handlers de canales IPC
+│   │   │   ├── db/               # connection.js + models/Usuario.js
+│   │   │   ├── ipc/              # auth/course/learning/lesson Handlers
 │   │   │   ├── index.js          # Entry point Electron
 │   │   │   └── preload.cjs       # Bridge IPC seguro (window.api)
 │   └── shared/                   # Código compartido
-│       └── ipc/                  # Definición de canales
-├── docs/                         # Documentación centralizada
-├── dist-gh/                      # Build para GitHub Pages
+│       └── ipc/                  # Definición de canales (channels.js)
+├── seeds/                        # Seed del Caso 3 (eduplatform.seed.js)
+├── docs/                         # Documentación + material del caso (docs/EduPlatform)
 ├── package.json                  # Root workspace
 ├── README.md                     # Este archivo
 └── SECURITY.md                   # Política de seguridad
@@ -112,9 +109,12 @@ EduPlataform/
      NODE_ENV=development
      ```
 
-4. **Verificar conexión a MongoDB**
-   - La aplicación incluye una herramienta DBTester en Configuración
-   - Utilizar para validar la conexión antes de usar la app
+4. **Cargar el seed del Caso 3** (con MongoDB corriendo)
+   ```bash
+   mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
+   ```
+   - Crea las colecciones `usuarios`, `cursos`, `lecciones`, `inscripciones`, `comentarios`.
+   - Login de prueba: `estudiante1@edu.cl` / `edu12345`.
 
 ---
 
