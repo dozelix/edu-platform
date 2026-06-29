@@ -1,3 +1,9 @@
+> NOTA (histórico): este informe describe el proyecto ANTES del rediseño del Caso 3. Muchos
+> puntos ya no aplican porque los archivos fueron eliminados o reemplazados: el CSS de auth/app y
+> la landing se borraron, el DBTester y los handlers `user:*` ya no existen, y la app pasó a tema
+> claro tipo Udemy con Tailwind. Se conserva como referencia. Estado actual en
+> [TAREAS.md](TAREAS.md) y [README.md](README.md).
+
 Informe de Malas Prácticas, Errores de Diseño e Implementación
 Proyecto: EduPlatform — Electron + React + MongoDB (IPC como pseudo-backend)
 
