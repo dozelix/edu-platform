@@ -9,6 +9,9 @@
 /* 2. Componentes de la app autenticada */
 @import './auth.css';
 @import './Dashboard.css';
+@import './Catalog.css';
+@import './MyLearning.css';
+@import './Lesson.css';
 @import './app.css';
 
 /* 3. Landing page — módulos independientes */
