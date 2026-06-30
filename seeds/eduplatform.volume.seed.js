@@ -5,11 +5,7 @@
 //
 // Idempotente: limpia las colecciones antes de sembrar.
 // Cargar con:  mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
-
-const database = 'eduplataform';
-
-// Create a new database.
-use(database);
+use ('eduplatform');
 
 // Password de desarrollo "edu12345" (bcrypt) compartida, para iniciar sesion con cualquier usuario.
 const PASS = '$2a$10$u5bCbkxGWzJlxymEoyt7BeX/TDTQON7pcQkK7.a52hJ58N/y8cmo6';
