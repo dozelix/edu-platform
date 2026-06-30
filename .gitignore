@@ -32,6 +32,10 @@ electron-builder-effective-config.yaml
 # Claude Code
 claude.md
 
+# Word / informes
+*.docx
+~$*.docx
+
 # TypeScript cache
 *.tsbuildinfo
 
