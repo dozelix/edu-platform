@@ -12,7 +12,11 @@ const { _electron: electron } = require('playwright-core');
 
 const OUT = process.env.SHOT_DIR || path.join(require('os').tmpdir(), 'eduplatform-shots');
 const MAIN = path.join(__dirname, '..', 'packages', 'main', 'src', 'index.js');
-const CREDS = { email: 'estudiante1@edu.cl', password: 'edu12345' };
+const FLOW = process.env.SHOT_FLOW || 'inscripcion';
+const CREDS = {
+  email: process.env.SHOT_EMAIL || 'estudiante1@edu.cl',
+  password: process.env.SHOT_PASS || 'edu12345',
+};
 
 // Captura la ventana con un nombre de paso y lo deja registrado en consola.
 async function shot(page, nombre) {
@@ -47,21 +51,44 @@ async function main() {
 
   // 1. Catalogo publico (sin sesion): deben verse las tarjetas y "Inscribirse".
   await page.waitForSelector('.cat-card__enroll', { timeout: 25000 });
+  // Esperar a que cargue la primera portada remota antes de capturar (sin red -> fallback).
+  try {
+    await page.waitForFunction(
+      () => {
+        const i = globalThis.document.querySelector('.cat-card__cover');
+        return i && i.complete && i.naturalWidth > 0;
+      },
+      { timeout: 12000 }
+    );
+  } catch {
+    // Sin red: queda el cover generado (gradiente) y se captura igual.
+  }
   await shot(page, '1-catalogo-publico');
 
-  // 2. Inscribirse sin sesion -> debe abrir el login.
-  await page.locator('.cat-card__enroll').first().click();
-  await page.waitForSelector('#login-email', { timeout: 10000 });
-  await shot(page, '2-login-tras-inscribir');
+  if (FLOW === 'instructor') {
+    // Login directo del instructor via el boton "Iniciar sesion" del topbar.
+    await page.click('.db-topbar__login');
+    await page.waitForSelector('#login-email', { timeout: 10000 });
+    await page.fill('#login-email', CREDS.email);
+    await page.fill('#login-password', CREDS.password);
+    await page.click('button[type="submit"]');
+    await page.waitForSelector('text=Mis cursos', { timeout: 15000 });
+    await shot(page, '2-panel-instructor');
+    console.log('OK: flujo instructor recorrido, capturas en ' + OUT);
+  } else {
+    // 2. Inscribirse sin sesion -> debe abrir el login.
+    await page.locator('.cat-card__enroll').first().click();
+    await page.waitForSelector('#login-email', { timeout: 10000 });
+    await shot(page, '2-login-tras-inscribir');
 
-  // 3. Iniciar sesion -> bienvenida -> aterrizar en Mi Aprendizaje.
-  await page.fill('#login-email', CREDS.email);
-  await page.fill('#login-password', CREDS.password);
-  await page.click('button[type="submit"]');
-  await page.waitForSelector('text=Mi Aprendizaje', { timeout: 15000 });
-  await shot(page, '3-mi-aprendizaje');
-
-  console.log('OK: flujo #21 recorrido, capturas en ' + OUT);
+    // 3. Iniciar sesion -> bienvenida -> aterrizar en Mi Aprendizaje.
+    await page.fill('#login-email', CREDS.email);
+    await page.fill('#login-password', CREDS.password);
+    await page.click('button[type="submit"]');
+    await page.waitForSelector('text=Mi Aprendizaje', { timeout: 15000 });
+    await shot(page, '3-mi-aprendizaje');
+    console.log('OK: flujo #21 recorrido, capturas en ' + OUT);
+  }
   await app.close();
 }
 

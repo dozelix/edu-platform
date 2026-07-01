@@ -5,6 +5,7 @@ import Topbar from './components/Topbar'
 import Catalog from './features/courses/Catalog'
 import MyLearning from './features/learning/MyLearning'
 import Lesson from './features/lesson/Lesson'
+import InstructorDashboard from './features/instructor/InstructorDashboard'
 import { LoginRegister } from './components/LoginRegister'
 
 function App() {
@@ -77,6 +78,11 @@ function App() {
         }}
       />
     )
+  }
+
+  // Los instructores tienen su propio panel: ven sus cursos, estudiantes y progreso.
+  if (isAuthenticated && currentUser.tipo === 'instructor') {
+    return <InstructorDashboard user={currentUser} onLogout={handleLogout} />
   }
 
   const appUser = currentUser
