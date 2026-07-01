@@ -51,6 +51,7 @@ app.on('ready', async () => {
   await import('./ipc/courseHandlers.js')
   await import('./ipc/learningHandlers.js')
   await import('./ipc/lessonHandlers.js')
+  await import('./ipc/instructorHandlers.js')
 })
 
 app.on('window-all-closed', async () => {
