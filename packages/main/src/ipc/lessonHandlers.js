@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
+import { getUsuarioId } from '../session.js'
 
 // ======================================================
 // IPC Lesson Handlers (Caso 3 — Vista 4: Lección)
@@ -15,9 +16,11 @@ function toObjectId(id) {
 }
 
 // Obtener una lección con datos de navegación (siguiente) y estado de completada.
-ipcMain.handle('leccion:obtener', async (_, { leccionId, usuarioId } = {}) => {
+ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
   try {
     if (!leccionId) return { success: false, error: 'leccionId requerido' }
+    // El estado "completada" es del usuario en sesion, no del id del renderer.
+    const usuarioId = getUsuarioId()
     let lid
     try {
       lid = toObjectId(leccionId)
@@ -79,10 +82,14 @@ ipcMain.handle('leccion:obtener', async (_, { leccionId, usuarioId } = {}) => {
 
 // Marcar una lección como completada para el usuario y recalcular el progreso
 // del curso = lecciones completadas / total de lecciones.
-ipcMain.handle('leccion:completar', async (_, { usuarioId, leccionId } = {}) => {
+ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
   try {
-    if (!usuarioId || !leccionId) {
-      return { success: false, error: 'usuarioId y leccionId requeridos' }
+    const usuarioId = getUsuarioId()
+    if (!usuarioId) {
+      return { success: false, error: 'No hay sesión iniciada' }
+    }
+    if (!leccionId) {
+      return { success: false, error: 'leccionId requerido' }
     }
     let uid, lid
     try {
@@ -154,9 +161,13 @@ ipcMain.handle('comentario:listar', async (_, leccionId) => {
 })
 
 // Crear un comentario en una lección.
-ipcMain.handle('comentario:crear', async (_, { leccionId, usuarioId, texto } = {}) => {
+ipcMain.handle('comentario:crear', async (_, { leccionId, texto } = {}) => {
   try {
-    if (!leccionId || !usuarioId || !texto || !texto.trim()) {
+    const usuarioId = getUsuarioId()
+    if (!usuarioId) {
+      return { success: false, error: 'No hay sesión iniciada' }
+    }
+    if (!leccionId || !texto || !texto.trim()) {
       return { success: false, error: 'Faltan datos del comentario' }
     }
     let lid, uid

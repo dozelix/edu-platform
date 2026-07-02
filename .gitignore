@@ -8,6 +8,7 @@ node_modules/
 
 # Build output
 dist/
+dist-gh/
 out/
 build/
 release/
@@ -47,11 +48,7 @@ TAREAS.md
 
 # Database
 *.db
-/data/
-!data/.gitkeep
-# Excluir datos de fuente de la app del ignore
-!packages/frontend/src/data/
-------------
-# Dependencies
+
+# Package managers (usamos npm)
 yarn.lock
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Lesson.css — Vista Lección (app autenticada, dark theme)
+   Lesson.css — Vista Lección (tema claro tipo Udemy)
    Prefijo: .les-
    ========================================================================== */
 
@@ -45,13 +45,6 @@
   background: #000;
 }
 
-.les-video__src {
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--color-text-muted);
-  word-break: break-all;
-}
-
 .les-video--empty {
   display: flex;
   align-items: center;
@@ -63,9 +56,27 @@
 .les-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   font-size: 13px;
   color: var(--color-text-muted);
+}
+
+/* Estado de la leccion: pildora neutra; verde cuando esta completada */
+.les-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+}
+
+.les-status--done {
+  background: var(--color-success-soft);
+  color: var(--color-success);
 }
 
 .les-content {
@@ -76,8 +87,103 @@
 }
 
 .les-content__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+/* Contenido de la leccion renderizado desde Markdown (Vista 4). */
+.les-content__body {
   font-size: 15px;
-  margin-bottom: 8px;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.les-content__body > *:first-child {
+  margin-top: 0;
+}
+
+.les-content__body h3,
+.les-content__body h4,
+.les-content__body h5 {
+  font-family: var(--font-heading);
+  margin: 20px 0 8px;
+  line-height: 1.3;
+}
+
+.les-content__body h3 {
+  font-size: 18px;
+}
+
+.les-content__body h4 {
+  font-size: 16px;
+}
+
+.les-content__body h5 {
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.les-content__body p {
+  margin: 0 0 12px;
+}
+
+/* El preflight de Tailwind quita los marcadores; se reponen para el contenido markdown. */
+.les-content__body ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  list-style: disc;
+}
+
+.les-content__body ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  list-style: decimal;
+}
+
+.les-content__body li {
+  margin-bottom: 4px;
+}
+
+.les-content__body a {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+}
+
+.les-content__body code {
+  font-family: 'Fira Code', ui-monospace, monospace;
+  font-size: 0.9em;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+}
+
+.md-pre {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.md-pre code {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.md-quote {
+  margin: 0 0 12px;
+  padding: 8px 14px;
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .les-actions {
@@ -123,7 +229,9 @@
 }
 
 .les-comments__title {
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
   margin-bottom: 12px;
 }
 

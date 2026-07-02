@@ -1,9 +1,10 @@
 /* =====================================================
    EduPlatform — Global CSS
-   Design system: dark mode, gradientes, tipografía
+   Design system: tema claro tipo Udemy, tipografia Inter
+   Norte visual: Dashboard EduPlataform (export shadcn)
    ===================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ── Tokens ───────────────────────────────────────── */
 :root {
@@ -13,16 +14,22 @@
   --color-surface-2: #f7f9fa;
   --color-border: #d1d7dc;
   --color-primary: #3b1c8c;
+  --color-primary-hover: #2d1470;
+  --color-primary-soft: #f0ebff; /* lavanda de la referencia (estado activo, badges) */
   --color-primary-light: #a435f0;
   --color-accent: #a435f0;
   --color-accent-2: #b4690e;
   --color-success: #2d8a4e;
+  --color-success-soft: #e8f5e9; /* tinte suave para badges de exito */
+  --color-warning-soft: #fef9e7; /* tinte suave para badges de calificacion */
   --color-danger: #e53935;
   --color-text: #1c1d1f;
   --color-text-muted: #6a6f73;
+  --color-text-subtle: #9ba0a6;
+  --color-on-primary-soft: #c4aff5; /* texto lavanda sobre el morado (banners) */
 
   /* Gradients */
-  --gradient-brand: linear-gradient(135deg, #3b1c8c 0%, #a435f0 100%);
+  --gradient-brand: linear-gradient(135deg, #3b1c8c 0%, #5a2db8 100%);
   --gradient-card: #ffffff;
   --gradient-glow: radial-gradient(ellipse at 50% 0%, rgba(59, 28, 140, 0.12) 0%, transparent 70%);
 
@@ -30,9 +37,9 @@
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
   --shadow-glow: 0 0 30px rgba(59, 28, 140, 0.15);
 
-  /* Typography */
+  /* Typography — Inter para todo, titulos en peso alto (como la referencia) */
   --font-body: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Space Grotesk', 'Inter', sans-serif;
+  --font-heading: 'Inter', system-ui, sans-serif;
 
   /* Spacing */
   --radius-sm: 4px;
