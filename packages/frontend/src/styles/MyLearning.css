@@ -1,7 +1,52 @@
 /* ==========================================================================
-   MyLearning.css — Vista Mi Aprendizaje (app autenticada, dark theme)
+   MyLearning.css — Vista Mi Aprendizaje (tema claro tipo Udemy)
    Prefijo: .lrn-
    ========================================================================== */
+
+/* Banner de bienvenida con resumen real (cursos en progreso / completados) */
+.lrn-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--gradient-brand);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 22px 26px;
+  margin-bottom: 24px;
+}
+
+.lrn-hero__greeting {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+.lrn-hero__sub {
+  font-size: 14px;
+  color: var(--color-on-primary-soft);
+}
+
+.lrn-hero__sub strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.lrn-hero__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
 .lrn-msg {
   color: var(--color-text-muted);
@@ -62,6 +107,12 @@
 .lrn-progress__fill {
   height: 100%;
   background: var(--gradient-brand);
+  transition: width 0.6s ease;
+}
+
+/* Curso completado: barra verde, como en la referencia */
+.lrn-progress__fill--done {
+  background: var(--color-success);
 }
 
 .lrn-progress__pct {

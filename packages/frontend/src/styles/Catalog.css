@@ -118,15 +118,41 @@
 }
 
 .cat-card__thumb {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
   aspect-ratio: 16 / 9;
-  font-family: var(--font-heading);
-  font-size: 46px;
-  font-weight: 700;
+  padding: 14px 16px;
   color: #fff;
-  background: var(--gradient-brand);
+  /* El gradiente varia por curso y se aplica inline (portadaDeCurso). */
+}
+
+.cat-card__monogram {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.cat-card__topic {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  opacity: 0.92;
+}
+
+/* Foto de portada encima del cover generado; si falla (onError) queda el gradiente. */
+.cat-card__cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .cat-card__body {
