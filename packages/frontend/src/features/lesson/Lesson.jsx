@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Markdown from './Markdown'
 
 // Vista 4 del Caso 3: Lección (Reproductor).
 // Muestra el video (si existe), contenido y duración (con fallback porque el seed
@@ -139,7 +140,13 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
 
             <div className="les-content">
               <h2 className="les-content__title">Contenido</h2>
-              <p>{leccion.contenido || 'Sin contenido (no provisto en los datos).'}</p>
+              {leccion.contenido ? (
+                <div className="les-content__body">
+                  <Markdown texto={leccion.contenido} />
+                </div>
+              ) : (
+                <p>Sin contenido (no provisto en los datos).</p>
+              )}
             </div>
 
             <div className="les-actions">

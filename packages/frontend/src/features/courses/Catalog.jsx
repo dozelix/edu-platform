@@ -43,7 +43,7 @@ const COVER_IMAGES = [
 ]
 
 // Convierte el precio en USD a la moneda elegida con las tasas de la API publica.
-function formatearPrecio(precioUSD, moneda, tasas) {
+export function formatearPrecio(precioUSD, moneda, tasas) {
   if (precioUSD == null) return 'Sin precio'
   const tasa = moneda === 'USD' ? 1 : tasas[moneda]
   if (!tasa) return `${precioUSD.toFixed(2)} USD`
@@ -52,7 +52,7 @@ function formatearPrecio(precioUSD, moneda, tasas) {
 }
 
 // Portada generada a partir del nombre: monograma, tema y un gradiente estable por curso.
-function portadaDeCurso(nombre) {
+export function portadaDeCurso(nombre) {
   const palabras = (nombre || '').split(/\s+/).filter(Boolean)
   const signif = palabras.filter((p) => !NIVELES.has(p.toLowerCase()))
   const base = signif.length ? signif : palabras
