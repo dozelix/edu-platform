@@ -73,8 +73,16 @@ function App() {
     setActiveNav('learning')
   }
 
-  // Cierra la sesion y devuelve la app al catalogo publico.
-  const handleLogout = () => {
+  // Cierra la sesion y devuelve la app al catalogo publico. Limpia tambien la
+  // sesion del proceso main (auth:logout): si no, el main seguiria autenticado y
+  // los handlers que usan la sesion (p. ej. curso:listar) filtrarian datos del
+  // usuario anterior al siguiente que use la app.
+  const handleLogout = async () => {
+    try {
+      await globalThis.window?.api?.invoke('auth:logout')
+    } catch {
+      // Un fallo al notificar el logout no debe bloquear el cierre en el renderer.
+    }
     setCurrentUser(null)
     setActiveNav('courses')
     setActiveLeccionId(null)

@@ -46,8 +46,8 @@ mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
 npm run dev
 ```
 
-Login de prueba (contraseña `edu12345`): estudiante `estudiante1@edu.cl`, docente/instructor
-`instructor1@edu.cl`.
+Login de prueba (contraseña `edu12345`): estudiante `alumno.test@edu.cl`, docente/instructor
+`profe.test@edu.cl`.
 
 Guía completa en [docs/SETUP.md](docs/SETUP.md).
 

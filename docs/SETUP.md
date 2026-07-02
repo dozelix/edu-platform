@@ -38,10 +38,10 @@ manejo null-safe:
 mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
 ```
 
-Credenciales de prueba (contraseña `edu12345`):
+Credenciales de prueba (contraseña `edu12345`) — las dos cuentas de testeo del seed de volumen:
 
-- Estudiante: `estudiante1@edu.cl` (o `alumno.test@edu.cl`)
-- Docente (instructor): `instructor1@edu.cl` (o `profe.test@edu.cl`)
+- Estudiante: `alumno.test@edu.cl`
+- Docente (instructor): `profe.test@edu.cl`
 
 ## 3. Correr
 
@@ -67,5 +67,5 @@ npm run shot           # abre la app con Playwright y guarda capturas (verificac
 - [ ] Node 18+ y MongoDB corriendo en `localhost:27017`.
 - [ ] `npm install` desde la raíz.
 - [ ] Seed cargado en la base `eduplatform`.
-- [ ] `npm run dev` abre la ventana y el login entra como estudiante (`estudiante1@edu.cl`) y como
-      docente (`instructor1@edu.cl`), contraseña `edu12345`.
+- [ ] `npm run dev` abre la ventana y el login entra como estudiante (`alumno.test@edu.cl`) y como
+      docente (`profe.test@edu.cl`), contraseña `edu12345`.
