@@ -30,7 +30,6 @@ export function LoginRegister({ onSuccess, onCancel }) {
   const [success, setSuccess] = useState('')
   const [currentUser, setCurrentUser] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
-  const [remember, setRemember] = useState(false)
 
   // Login
   const [loginEmail, setLoginEmail] = useState('')
@@ -272,29 +271,6 @@ export function LoginRegister({ onSuccess, onCancel }) {
                 </p>
               </div>
 
-              {/* Botones sociales (decorativos) */}
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { name: 'Google', letter: 'G' },
-                  { name: 'Facebook', letter: 'f' },
-                ].map(({ name, letter }) => (
-                  <button
-                    key={name}
-                    type="button"
-                    className="flex items-center justify-center gap-2 border border-[#d1d7dc] py-2.5 text-sm font-semibold text-[#1c1d1f] hover:bg-[#f7f9fa] transition-colors"
-                  >
-                    <span className="font-bold text-base leading-none">{letter}</span>
-                    {name}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-[#d1d7dc]" />
-                <span className="text-xs text-[#6a6f73]">o con tu correo</span>
-                <div className="flex-1 h-px bg-[#d1d7dc]" />
-              </div>
-
               {error && (
                 <div className="flex items-start gap-2.5 bg-[#fff3f3] border border-[#fca5a5] px-4 py-3 text-sm text-[#c0392b]">
                   <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
@@ -330,17 +306,9 @@ export function LoginRegister({ onSuccess, onCancel }) {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="login-password" className={FIELD_LABEL}>
-                        Contrasena
-                      </label>
-                      <button
-                        type="button"
-                        className="text-xs text-[#3b1c8c] hover:underline font-medium"
-                      >
-                        ¿Olvidaste tu contrasena?
-                      </button>
-                    </div>
+                    <label htmlFor="login-password" className={FIELD_LABEL}>
+                      Contrasena
+                    </label>
                     <div className={FIELD_WRAP}>
                       <Lock size={16} className="text-[#6a6f73] flex-shrink-0" />
                       <input
@@ -363,20 +331,6 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       </button>
                     </div>
                   </div>
-
-                  <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                    <button
-                      type="button"
-                      onClick={() => setRemember((v) => !v)}
-                      className={`w-4 h-4 flex-shrink-0 border flex items-center justify-center transition-colors ${
-                        remember ? 'bg-[#3b1c8c] border-[#3b1c8c]' : 'border-[#d1d7dc] bg-white'
-                      }`}
-                      aria-pressed={remember}
-                    >
-                      {remember && <Check size={10} className="text-white" />}
-                    </button>
-                    <span className="text-sm text-[#6a6f73]">Mantener sesion iniciada</span>
-                  </label>
 
                   <SubmitButton loading={loading} label="Iniciar sesion" />
                 </form>

@@ -48,12 +48,12 @@ export default function MyLearning({ user, onContinue }) {
 
   return (
     <>
-      <div className="db-page-header">
-        <div>
+      <header className="db-page-header">
+        <hgroup>
           <h1 className="db-page-header__title">Mi Aprendizaje</h1>
           <p className="db-page-header__sub">Tus cursos y tu progreso</p>
-        </div>
-      </div>
+        </hgroup>
+      </header>
 
       {estado === 'loading' && <p className="lrn-msg">Cargando...</p>}
       {estado === 'no-api' && (
@@ -85,7 +85,13 @@ export default function MyLearning({ user, onContinue }) {
                   <td>{f.instructor}</td>
                   <td>
                     <div className="lrn-progress">
-                      <div className="lrn-progress__track">
+                      <div
+                        className="lrn-progress__track"
+                        role="progressbar"
+                        aria-valuenow={f.progreso}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      >
                         <div className="lrn-progress__fill" style={{ width: `${f.progreso}%` }} />
                       </div>
                       <span className="lrn-progress__pct">{f.progreso}%</span>

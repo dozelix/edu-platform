@@ -132,11 +132,11 @@ export default function InstructorDashboard({ user, onLogout }) {
           <span className="w-12 h-12 rounded-full bg-[#3b1c8c] flex items-center justify-center flex-shrink-0">
             <GraduationCap size={24} />
           </span>
-          <div>
+          <hgroup>
             <p className="text-sm text-[#9ba0a6] mb-0.5">Bienvenido, instructor</p>
             <h1 className="text-2xl font-extrabold">{nombre}</h1>
             <p className="text-sm text-[#9ba0a6] mt-0.5">Tus cursos y quién está aprendiendo.</p>
-          </div>
+          </hgroup>
         </section>
 
         {estado === 'loading' && <p className="text-[#6a6f73]">Cargando...</p>}

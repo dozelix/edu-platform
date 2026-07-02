@@ -100,19 +100,19 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
 
   return (
     <>
-      <div className="db-page-header">
-        <div>
+      <header className="db-page-header">
+        <hgroup>
           <h1 className="db-page-header__title">
             {leccion ? leccion.titulo : 'Lección'}
           </h1>
           <p className="db-page-header__sub">{leccion ? leccion.cursoNombre : ''}</p>
-        </div>
+        </hgroup>
         {onBack && (
           <button className="db-link-btn" onClick={onBack}>
             ← Mi Aprendizaje
           </button>
         )}
-      </div>
+      </header>
 
       {estado === 'loading' && <p className="les-msg">Cargando...</p>}
       {estado === 'no-api' && (
@@ -124,12 +124,12 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
         <div className="les-layout">
           <section className="les-player">
             {leccion.videoUrl ? (
-              <div className="les-video">
+              <figure className="les-video">
                 <video controls src={leccion.videoUrl} />
-                <p className="les-video__src">Fuente: {leccion.videoUrl}</p>
-              </div>
+                <figcaption className="les-video__src">Fuente: {leccion.videoUrl}</figcaption>
+              </figure>
             ) : (
-              <div className="les-video les-video--empty">Sin video</div>
+              <figure className="les-video les-video--empty">Sin video</figure>
             )}
 
             <div className="les-meta">
@@ -138,7 +138,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
               <span>{leccion.completada ? 'Completada' : 'Pendiente'}</span>
             </div>
 
-            <div className="les-content">
+            <section className="les-content">
               <h2 className="les-content__title">Contenido</h2>
               {leccion.contenido ? (
                 <div className="les-content__body">
@@ -147,7 +147,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
               ) : (
                 <p>Sin contenido (no provisto en los datos).</p>
               )}
-            </div>
+            </section>
 
             <div className="les-actions">
               <button className="les-btn" onClick={completar} disabled={leccion.completada || completando}>
