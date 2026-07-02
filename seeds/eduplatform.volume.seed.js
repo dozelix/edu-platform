@@ -61,14 +61,14 @@ const instructores = [
   { _id: ObjectId(), nombre: 'Profe Testeo', email: 'profe.test@edu.cl', tipo: 'instructor', password: PASS, bio: 'Cuenta de profesor para pruebas.', especialidades: 'Python, Django', fecha_registro: new Date() },
 ];
 for (let i = 1; i <= 99; i++) {
-  instructores.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `instructor${i}@edu.cl`, tipo: 'instructor', password: PASS, bio: 'Instructor de ' + pick(TEMAS) + '.', especialidades: pick(ESPECIALIDADES), fecha_registro: new Date() });
+  instructores.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `profe.bulk${i}@edu.cl`, tipo: 'instructor', password: PASS, bio: 'Instructor de ' + pick(TEMAS) + '.', especialidades: pick(ESPECIALIDADES), fecha_registro: new Date() });
 }
 
 const estudiantes = [
   { _id: ObjectId(), nombre: 'Alumno Testeo', email: 'alumno.test@edu.cl', tipo: 'estudiante', password: PASS, fecha_registro: new Date() },
 ];
 for (let i = 1; i <= 999; i++) {
-  estudiantes.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `estudiante${i}@edu.cl`, tipo: 'estudiante', password: PASS, fecha_registro: new Date() });
+  estudiantes.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `alumno.bulk${i}@edu.cl`, tipo: 'estudiante', password: PASS, fecha_registro: new Date() });
 }
 db.usuarios.insertMany(instructores);
 db.usuarios.insertMany(estudiantes);
@@ -133,7 +133,15 @@ function inscribir(estudianteId, cursoId, forzarProgreso) {
     lecciones_completadas: completadas,
   });
 }
-estudiantes.forEach((est) => {
+// El alumno de testeo (estudiantes[0]) recibe inscripciones deterministas que cubren
+// los estados que verifica scripts/verify-backend.cjs: uno en progreso con la leccion 1
+// completada (curso incompleto), uno completado y uno sin empezar. Asi la verificacion
+// no depende del azar del sembrado. El resto de estudiantes se inscribe al azar.
+const cursosTest = cursos.slice(0, 3).map((c) => c._id);
+inscribir(estudiantes[0]._id, cursosTest[0], 40);
+inscribir(estudiantes[0]._id, cursosTest[1], 100);
+inscribir(estudiantes[0]._id, cursosTest[2], 0);
+estudiantes.slice(1).forEach((est) => {
   const n = randInt(1, 5);
   const elegidos = new Set();
   while (elegidos.size < n) elegidos.add(pick(cursos)._id.toString());
