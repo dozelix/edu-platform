@@ -1,7 +1,7 @@
 // Seed de volumen del Caso 3 (issue #22): 100 cursos, 999 estudiantes, 99 profesores
 // + 1 profesor de testeo y 1 alumno de testeo. Transformacion del modelo relacional
 // (Documentacion docente/CASO_3_EduPlatform_schema.sql) a un modelo documental por referencia.
-// Decisiones de modelado en docs/MODELO_NOSQL.md.
+// Decisiones de modelado en docs/ARQUITECTURA.md.
 //
 // Idempotente: limpia las colecciones antes de sembrar.
 // Cargar con:  mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js

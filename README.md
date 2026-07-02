@@ -1,256 +1,86 @@
-# 📚 EduPlataform
+# EduPlatform
 
-**Plataforma educativa de escritorio nativa construida con Electron, React y MongoDB**
+Plataforma educativa de escritorio construida con Electron, React y MongoDB. Implementa el Caso 3:
+catálogo de cursos, inscripción, seguimiento de progreso, lecciones con comentarios y un panel para
+que los instructores vean quién está aprendiendo.
 
----
+## Descripción general
 
-## 📋 Tabla de Contenidos
+- Frontend: React 18 (JSX) con Vite 8 y Tailwind v4 (tema claro tipo Udemy).
+- Backend: proceso principal de Electron como pseudo-backend, vía IPC (`window.api`).
+- Base de datos: MongoDB con Mongoose 8 (base `eduplatform`).
+- Distribución: Electron para escritorio; build web publicable en GitHub Pages.
 
-- [Descripción General](#descripción-general)
-- [Stack Tecnológico](#stack-tecnológico)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Instalación y Configuración](#instalación-y-configuración)
-- [Desarrollo](#desarrollo)
-- [Documentación](#documentación)
-- [Seguridad](#seguridad)
-- [Contribuciones](#contribuciones)
+### Funcionalidades
 
----
+- Login de estudiantes e instructores (bcrypt).
+- Catálogo: grid con nombre, instructor, precio y calificación; búsqueda por nombre; filtro por
+  instructor; inscribirse solo si no está inscrito; precio en varias monedas (API pública).
+- Mi Aprendizaje: progreso por curso, última lección y continuar aprendiendo.
+- Lección: video (si existe), contenido en Markdown, duración, últimos 5 comentarios, agregar
+  comentario, marcar como completada y siguiente lección.
+- Panel de instructor: sus cursos, estudiantes inscritos y progreso real.
 
-## 📖 Descripción General
-
-**EduPlataform** es una aplicación de escritorio multiplataforma que proporciona una interfaz para la gestión de cursos, usuarios y estadísticas educativas. La arquitectura combina:
-
-- **Frontend**: Interfaz React con Vite
-- **Backend**: Electron con IPC (Inter-Process Communication) como pseudo-backend
-- **Base de Datos**: MongoDB con Mongoose ODM
-- **Distribución**: Electron Builder + GitHub Pages (versión web)
-
-### Características Principales
-
-- Login de estudiantes e instructores
-- Catálogo de cursos (filtro por instructor, búsqueda, inscribirse, precio en varias monedas)
-- Mi Aprendizaje (progreso por curso, última lección)
-- Lección (video, comentarios, marcar como completada, siguiente lección)
-- Interfaz tipo Udemy (tema claro, Tailwind)
-
----
-
-## 🛠️ Stack Tecnológico
+## Stack
 
 | Capa | Tecnologías |
 |------|-------------|
-| **Desktop** | Electron 39, Electron Builder |
-| **Frontend** | React 18 (JSX), Vite 8 |
-| **Styling** | Tailwind v4 + lucide-react (tema claro tipo Udemy) + CSS heredado |
-| **Backend** | Node.js, Electron IPC (pseudo-backend) |
-| **Base de Datos** | MongoDB, Mongoose 8 (base `eduplatform`) |
-| **Development** | Concurrently, Cross-env, ESLint, Prettier |
-| **Testing** | Vitest |
+| Escritorio | Electron 39, Electron Builder |
+| Frontend | React 18 (JSX), Vite 8 |
+| Estilos | Tailwind v4 + lucide-react |
+| Backend | Node.js, Electron IPC (pseudo-backend) |
+| Base de datos | MongoDB, Mongoose 8 |
+| Calidad | ESLint, Prettier, Vitest |
 
----
-
-## 📁 Estructura del Proyecto
-
-```
-EduPlataform/
-├── packages/
-│   ├── frontend/                 # Aplicación React (Vite + Tailwind)
-│   │   ├── src/
-│   │   │   ├── components/       # LoginRegister, Sidebar, Topbar, icons
-│   │   │   ├── features/         # courses/Catalog, learning/MyLearning, lesson/Lesson
-│   │   │   ├── styles/           # index, tailwind, main + CSS por vista
-│   │   │   ├── app.jsx           # Componente principal
-│   │   │   └── main.jsx          # Entry point
-│   │   └── vite.config.js        # Configuración Vite (+ plugin Tailwind)
-│   ├── main/                     # Proceso principal Electron (pseudo-backend)
-│   │   ├── src/
-│   │   │   ├── db/               # connection.js + models/Usuario.js
-│   │   │   ├── ipc/              # auth/course/learning/lesson Handlers
-│   │   │   ├── index.js          # Entry point Electron
-│   │   │   └── preload.cjs       # Bridge IPC seguro (window.api)
-│   └── shared/                   # Código compartido
-│       └── ipc/                  # Definición de canales (channels.js)
-├── seeds/                        # Seed del Caso 3 (eduplatform.seed.js)
-├── Documentacion docente/        # Pauta oficial del caso (schema.sql, mongodb_existente.js, PDF)
-├── docs/                         # Documentación interna (ver docs/FUENTE_DE_VERDAD.md)
-├── package.json                  # Root workspace
-├── README.md                     # Este archivo
-└── SECURITY.md                   # Política de seguridad
-```
-
----
-
-## 🚀 Instalación y Configuración
-
-### Requisitos Previos
-
-- **Node.js**: v18+ recomendado
-- **npm**: v9+ o superior
-- **MongoDB**: Instancia local o remota accesible
-
-### Pasos de Instalación
-
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/dozelix/EduPlataform.git
-   cd EduPlataform
-   ```
-
-2. **Instalar dependencias**
-   ```bash
-   npm install
-   ```
-
-3. **Configurar variables de entorno**
-   - Crear archivo `.env.local` en la raíz del proyecto (ver [SETUP_INICIAL.md](docs/SETUP_INICIAL.md))
-   - Variables requeridas:
-     ```env
-     MONGODB_URI=mongodb://localhost:27017/eduplatform
-     NODE_ENV=development
-     ```
-
-4. **Cargar el seed del Caso 3** (con MongoDB corriendo)
-   ```bash
-   mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
-   ```
-   - Crea las colecciones `usuarios`, `cursos`, `lecciones`, `inscripciones`, `comentarios`.
-   - Login de prueba: `estudiante1@edu.cl` / `edu12345`.
-
----
-
-## 💻 Desarrollo
-
-### Scripts Disponibles
+## Instalación y uso
 
 ```bash
-# Frontend
-npm run dev:frontend              # Inicia Vite dev server (puerto 5173)
+git clone https://github.com/dozelix/EduPlataform.git
+cd EduPlataform
+npm install
 
-# Electron (requiere frontend corriendo)
-npm run dev:main                  # Inicia proceso principal Electron
+# Con MongoDB corriendo en localhost:27017, sembrar la base:
+mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
 
-# Desarrollo integrado
-npm run dev                        # Inicia frontend + Electron simultáneamente
-
-# Build
-npm run build:frontend            # Compila React para producción
-npm run build:main                # Build del proceso principal
-npm run build                     # Build completo (frontend + main)
-
-# Distribución
-npm run electron                  # Ejecuta app compilada
-npm run electron:dev              # Ejecuta en modo desarrollo
-
-# Calidad de código
-npm run lint                      # Verificar sintaxis (ESLint)
-npm run format                    # Formatear código (Prettier)
-npm run test                      # Ejecutar tests (Vitest)
-
-# Deployment
-npm run deploy                    # Deploy a GitHub Pages
+# Iniciar Vite + Electron:
+npm run dev
 ```
 
-### Flujo de Desarrollo
+Login de prueba (contraseña `edu12345`): `estudiante1@edu.cl`, `instructor1@edu.cl`.
 
-1. **Iniciar dev servers**
-   ```bash
-   npm run dev
-   ```
-   Esto inicia simultáneamente:
-   - Vite dev server (http://localhost:5173)
-   - Electron app conectada al dev server
+Guía completa en [docs/SETUP.md](docs/SETUP.md).
 
-2. **Realizar cambios**
-   - Los cambios en React se reflejan automáticamente (Hot Reload)
-   - Los cambios en el proceso principal requieren reinicio de Electron
+## Scripts
 
-3. **Lint y Formato**
-   ```bash
-   npm run format && npm run lint
-   ```
+```bash
+npm run dev            # Vite (:5173) + Electron
+npm run dev:frontend   # solo Vite
+npm run build          # build de producción del frontend
+npm run lint           # ESLint
+npm run format         # Prettier
+npm run test           # Vitest
+npm run shot           # verificación visual con Playwright (capturas)
+```
 
----
-
-## 📚 Documentación
-
-Toda la documentación centralizada está en el directorio [docs/](docs/):
+## Documentación
 
 | Documento | Propósito |
 |-----------|-----------|
-| [FUENTE_DE_VERDAD.md](docs/FUENTE_DE_VERDAD.md) | Empieza aquí. Pauta real (relacional a NoSQL, volumen) y errores de los docs internos |
-| [MODELO_NOSQL.md](docs/MODELO_NOSQL.md) | Modelo documental y seed de volumen (100 cursos / 999 estudiantes / 99 profesores) |
-| [SETUP_INICIAL.md](docs/SETUP_INICIAL.md) | Guía de instalación y configuración inicial |
-| [ESTRUCTURA_PROYECTO.md](docs/ESTRUCTURA_PROYECTO.md) | Descripción detallada de estructura y convenciones |
-| [AUTH_GUIDE.md](docs/AUTH_GUIDE.md) | Sistema de autenticación y login/register |
-| [DOCUMENTACION.md](docs/DOCUMENTACION.md) | Índice central de la documentación |
-| [REGLAS_COLABORACION.md](docs/REGLAS_COLABORACION.md) | Normas para contribuciones y código |
-| [SECURITY.md](SECURITY.md) | Política de seguridad y vulnerabilidades |
-| [AUDITORIA.md](docs/AUDITORIA.md) | Auditoría: hallazgos verificados (seguridad, funcional, docs) |
+| [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md) | Visión del proyecto y correspondencia con la pauta del Caso 3. |
+| [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Estructura, modelo de datos, canales IPC y seguridad. |
+| [docs/SETUP.md](docs/SETUP.md) | Instalación, seed y ejecución. |
+| [SECURITY.md](SECURITY.md) | Política de seguridad y limitaciones conocidas. |
 
-### Resumen de Problemas Conocidos
+La pauta oficial del caso está en `Documentacion docente/`.
 
-Revisar [docs/AUDITORIA.md](docs/AUDITORIA.md) para lista de:
-- ❌ Problemas críticos (seguridad IPC)
-- ⚠️ Problemas de diseño (CSS duplicado, colisiones)
-- 🔧 Áreas en construcción
+## Seguridad
 
----
+- Lista blanca de canales IPC en el puente `preload.cjs`.
+- Content-Security-Policy por sesión (estricta en producción).
+- La app no se cierra si falla la base de datos: muestra el error en las vistas.
 
-## 🔐 Seguridad
+Detalle en [SECURITY.md](SECURITY.md).
 
-**⚠️ Aplicación en desarrollo** — No usar en producción sin revisar [SECURITY.md](SECURITY.md)
+## Licencia
 
-### Consideraciones Críticas
-
-1. **IPC Whitelist**: Los canales IPC deben validarse estrictamente
-2. **Variables de Entorno**: Nunca commitear credenciales en `.env`
-3. **MongoDB**: Usar autenticación fuerte en producción
-4. **Electron**: Deshabilitar dev tools en builds de producción
-
-Para más detalles ver [SECURITY.md](SECURITY.md)
-
----
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. Leer [REGLAS_COLABORACION.md](docs/REGLAS_COLABORACION.md)
-2. Fork el repositorio
-3. Crear rama feature: `git checkout -b feature/tu-feature`
-4. Commit con mensajes descriptivos: `git commit -am 'Agregar nueva feature'`
-5. Push a la rama: `git push origin feature/tu-feature`
-6. Abrir Pull Request
-
-### Normas de Código
-
-- Ejecutar `npm run format` antes de commit
-- Pasar `npm run lint` sin errores
-- Tests: `npm run test`
-
----
-
-## 📄 Licencia
-
-Este proyecto es privado. Consultar con los maintainers para permisos de uso.
-
----
-
-## 👥 Maintainers
-
-- [@dozelix](https://github.com/dozelix) - Creador principal
-
----
-
-## 📞 Soporte
-
-Para reportar bugs o solicitar features:
-- Crear un issue en GitHub
-- Incluir pasos para reproducir
-- Especificar versión de Node.js y SO
-- Adjuntar screenshots si es relevante
-
----
-
-**Última actualización**: 2025-12-23
+Proyecto privado. Consultar con los mantenedores para permisos de uso.

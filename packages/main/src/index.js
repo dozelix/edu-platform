@@ -45,18 +45,17 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.cjs'), // 👈 Inyecta el puente IPC seguro window.api
+      preload: path.join(__dirname, 'preload.cjs'), // Inyecta el puente IPC seguro window.api
       nodeIntegration: false,
       contextIsolation: true,
     },
   })
 
-  // 🌐 EL TRUCO MAGISTRAL:
-  // Si estamos en desarrollo, consume el servidor local caliente de Vite (localhost:5173).
-  // Si estamos en producción, descarga el bundle web directamente desde GitHub Pages.
+  // En desarrollo carga el dev server de Vite (localhost:5173); en produccion, el
+  // bundle publicado en GitHub Pages.
   const url = isDev
     ? 'http://localhost:5173'
-    : 'https://dozelix.github.io/EduPlataform/' // 👈 REEMPLAZA CON TU ENLACE DE GH-PAGES
+    : 'https://dozelix.github.io/EduPlataform/'
 
   mainWindow.loadURL(url)
 

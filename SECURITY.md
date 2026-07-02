@@ -21,58 +21,37 @@ EduPlataform implementa las recomendaciones de seguridad de la guía oficial de 
 | `contextIsolation` | `true` | El contexto del renderer está aislado del preload |
 | `preload` | `preload.cjs` | Único puente de comunicación autorizado |
 
-El preload expone exclusivamente `window.api.invoke` y `window.api.on` mediante
-`contextBridge.exposeInMainWorld`.
+El preload expone únicamente `window.api.invoke`, y solo para una lista blanca de canales
+conocidos, mediante `contextBridge.exposeInMainWorld`.
 
 ---
 
-## Problemas de seguridad conocidos
+## Estado de endurecimiento
 
-Identificados en la revisión de QA, pendientes de corrección. Se listan para transparencia
-del equipo. Detalle completo en [docs/AUDITORIA.md](docs/AUDITORIA.md).
+Resuelto:
+- **Whitelist de canales IPC** en `packages/main/src/preload.cjs`: `window.api.invoke` solo acepta
+  canales conocidos; cualquier otro se rechaza.
+- **Content-Security-Policy** por sesión en `packages/main/src/index.js`: estricta en producción y
+  relajada en desarrollo para el HMR de Vite; habilita solo los orígenes usados.
+- **Fallo de BD no fatal**: `connectDB` ya no llama `process.exit(1)`; la ventana se abre y las
+  vistas muestran el error en lugar de cerrar el proceso.
 
-### CRÍTICO — Sin whitelist de canales IPC
-
-**Archivo:** `packages/main/src/preload.cjs`
-
-`window.api.invoke(channel, ...args)` acepta cualquier string como canal sin validación. Si la
-página del renderer fuera comprometida, un script podría invocar handlers IPC arbitrarios
-(`inscripcion:crear`, `comentario:crear`, `leccion:completar`…).
-
-**Solución pendiente:**
-```js
-const ALLOWED = ['auth:login', 'auth:register', 'auth:logout',
-                 'curso:listar', 'aprendizaje:listar', 'inscripcion:crear',
-                 'leccion:obtener', 'leccion:completar',
-                 'comentario:listar', 'comentario:crear']
-
-invoke: (channel, ...args) => {
-  if (!ALLOWED.includes(channel)) throw new Error(`Canal no permitido: ${channel}`)
-  return ipcRenderer.invoke(channel, ...args)
-}
-```
-
-### MEDIO — Sin persistencia de sesión
-
-La sesión activa vive únicamente en el estado de React: al recargar el renderer hay que volver a
-iniciar sesión. No hay token ni almacenamiento de sesión.
-
-### MEDIO — `connectDB` termina el proceso con `process.exit(1)`
-
-**Archivo:** `packages/main/src/db/connection.js` línea 11
-
-Si MongoDB no está disponible, Electron cierra abruptamente sin mensaje al usuario.
+Limitaciones conocidas (aceptables para esta entrega de escritorio local):
+- Los handlers IPC confían en el id de usuario que envía el renderer (no hay sesión ni token). Por
+  ejemplo, `instructor:resumen` no verifica que el llamante sea ese instructor. Un despliegue
+  multiusuario requeriría un modelo de sesión.
+- Sin persistencia de sesión: al recargar el renderer hay que volver a iniciar sesión.
 
 ---
 
 ## Checklist de seguridad pre-producción
 
-- [ ] Implementar whitelist de canales IPC en `preload.cjs`
+- [x] Whitelist de canales IPC en `preload.cjs`
+- [x] CSP (Content Security Policy) por sesión en Electron
+- [ ] Modelo de sesión/token para no confiar en el id que envía el renderer
 - [ ] Validar/sanitizar todo input en los handlers IPC (Main Process)
 - [ ] Configurar autenticación de MongoDB con credenciales fuertes
 - [ ] Deshabilitar dev tools en builds de producción: `webPreferences: { devTools: false }`
-- [ ] Implementar CSP (Content Security Policy) en Electron
-- [ ] No cargar contenido remoto no confiable en una ventana con bridge IPC
 - [ ] Auditoría de código de seguridad
 
 ---
