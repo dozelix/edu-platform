@@ -48,12 +48,17 @@ function EstadoBadge({ estado }) {
   const activo = estado === 'activo'
   return (
     <span
-      className="text-xs font-semibold px-2 py-0.5 rounded-full"
+      className="inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full"
       style={{
-        background: activo ? '#e8f5e9' : '#f7f9fa',
+        background: activo ? 'var(--color-success-soft)' : '#f7f9fa',
         color: activo ? '#2d8a4e' : '#6a6f73',
       }}
     >
+      <span
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ background: activo ? '#2d8a4e' : '#9ba0a6' }}
+        aria-hidden="true"
+      />
       {estado || 'sin estado'}
     </span>
   )
@@ -76,7 +81,7 @@ export default function InstructorDashboard({ user, onLogout }) {
         return
       }
       try {
-        const res = await window.api.invoke('instructor:resumen', user.id)
+        const res = await window.api.invoke('instructor:resumen')
         if (!activo) return
         if (res.success) {
           setData(res.data)
@@ -100,12 +105,26 @@ export default function InstructorDashboard({ user, onLogout }) {
   const nombre = user?.nombre || 'Instructor'
   const totales = data?.totales
   const stats = [
-    { icon: BookOpen, label: 'Cursos publicados', value: totales ? totales.cursos : '—' },
-    { icon: Users, label: 'Estudiantes', value: totales ? totales.estudiantes : '—' },
+    {
+      icon: BookOpen,
+      label: 'Cursos publicados',
+      value: totales ? totales.cursos : '—',
+      color: '#3b1c8c',
+      bg: 'var(--color-primary-soft)',
+    },
+    {
+      icon: Users,
+      label: 'Estudiantes',
+      value: totales ? totales.estudiantes : '—',
+      color: '#2d8a4e',
+      bg: 'var(--color-success-soft)',
+    },
     {
       icon: Star,
       label: 'Calificación promedio',
       value: totales?.calificacionPromedio ?? 'Sin calificación',
+      color: '#b4690e',
+      bg: 'var(--color-warning-soft)',
     },
   ]
 
@@ -128,14 +147,14 @@ export default function InstructorDashboard({ user, onLogout }) {
       </header>
 
       <main className="flex-1 w-full max-w-[1100px] mx-auto px-6 py-8 space-y-8">
-        <section className="bg-gradient-to-r from-[#1c1d1f] to-[#3e4143] text-white p-6 flex items-center gap-4">
-          <span className="w-12 h-12 rounded-full bg-[#3b1c8c] flex items-center justify-center flex-shrink-0">
+        <section className="bg-gradient-to-r from-[#3b1c8c] to-[#5a2db8] text-white p-6 flex items-center gap-4">
+          <span className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
             <GraduationCap size={24} />
           </span>
           <hgroup>
-            <p className="text-sm text-[#9ba0a6] mb-0.5">Bienvenido, instructor</p>
+            <p className="text-sm text-[#c4aff5] mb-0.5">Bienvenido, instructor</p>
             <h1 className="text-2xl font-extrabold">{nombre}</h1>
-            <p className="text-sm text-[#9ba0a6] mt-0.5">Tus cursos y quién está aprendiendo.</p>
+            <p className="text-sm text-[#c4aff5] mt-0.5">Tus cursos y quién está aprendiendo.</p>
           </hgroup>
         </section>
 
@@ -151,10 +170,13 @@ export default function InstructorDashboard({ user, onLogout }) {
         {estado === 'ready' && data && (
           <>
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="Resumen">
-              {stats.map(({ icon: Icon, label, value }) => (
+              {stats.map(({ icon: Icon, label, value, color, bg }) => (
                 <article key={label} className="bg-white border border-[#d1d7dc] p-5">
-                  <span className="w-9 h-9 rounded-full bg-[#f0ebff] flex items-center justify-center mb-3">
-                    <Icon size={16} className="text-[#3b1c8c]" />
+                  <span
+                    className="w-9 h-9 rounded-full flex items-center justify-center mb-3"
+                    style={{ background: bg }}
+                  >
+                    <Icon size={16} style={{ color }} />
                   </span>
                   <p className="text-2xl font-extrabold text-[#1c1d1f]">{value}</p>
                   <p className="text-xs font-semibold text-[#6a6f73] mt-0.5">{label}</p>

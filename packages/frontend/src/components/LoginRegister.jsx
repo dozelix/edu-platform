@@ -9,7 +9,6 @@ import {
   Check,
   ArrowRight,
   User,
-  Star,
 } from 'lucide-react'
 
 // ======================================================
@@ -123,7 +122,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
           </div>
           <h2 className="text-2xl font-extrabold text-[#1c1d1f] mb-2">Bienvenido de vuelta</h2>
           <p className="text-sm text-[#6a6f73]">
-            Sesion iniciada como{' '}
+            Sesión iniciada como{' '}
             <strong className="text-[#1c1d1f]">{currentUser.nombre}</strong> ({currentUser.tipo}).
           </p>
         </div>
@@ -151,7 +150,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
           <p className="text-sm text-[#6a6f73]">
             {mode === 'login' ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
             <button onClick={switchMode} className="text-[#3b1c8c] font-semibold hover:underline">
-              {mode === 'login' ? 'Registrate gratis' : 'Inicia sesion'}
+              {mode === 'login' ? 'Regístrate gratis' : 'Inicia sesión'}
             </button>
           </p>
         </div>
@@ -163,69 +162,42 @@ export function LoginRegister({ onSuccess, onCancel }) {
           <aside className="hidden lg:flex flex-col justify-between bg-[#1c1d1f] text-white p-10 w-[420px] flex-shrink-0">
             <div>
               <p className="text-xs font-semibold tracking-widest text-[#c4aff5] uppercase mb-4">
-                Continua aprendiendo
+                Continúa aprendiendo
               </p>
               <h2 className="text-3xl font-extrabold leading-tight mb-4 text-white">
-                Tu proxima
+                Tu próxima
                 <br />
                 habilidad te
                 <br />
-                <span className="text-[#c4aff5]">esta esperando.</span>
+                <span className="text-[#c4aff5]">está esperando.</span>
               </h2>
               <p className="text-[#9ba0a6] text-sm leading-relaxed">
-                Inicia sesion para retomar donde lo dejaste, ver tu progreso y acceder a tus cursos.
+                Inicia sesión para retomar donde lo dejaste, ver tu progreso y acceder a tus cursos.
               </p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 p-5 flex flex-col gap-4">
-              <p className="text-xs font-semibold text-[#9ba0a6] uppercase tracking-widest">
-                Ultimo curso visto
-              </p>
-              <div className="flex items-start gap-3">
-                <div className="w-16 h-12 flex-shrink-0 bg-gradient-to-br from-[#3b1c8c] to-[#a435f0] flex items-center justify-center text-white font-bold">
-                  PY
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white leading-snug">Python Avanzado</p>
-                  <p className="text-xs text-[#9ba0a6] mt-1">Prof. Daniela Soto</p>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-xs text-[#9ba0a6] mb-1.5">
-                  <span>Progreso</span>
-                  <span className="text-[#c4aff5] font-semibold">50%</span>
-                </div>
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#3b1c8c] rounded-full" style={{ width: '50%' }} />
-                </div>
-              </div>
-            </div>
+            <ul className="flex flex-col gap-4">
+              {[
+                'Retoma cada curso donde lo dejaste',
+                'Sigue tu progreso lección a lección',
+                'Comenta y aprende a tu propio ritmo',
+              ].map((texto) => (
+                <li key={texto} className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <Check size={16} className="text-[#c4aff5]" />
+                  </span>
+                  <span className="text-sm text-[#c4aff5]">{texto}</span>
+                </li>
+              ))}
+            </ul>
 
-            <div className="flex flex-col gap-3">
-              <div className="flex gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={14} className="text-[#e59819]" fill="#e59819" />
-                ))}
-              </div>
-              <p className="text-sm text-[#9ba0a6] leading-relaxed italic">
-                "La calidad del contenido y los instructores son de otro nivel."
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#3b1c8c] flex items-center justify-center text-xs font-bold text-white">
-                  CR
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-white">Carlos Ramirez</p>
-                  <p className="text-[10px] text-[#9ba0a6]">Estudiante</p>
-                </div>
-              </div>
-            </div>
+            <div />
           </aside>
         ) : (
           <aside className="hidden lg:flex flex-col justify-between bg-[#3b1c8c] text-white p-10 w-[420px] flex-shrink-0">
             <div>
               <h2 className="text-3xl font-extrabold leading-tight mb-4 text-white">
-                Unete a<br />
+                Únete a<br />
                 <span className="text-[#c4aff5]">EduPlatform</span>
               </h2>
               <p className="text-[#c4aff5] text-sm leading-relaxed">
@@ -234,23 +206,23 @@ export function LoginRegister({ onSuccess, onCancel }) {
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <ul className="flex flex-col gap-4">
               {[
-                { stat: 'Catalogo', label: 'cursos con instructores' },
+                { stat: 'Catálogo', label: 'cursos con instructores' },
                 { stat: 'Progreso', label: 'siempre a la vista' },
-                { stat: 'Comenta', label: 'leccion a leccion' },
+                { stat: 'Comenta', label: 'lección a lección' },
               ].map((item) => (
-                <div key={item.label} className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                <li key={item.label} className="flex items-center gap-4">
+                  <span className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
                     <Check size={18} className="text-[#c4aff5]" />
-                  </div>
-                  <div>
-                    <div className="text-base font-extrabold text-white">{item.stat}</div>
-                    <div className="text-[#c4aff5] text-xs">{item.label}</div>
-                  </div>
-                </div>
+                  </span>
+                  <span>
+                    <span className="block text-base font-extrabold text-white">{item.stat}</span>
+                    <span className="block text-[#c4aff5] text-xs">{item.label}</span>
+                  </span>
+                </li>
               ))}
-            </div>
+            </ul>
 
             <div />
           </aside>
@@ -262,12 +234,12 @@ export function LoginRegister({ onSuccess, onCancel }) {
             <div className="bg-white border border-[#d1d7dc] shadow-sm p-8 flex flex-col gap-5">
               <div>
                 <h1 className="text-2xl font-extrabold text-[#1c1d1f]">
-                  {mode === 'login' ? 'Iniciar sesion' : 'Crear cuenta'}
+                  {mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
                 </h1>
                 <p className="text-sm text-[#6a6f73] mt-1">
                   {mode === 'login'
                     ? 'Bienvenido de vuelta. Accede a tu cuenta.'
-                    : 'Registrate como estudiante o instructor.'}
+                    : 'Regístrate como estudiante o instructor.'}
                 </p>
               </div>
 
@@ -288,7 +260,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="login-email" className={FIELD_LABEL}>
-                      Correo electronico
+                      Correo electrónico
                     </label>
                     <div className={FIELD_WRAP}>
                       <Mail size={16} className="text-[#6a6f73] flex-shrink-0" />
@@ -307,7 +279,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
 
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="login-password" className={FIELD_LABEL}>
-                      Contrasena
+                      Contraseña
                     </label>
                     <div className={FIELD_WRAP}>
                       <Lock size={16} className="text-[#6a6f73] flex-shrink-0" />
@@ -316,7 +288,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                         type={showPassword ? 'text' : 'password'}
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
-                        placeholder="Tu contrasena"
+                        placeholder="Tu contraseña"
                         className={FIELD}
                         required
                         disabled={loading}
@@ -325,14 +297,14 @@ export function LoginRegister({ onSuccess, onCancel }) {
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
                         className="text-[#6a6f73] hover:text-[#3b1c8c]"
-                        aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                   </div>
 
-                  <SubmitButton loading={loading} label="Iniciar sesion" />
+                  <SubmitButton loading={loading} label="Iniciar sesión" />
                 </form>
               ) : (
                 <form onSubmit={handleRegister} className="flex flex-col gap-4">
@@ -357,7 +329,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
 
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="reg-email" className={FIELD_LABEL}>
-                      Correo electronico
+                      Correo electrónico
                     </label>
                     <div className={FIELD_WRAP}>
                       <Mail size={16} className="text-[#6a6f73] flex-shrink-0" />
@@ -377,7 +349,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1.5">
                       <label htmlFor="reg-pass" className={FIELD_LABEL}>
-                        Contrasena
+                        Contraseña
                       </label>
                       <div className={FIELD_WRAP}>
                         <Lock size={16} className="text-[#6a6f73] flex-shrink-0" />

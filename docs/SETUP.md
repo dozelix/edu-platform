@@ -14,7 +14,7 @@ cd EduPlataform
 npm install
 ```
 
-`npm install` usa workspaces e instala todos los paquetes (frontend, main, shared) de una vez.
+`npm install` usa workspaces e instala todos los paquetes (frontend, main) de una vez.
 
 Stack: Electron 39, React 18, Vite 8, Tailwind v4, lucide-react, Mongoose 8, bcryptjs, Vitest.
 
@@ -38,7 +38,10 @@ manejo null-safe:
 mongosh "mongodb://localhost:27017" < seeds/eduplatform.seed.js
 ```
 
-Credenciales de prueba (contraseña `edu12345`): `estudiante1@edu.cl`, `instructor1@edu.cl`.
+Credenciales de prueba (contraseña `edu12345`):
+
+- Estudiante: `estudiante1@edu.cl` (o `alumno.test@edu.cl`)
+- Docente (instructor): `instructor1@edu.cl` (o `profe.test@edu.cl`)
 
 ## 3. Correr
 
@@ -64,4 +67,5 @@ npm run shot           # abre la app con Playwright y guarda capturas (verificac
 - [ ] Node 18+ y MongoDB corriendo en `localhost:27017`.
 - [ ] `npm install` desde la raíz.
 - [ ] Seed cargado en la base `eduplatform`.
-- [ ] `npm run dev` abre la ventana, conecta a la BD y el login entra con `estudiante1@edu.cl` / `edu12345`.
+- [ ] `npm run dev` abre la ventana y el login entra como estudiante (`estudiante1@edu.cl`) y como
+      docente (`instructor1@edu.cl`), contraseña `edu12345`.

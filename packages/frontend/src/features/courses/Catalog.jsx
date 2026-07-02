@@ -100,7 +100,7 @@ export default function Catalog({ user, onRequireLogin }) {
       return
     }
     try {
-      const res = await window.api.invoke('curso:listar', user?.id)
+      const res = await window.api.invoke('curso:listar')
       if (res.success) {
         setCursos(res.data)
         setEstado('ready')
@@ -147,7 +147,7 @@ export default function Catalog({ user, onRequireLogin }) {
     setInscribiendo(cursoId)
     setError('')
     try {
-      const res = await window.api.invoke('inscripcion:crear', { usuarioId: user.id, cursoId })
+      const res = await window.api.invoke('inscripcion:crear', { cursoId })
       if (res.success) {
         await cargar()
       } else {
@@ -163,7 +163,7 @@ export default function Catalog({ user, onRequireLogin }) {
   return (
     <>
       <header className="cat-header">
-        <h1 className="cat-header__title">Catalogo de Cursos</h1>
+        <h1 className="cat-header__title">Catálogo de Cursos</h1>
         <p className="cat-header__sub">Explora los cursos disponibles y avanza a tu ritmo</p>
       </header>
 

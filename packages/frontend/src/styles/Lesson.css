@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Lesson.css — Vista Lección (app autenticada, dark theme)
+   Lesson.css — Vista Lección (tema claro tipo Udemy)
    Prefijo: .les-
    ========================================================================== */
 
@@ -45,13 +45,6 @@
   background: #000;
 }
 
-.les-video__src {
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--color-text-muted);
-  word-break: break-all;
-}
-
 .les-video--empty {
   display: flex;
   align-items: center;
@@ -63,9 +56,27 @@
 .les-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   font-size: 13px;
   color: var(--color-text-muted);
+}
+
+/* Estado de la leccion: pildora neutra; verde cuando esta completada */
+.les-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+}
+
+.les-status--done {
+  background: var(--color-success-soft);
+  color: var(--color-success);
 }
 
 .les-content {
@@ -76,8 +87,10 @@
 }
 
 .les-content__title {
-  font-size: 15px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 10px;
 }
 
 /* Contenido de la leccion renderizado desde Markdown (Vista 4). */
@@ -216,7 +229,9 @@
 }
 
 .les-comments__title {
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
   margin-bottom: 12px;
 }
 

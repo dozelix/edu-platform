@@ -51,10 +51,11 @@ function App() {
   }
 
   // Inscribe al usuario en un curso; no bloquea el post-login si ya estaba inscrito o falla.
-  const enrollCourse = async (usuarioId, cursoId) => {
+  // El usuario a inscribir lo determina la sesion del proceso main, no el renderer.
+  const enrollCourse = async (cursoId) => {
     if (!globalThis.window?.api) return
     try {
-      await globalThis.window.api.invoke('inscripcion:crear', { usuarioId, cursoId })
+      await globalThis.window.api.invoke('inscripcion:crear', { cursoId })
     } catch {
       // Un fallo de inscripcion no debe impedir que el usuario entre a la app.
     }
@@ -66,7 +67,7 @@ function App() {
     setCurrentUser(user)
     setShowLogin(false)
     if (pendingCourseId) {
-      await enrollCourse(user.id, pendingCourseId)
+      await enrollCourse(pendingCourseId)
       setPendingCourseId(null)
     }
     setActiveNav('learning')

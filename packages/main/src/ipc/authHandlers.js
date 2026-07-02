@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import { Usuario } from '../db/models/Usuario.js'
+import { setUsuario, limpiarSesion } from '../session.js'
 
 // ======================================================
 // IPC Auth Handlers (Caso 3)
@@ -30,7 +31,9 @@ ipcMain.handle('auth:login', async (_, { email, password } = {}) => {
     if (!valido) {
       return { success: false, error: 'Email o contraseña incorrectos' }
     }
-    return { success: true, data: publico(usuario) }
+    const datos = publico(usuario)
+    setUsuario(datos)
+    return { success: true, data: datos }
   } catch (error) {
     return { success: false, error: error.message || 'Error en el login' }
   }
@@ -66,12 +69,15 @@ ipcMain.handle('auth:register', async (_, data = {}) => {
       tipo: tipo === 'instructor' ? 'instructor' : 'estudiante',
     })
 
-    return { success: true, data: publico(usuario) }
+    const datos = publico(usuario)
+    setUsuario(datos)
+    return { success: true, data: datos }
   } catch (error) {
     return { success: false, error: error.message || 'Error en el registro' }
   }
 })
 
 ipcMain.handle('auth:logout', async () => {
+  limpiarSesion()
   return { success: true, data: { message: 'Sesión cerrada' } }
 })

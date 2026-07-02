@@ -26,10 +26,10 @@ packages/main/src/
 ├── preload.cjs              puente IPC (window.api) con lista blanca de canales
 ├── db/connection.js         conexión a mongodb://localhost:27017/eduplatform
 ├── db/models/Usuario.js     colección `usuarios` (bcrypt)
+├── session.js               sesión del proceso main (identidad para los handlers)
 └── ipc/                     authHandlers, courseHandlers, learningHandlers,
                              lessonHandlers, instructorHandlers, dbHandlers
 
-packages/shared/src/ipc/channels.js   constantes de canales compartidas
 seeds/                                eduplatform.seed.js (mínimo/huérfanos), eduplatform.volume.seed.js
 ```
 
@@ -51,7 +51,7 @@ rechaza. Cada canal responde `{ success, data }` o `{ success: false, error }`.
 
 ## Modelo de datos (NoSQL por referencias)
 
-Transformación del esquema relacional de origen (`Documentacion docente/CASO_3_EduPlatform_schema.sql`)
+Transformación del esquema relacional de origen (`docs/docs_ev/CASO_3_EduPlatform_schema.sql`)
 a documentos con referencias (no embebidos) por la alta cardinalidad (100 cursos, ~1000 usuarios).
 
 ```

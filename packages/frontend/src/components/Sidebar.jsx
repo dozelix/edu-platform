@@ -1,4 +1,5 @@
 import React from 'react'
+import { ChevronRight } from 'lucide-react'
 import {
   IconGraduationCap,
   IconClose,
@@ -49,6 +50,7 @@ export default function Sidebar({
         </div>
 
         <nav className="db-sidebar__nav">
+          <p className="db-sidebar__nav-label">Menú</p>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.id}
@@ -60,43 +62,28 @@ export default function Sidebar({
                 {item.icon}
               </span>
               {item.label}
+              {activeNav === item.id && (
+                <ChevronRight size={14} className="db-sidebar__nav-chevron" aria-hidden="true" />
+              )}
             </button>
           ))}
         </nav>
 
         <div className="db-sidebar__footer">
           {dbStatus && (
-            <div
-              className="sidebar__status"
-              style={{
-                marginBottom: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                background: 'var(--color-surface-2)',
-                fontSize: '12px',
-                color: 'var(--color-text-muted)',
-              }}
-            >
+            <p className="db-sidebar__status" role="status">
               <span
-                className={`sidebar__status-dot ${dbStatus}`}
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  flexShrink: 0,
-                  background:
-                    dbStatus === 'connected'
-                      ? 'var(--color-success)'
-                      : dbStatus === 'error'
-                        ? 'var(--color-danger)'
-                        : 'var(--color-text-muted)',
-                }}
+                className={`db-sidebar__status-dot${
+                  dbStatus === 'connected'
+                    ? ' is-connected'
+                    : dbStatus === 'error'
+                      ? ' is-error'
+                      : ''
+                }`}
+                aria-hidden="true"
               />
-              <span>DB: {dbStatus.toUpperCase()}</span>
-            </div>
+              DB: {dbStatus.toUpperCase()}
+            </p>
           )}
           {isAuthenticated && (
             <button className="db-sidebar__logout" onClick={onLogout}>

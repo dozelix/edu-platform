@@ -46,7 +46,8 @@ mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
 npm run dev
 ```
 
-Login de prueba (contraseña `edu12345`): `estudiante1@edu.cl`, `instructor1@edu.cl`.
+Login de prueba (contraseña `edu12345`): estudiante `estudiante1@edu.cl`, docente/instructor
+`instructor1@edu.cl`.
 
 Guía completa en [docs/SETUP.md](docs/SETUP.md).
 
@@ -71,12 +72,13 @@ npm run shot           # verificación visual con Playwright (capturas)
 | [docs/SETUP.md](docs/SETUP.md) | Instalación, seed y ejecución. |
 | [SECURITY.md](SECURITY.md) | Política de seguridad y limitaciones conocidas. |
 
-La pauta oficial del caso está en `Documentacion docente/`.
+La pauta oficial del caso está en `docs/docs_ev/`.
 
 ## Seguridad
 
 - Lista blanca de canales IPC en el puente `preload.cjs`.
 - Content-Security-Policy por sesión (estricta en producción).
+- Identidad desde la sesión del proceso main: los handlers IPC no confían en el id del renderer.
 - La app no se cierra si falla la base de datos: muestra el error en las vistas.
 
 Detalle en [SECURITY.md](SECURITY.md).
