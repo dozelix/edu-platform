@@ -1,5 +1,5 @@
 import React from 'react'
-import { IconMenu, IconBell } from './icons/Icons'
+import { IconMenu } from './icons/Icons'
 
 export default function Topbar({ user, isAuthenticated, onLogin, setSidebarOpen }) {
   const hour = new Date().getHours()
@@ -32,17 +32,9 @@ export default function Topbar({ user, isAuthenticated, onLogin, setSidebarOpen 
 
       <div className="db-topbar__actions">
         {isAuthenticated ? (
-          <>
-            <button className="db-topbar__icon-btn" aria-label="Notificaciones">
-              <IconBell />
-              <span className="db-topbar__badge" aria-hidden="true">
-                3
-              </span>
-            </button>
-            <div className="db-topbar__avatar" title={`Perfil de ${user.name}`}>
-              {user.initials}
-            </div>
-          </>
+          <div className="db-topbar__avatar" title={`Perfil de ${user.name}`}>
+            {user.initials}
+          </div>
         ) : (
           <button className="db-topbar__login" onClick={onLogin}>
             Iniciar sesión

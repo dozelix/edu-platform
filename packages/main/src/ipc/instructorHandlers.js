@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
+import { getUsuario } from '../session.js'
 
 // ======================================================
 // IPC Instructor Handlers (Caso 3 — visibilidad del instructor)
@@ -9,12 +10,17 @@ import mongoose from 'mongoose'
 // Canal: instructor:resumen
 // ======================================================
 
-ipcMain.handle('instructor:resumen', async (_, usuarioId) => {
+ipcMain.handle('instructor:resumen', async () => {
   try {
-    if (!usuarioId) return { success: false, error: 'usuarioId requerido' }
+    // Solo el instructor en sesion ve su resumen; el renderer no elige de quien.
+    const usuario = getUsuario()
+    if (!usuario) return { success: false, error: 'No hay sesión iniciada' }
+    if (usuario.tipo !== 'instructor') {
+      return { success: false, error: 'No autorizado' }
+    }
     let uid
     try {
-      uid = new mongoose.Types.ObjectId(usuarioId)
+      uid = new mongoose.Types.ObjectId(usuario.id)
     } catch {
       return { success: false, error: 'usuarioId inválido' }
     }

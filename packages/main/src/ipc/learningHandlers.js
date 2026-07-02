@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
+import { getUsuarioId } from '../session.js'
 
 // ======================================================
 // IPC Learning Handlers (Caso 3 — Vista 3: Mi Aprendizaje)
@@ -9,10 +10,12 @@ import mongoose from 'mongoose'
 // Canales: aprendizaje:*
 // ======================================================
 
-ipcMain.handle('aprendizaje:listar', async (_, usuarioId) => {
+ipcMain.handle('aprendizaje:listar', async () => {
   try {
+    // La identidad sale de la sesion del main, no del renderer.
+    const usuarioId = getUsuarioId()
     if (!usuarioId) {
-      return { success: false, error: 'usuarioId requerido' }
+      return { success: false, error: 'No hay sesión iniciada' }
     }
     let uid
     try {
@@ -82,10 +85,15 @@ ipcMain.handle('aprendizaje:listar', async (_, usuarioId) => {
 
 // Inscribir al usuario en un curso. Valida que el curso exista (no se permite
 // inscribir a un curso inexistente) y evita inscripciones duplicadas.
-ipcMain.handle('inscripcion:crear', async (_, { usuarioId, cursoId } = {}) => {
+ipcMain.handle('inscripcion:crear', async (_, { cursoId } = {}) => {
   try {
-    if (!usuarioId || !cursoId) {
-      return { success: false, error: 'usuarioId y cursoId requeridos' }
+    // El usuario a inscribir es el de la sesion; el renderer solo elige el curso.
+    const usuarioId = getUsuarioId()
+    if (!usuarioId) {
+      return { success: false, error: 'No hay sesión iniciada' }
+    }
+    if (!cursoId) {
+      return { success: false, error: 'cursoId requerido' }
     }
     let uid, cid
     try {

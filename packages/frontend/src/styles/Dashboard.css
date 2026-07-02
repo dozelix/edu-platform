@@ -95,6 +95,16 @@
   flex: 1;
 }
 
+.db-sidebar__nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
 .db-sidebar__nav-item {
   display: flex;
   align-items: center;
@@ -118,8 +128,15 @@
 }
 
 .db-sidebar__nav-item.active {
-  background: rgba(59, 28, 140, 0.15);
-  color: var(--color-primary-light);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.db-sidebar__nav-chevron {
+  margin-left: auto;
+  display: flex;
+  flex-shrink: 0;
 }
 
 .db-sidebar__nav-icon {
@@ -133,6 +150,34 @@
   border-top: 1px solid var(--color-border);
   padding-top: 16px;
   margin-top: 8px;
+}
+
+.db-sidebar__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.db-sidebar__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-text-subtle);
+}
+
+.db-sidebar__status-dot.is-connected {
+  background: var(--color-success);
+}
+
+.db-sidebar__status-dot.is-error {
+  background: var(--color-danger);
 }
 
 .db-sidebar__logout {
@@ -331,10 +376,8 @@
 .db-page-header__title {
   font-size: 28px;
   font-weight: 800;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
   line-height: 1.1;
 }
 

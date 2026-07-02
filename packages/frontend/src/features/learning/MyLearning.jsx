@@ -11,6 +11,14 @@ export default function MyLearning({ user, onContinue }) {
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api | no-user
   const [error, setError] = useState('')
 
+  // Resumen real para el banner: cursos en progreso y completados del usuario.
+  const primerNombre = user?.nombre ? user.nombre.split(' ')[0] : ''
+  const iniciales = user?.nombre
+    ? user.nombre.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+    : ''
+  const enProgreso = filas.filter((f) => f.disponible && f.progreso > 0 && f.progreso < 100).length
+  const completados = filas.filter((f) => f.disponible && f.progreso === 100).length
+
   useEffect(() => {
     let activo = true
 
@@ -24,7 +32,7 @@ export default function MyLearning({ user, onContinue }) {
         return
       }
       try {
-        const res = await window.api.invoke('aprendizaje:listar', user.id)
+        const res = await window.api.invoke('aprendizaje:listar')
         if (!activo) return
         if (res.success) {
           setFilas(res.data)
@@ -64,6 +72,26 @@ export default function MyLearning({ user, onContinue }) {
       {estado === 'no-user' && <p className="lrn-msg">Inicia sesión para ver tu aprendizaje.</p>}
       {estado === 'error' && <p className="lrn-msg lrn-msg--error">Error: {error}</p>}
 
+      {estado === 'ready' && filas.length > 0 && (
+        <section className="lrn-hero" aria-label="Resumen de tu aprendizaje">
+          <div className="lrn-hero__text">
+            <p className="lrn-hero__greeting">Hola, {primerNombre}</p>
+            <p className="lrn-hero__sub">
+              Tienes <strong>{enProgreso}</strong> {enProgreso === 1 ? 'curso' : 'cursos'} en progreso
+              {completados > 0 && (
+                <>
+                  {' '}y <strong>{completados}</strong> {completados === 1 ? 'completado' : 'completados'}
+                </>
+              )}
+              .
+            </p>
+          </div>
+          <p className="lrn-hero__avatar" aria-hidden="true">
+            {iniciales}
+          </p>
+        </section>
+      )}
+
       {estado === 'ready' &&
         (filas.length === 0 ? (
           <p className="lrn-msg">Aún no estás inscrito en ningún curso.</p>
@@ -92,7 +120,10 @@ export default function MyLearning({ user, onContinue }) {
                         aria-valuemin={0}
                         aria-valuemax={100}
                       >
-                        <div className="lrn-progress__fill" style={{ width: `${f.progreso}%` }} />
+                        <div
+                          className={`lrn-progress__fill${f.progreso === 100 ? ' lrn-progress__fill--done' : ''}`}
+                          style={{ width: `${f.progreso}%` }}
+                        />
                       </div>
                       <span className="lrn-progress__pct">{f.progreso}%</span>
                     </div>

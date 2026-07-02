@@ -10,7 +10,7 @@ Documentos de esta carpeta:
 
 ## Vistas y su correspondencia con la pauta
 
-La pauta oficial está en `Documentacion docente/CASO_3_EduPlatform_Requerimientos_Frontend.pdf`.
+La pauta oficial está en `docs/docs_ev/CASO_3_EduPlatform_Requerimientos_Frontend.pdf`.
 
 | Vista (pauta) | Qué hace | Dónde |
 |---|---|---|
@@ -27,13 +27,14 @@ La pauta oficial está en `Documentacion docente/CASO_3_EduPlatform_Requerimient
   verificados en la interfaz real.
 - El contenido de la lección se renderiza desde Markdown con un componente propio (sin
   dependencias externas y sin `dangerouslySetInnerHTML`).
-- Endurecimiento aplicado: lista blanca de canales IPC, Content-Security-Policy, y la app no se
+- Endurecimiento aplicado: lista blanca de canales IPC, Content-Security-Policy, identidad desde la
+  sesión del proceso main (los handlers no confían en el id que envía el renderer), y la app no se
   cierra si falla la base de datos.
 - Pruebas automáticas con Vitest (`npm run test`).
 
 ## Material del caso
 
-En `Documentacion docente/` está la pauta oficial:
+En `docs/docs_ev/` está la pauta oficial:
 
 | Archivo | Qué es |
 |---|---|
@@ -45,5 +46,7 @@ Ante discrepancias, manda el código y la base real, luego el material del caso,
 
 ## Credenciales de prueba
 
-Base sembrada con el seed de volumen (contraseña `edu12345`): `estudiante1@edu.cl`,
-`instructor1@edu.cl`, `alumno.test@edu.cl`, `profe.test@edu.cl`.
+Base sembrada con el seed de volumen (contraseña `edu12345`):
+
+- Estudiantes: `estudiante1@edu.cl`, `alumno.test@edu.cl`
+- Docentes (instructor): `instructor1@edu.cl`, `profe.test@edu.cl`

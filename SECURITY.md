@@ -35,11 +35,14 @@ Resuelto:
   relajada en desarrollo para el HMR de Vite; habilita solo los orígenes usados.
 - **Fallo de BD no fatal**: `connectDB` ya no llama `process.exit(1)`; la ventana se abre y las
   vistas muestran el error en lugar de cerrar el proceso.
+- **Identidad desde la sesión del proceso main** (`packages/main/src/session.js`): los handlers
+  privilegiados derivan el usuario de la sesión fijada en `auth:login`/`auth:register`, no del id
+  que envía el renderer. `instructor:resumen` además exige `tipo === 'instructor'`. Un renderer
+  comprometido solo puede actuar como el usuario en sesión, no suplantar a otro.
 
 Limitaciones conocidas (aceptables para esta entrega de escritorio local):
-- Los handlers IPC confían en el id de usuario que envía el renderer (no hay sesión ni token). Por
-  ejemplo, `instructor:resumen` no verifica que el llamante sea ese instructor. Un despliegue
-  multiusuario requeriría un modelo de sesión.
+- La sesión vive en memoria del proceso main y es de una sola ventana; un despliegue
+  multiusuario/multiventana o cliente-servidor requeriría tokens firmados por petición.
 - Sin persistencia de sesión: al recargar el renderer hay que volver a iniciar sesión.
 
 ---
@@ -48,7 +51,8 @@ Limitaciones conocidas (aceptables para esta entrega de escritorio local):
 
 - [x] Whitelist de canales IPC en `preload.cjs`
 - [x] CSP (Content Security Policy) por sesión en Electron
-- [ ] Modelo de sesión/token para no confiar en el id que envía el renderer
+- [x] Sesión en el proceso main para no confiar en el id que envía el renderer (`session.js`);
+  tokens firmados por petición quedan pendientes solo para un despliegue multiusuario/cliente-servidor
 - [ ] Validar/sanitizar todo input en los handlers IPC (Main Process)
 - [ ] Configurar autenticación de MongoDB con credenciales fuertes
 - [ ] Deshabilitar dev tools en builds de producción: `webPreferences: { devTools: false }`
@@ -81,6 +85,6 @@ Recibirás confirmación en menos de 72 horas.
 - Nunca guardes credenciales, tokens o URIs de base de datos en el código. Usa `.env.local`
   (ignorado por git).
 - No deshabilites `contextIsolation` ni actives `nodeIntegration` bajo ninguna circunstancia.
-- Los canales IPC nuevos deben añadirse a `packages/shared/src/ipc/channels.js` y documentarse
-  en este archivo.
+- Los canales IPC nuevos deben añadirse a la whitelist de `packages/main/src/preload.cjs` y
+  registrarse con su `ipcMain.handle` en `packages/main/src/ipc/`; documentarlos en este archivo.
 - Toda validación de datos debe hacerse en el Main Process, nunca confiar solo en el renderer.

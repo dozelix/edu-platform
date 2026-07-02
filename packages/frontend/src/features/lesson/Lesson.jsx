@@ -33,7 +33,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     }
     try {
       const [lecRes, comRes] = await Promise.all([
-        window.api.invoke('leccion:obtener', { leccionId, usuarioId: user?.id }),
+        window.api.invoke('leccion:obtener', { leccionId }),
         window.api.invoke('comentario:listar', leccionId),
       ])
       if (lecRes.success) {
@@ -63,7 +63,6 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     try {
       const res = await window.api.invoke('comentario:crear', {
         leccionId,
-        usuarioId: user.id,
         texto: nuevo,
       })
       if (res.success) {
@@ -85,7 +84,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     setCompletando(true)
     setError('')
     try {
-      const res = await window.api.invoke('leccion:completar', { usuarioId: user.id, leccionId })
+      const res = await window.api.invoke('leccion:completar', { leccionId })
       if (res.success) {
         setLeccion((prev) => ({ ...prev, completada: true }))
       } else {
@@ -126,7 +125,6 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
             {leccion.videoUrl ? (
               <figure className="les-video">
                 <video controls src={leccion.videoUrl} />
-                <figcaption className="les-video__src">Fuente: {leccion.videoUrl}</figcaption>
               </figure>
             ) : (
               <figure className="les-video les-video--empty">Sin video</figure>
@@ -135,7 +133,9 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
             <div className="les-meta">
               <span>Lección {leccion.numero ?? '—'}</span>
               <span>Duración: {leccion.duracion != null ? `${leccion.duracion} min` : '—'}</span>
-              <span>{leccion.completada ? 'Completada' : 'Pendiente'}</span>
+              <span className={`les-status${leccion.completada ? ' les-status--done' : ''}`}>
+                {leccion.completada ? 'Completada' : 'Pendiente'}
+              </span>
             </div>
 
             <section className="les-content">
