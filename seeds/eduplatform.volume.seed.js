@@ -5,6 +5,7 @@
 //
 // Idempotente: limpia las colecciones antes de sembrar.
 // Cargar con:  mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+/* global use, db, ObjectId, print */
 use ('eduplatform');
 
 // Password de desarrollo "edu12345" (bcrypt) compartida, para iniciar sesion con cualquier usuario.
@@ -26,6 +27,32 @@ const ESPECIALIDADES = ['Python, Django','React, JavaScript','Node, APIs','Data 
 const ESTADOS_CURSO = ['activo','activo','activo','borrador','inactivo'];
 
 const nombreCompleto = () => pick(NOMBRES) + ' ' + pick(APELLIDOS);
+
+// Contenido de leccion en Markdown (Vista 4 pide "texto/markdown"): encabezados,
+// listas, negrita, codigo inline, bloque de codigo y un enlace.
+function contenidoMarkdown(n, tema) {
+  return [
+    '## Objetivos de la leccion ' + n,
+    '',
+    'En esta leccion de **' + tema + '** repasaras los conceptos clave y los aplicaras con ejercicios guiados.',
+    '',
+    '### Que veras',
+    '- Fundamentos de ' + tema,
+    '- Errores comunes y como evitarlos',
+    '- Un ejercicio practico paso a paso',
+    '',
+    '### Ejemplo',
+    '```',
+    '// ejemplo minimo de ' + tema,
+    'const resultado = practicar(' + n + ')',
+    'console.log(resultado)',
+    '```',
+    '',
+    'Usa `practicar()` con distintos valores para afianzar la idea.',
+    '',
+    '> Consejo: repite el ejemplo antes de pasar a la [documentacion oficial](https://developer.mozilla.org).',
+  ].join('\n');
+}
 
 // --- Usuarios: instructores (99 + 1 testeo) y estudiantes (999 + 1 testeo) ---
 // El perfil de instructor (bio, especialidades) se embebe en el usuario en vez de
@@ -79,7 +106,7 @@ cursos.forEach((curso) => {
       numero: n,
       orden: n,
       titulo: `Leccion ${n}: ${pick(TEMAS)}`,
-      contenido_text: `Contenido de la leccion ${n}. Conceptos y ejercicios.`,
+      contenido_text: contenidoMarkdown(n, curso.nombre.split(' ')[0]),
       video_url: randInt(0, 1) ? 'https://example.com/video.mp4' : null,
       duracion_minutos: randInt(8, 60),
     });

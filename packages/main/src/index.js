@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, session } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { connectDB, disconnectDB } from './db/connection.js'
@@ -12,6 +12,33 @@ dotenv.config({ path: path.join(__dirname, '../../../.env') })
 
 let mainWindow = null
 const isDev = process.env.NODE_ENV !== 'production'
+
+// Aplica una Content-Security-Policy a las respuestas de la sesion. En dev se relaja
+// (inline/eval y ws) para no romper el HMR de Vite; en prod queda estricta y solo
+// habilita los origenes que la app usa: Google Fonts, imagenes de Unsplash y la API
+// de tipos de cambio.
+function aplicarCSP() {
+  const script = isDev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self'"
+  const connect = isDev
+    ? "connect-src 'self' https://open.er-api.com ws://localhost:5173 http://localhost:5173"
+    : "connect-src 'self' https://open.er-api.com"
+  const csp = [
+    "default-src 'self'",
+    script,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https://images.unsplash.com",
+    // Los videos de leccion son externos (video_url); se permiten fuentes https.
+    "media-src 'self' https:",
+    connect,
+  ].join('; ')
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [csp] },
+    })
+  })
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -43,7 +70,9 @@ function createWindow() {
 }
 
 app.on('ready', async () => {
-  await connectDB() // Conexión a MongoDB Local nativa
+  aplicarCSP()
+  // Si la BD falla, connectDB no aborta: la ventana se abre y las vistas avisan del error.
+  await connectDB()
   createWindow()
 
   // Carga dinámica de handlers IPC nativos
@@ -52,6 +81,7 @@ app.on('ready', async () => {
   await import('./ipc/learningHandlers.js')
   await import('./ipc/lessonHandlers.js')
   await import('./ipc/instructorHandlers.js')
+  await import('./ipc/dbHandlers.js')
 })
 
 app.on('window-all-closed', async () => {

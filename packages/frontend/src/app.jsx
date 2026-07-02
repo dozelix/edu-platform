@@ -26,8 +26,21 @@ function App() {
     () => typeof globalThis.window !== 'undefined' && !!globalThis.window.api
   )
 
+  // Estado real de la BD (no decorativo): consulta db:estado al proceso main.
   useEffect(() => {
-    if (isElectron) setDbStatus('connected')
+    if (!isElectron) return
+    let activo = true
+    globalThis.window.api
+      .invoke('db:estado')
+      .then((res) => {
+        if (activo) setDbStatus(res?.data?.conectado ? 'connected' : 'error')
+      })
+      .catch(() => {
+        if (activo) setDbStatus('error')
+      })
+    return () => {
+      activo = false
+    }
   }, [isElectron])
 
   // Abre el login recordando (opcional) el curso que el usuario intentaba inscribir.

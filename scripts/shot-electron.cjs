@@ -19,10 +19,10 @@ const CREDS = {
 };
 
 // Captura la ventana con un nombre de paso y lo deja registrado en consola.
-async function shot(page, nombre) {
+async function shot(page, nombre, fullPage = false) {
   fs.mkdirSync(OUT, { recursive: true });
   const file = path.join(OUT, nombre + '.png');
-  await page.screenshot({ path: file, fullPage: false });
+  await page.screenshot({ path: file, fullPage });
   console.log('  shot -> ' + file);
 }
 
@@ -42,12 +42,14 @@ async function main() {
   page.on('console', (m) => console.log('[console] ' + m.text()));
   await page.waitForLoadState('domcontentloaded');
   console.log('  url: ' + page.url());
-  await shot(page, '0-carga-inicial');
-  // El devtools abierto en dev encoge el area util; se cierra para capturar limpio.
+  // El devtools abierto en dev deja el area util en 0 y rompe el screenshot; se cierra
+  // ANTES de la primera captura y se espera a que la ventana recupere su tamano.
   await app.evaluate(({ BrowserWindow }) => {
     const w = BrowserWindow.getAllWindows()[0];
     if (w) w.webContents.closeDevTools();
   });
+  await page.waitForTimeout(600);
+  await shot(page, '0-carga-inicial');
 
   // 1. Catalogo publico (sin sesion): deben verse las tarjetas y "Inscribirse".
   await page.waitForSelector('.cat-card__enroll', { timeout: 25000 });
@@ -75,6 +77,21 @@ async function main() {
     await page.waitForSelector('text=Mis cursos', { timeout: 15000 });
     await shot(page, '2-panel-instructor');
     console.log('OK: flujo instructor recorrido, capturas en ' + OUT);
+  } else if (FLOW === 'leccion') {
+    // Login estudiante -> Mi Aprendizaje -> Continuar -> Leccion (contenido en Markdown).
+    await page.click('.db-topbar__login');
+    await page.waitForSelector('#login-email', { timeout: 10000 });
+    await page.fill('#login-email', CREDS.email);
+    await page.fill('#login-password', CREDS.password);
+    await page.click('button[type="submit"]');
+    await page.waitForSelector('text=Mi Aprendizaje', { timeout: 15000 });
+    await shot(page, '2-mi-aprendizaje');
+    await page.locator('.lrn-continue:not([disabled])').first().click();
+    await page.waitForSelector('.les-content__body', { timeout: 15000 });
+    await shot(page, '3-leccion-markdown');
+    // Captura de pagina completa para ver todo el contenido markdown (listas, codigo, cita, enlace).
+    await shot(page, '4-leccion-contenido-completo', true);
+    console.log('OK: flujo leccion recorrido, capturas en ' + OUT);
   } else {
     // 2. Inscribirse sin sesion -> debe abrir el login.
     await page.locator('.cat-card__enroll').first().click();
