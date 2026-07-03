@@ -5,7 +5,7 @@
 ## Versiones soportadas
 
 | Versión | Soporte activo |
-|---|---|
+| --- | --- |
 | 1.0.x (actual) | Sí |
 | < 1.0 | No |
 
@@ -16,7 +16,7 @@
 EduPlataform implementa las recomendaciones de seguridad de la guía oficial de Electron:
 
 | Configuración | Valor | Propósito |
-|---|---|---|
+| --- | --- | --- |
 | `nodeIntegration` | `false` | El renderer no tiene acceso directo a Node.js |
 | `contextIsolation` | `true` | El contexto del renderer está aislado del preload |
 | `preload` | `preload.cjs` | Único puente de comunicación autorizado |
@@ -29,6 +29,7 @@ conocidos, mediante `contextBridge.exposeInMainWorld`.
 ## Estado de endurecimiento
 
 Resuelto:
+
 - **Whitelist de canales IPC** en `packages/main/src/preload.cjs`: `window.api.invoke` solo acepta
   canales conocidos; cualquier otro se rechaza.
 - **Content-Security-Policy** por sesión en `packages/main/src/index.js`: estricta en producción y
@@ -41,6 +42,7 @@ Resuelto:
   comprometido solo puede actuar como el usuario en sesión, no suplantar a otro.
 
 Limitaciones conocidas (aceptables para esta entrega de escritorio local):
+
 - La sesión vive en memoria del proceso main y es de una sola ventana; un despliegue
   multiusuario/multiventana o cliente-servidor requeriría tokens firmados por petición.
 - Sin persistencia de sesión: al recargar el renderer hay que volver a iniciar sesión.
