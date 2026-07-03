@@ -72,7 +72,7 @@ export default function InstructorDashboard({ user, onLogout }) {
   useEffect(() => {
     let activo = true
     async function cargar() {
-      if (!window.api) {
+      if (!globalThis.window?.api) {
         setEstado('no-api')
         return
       }
@@ -81,7 +81,7 @@ export default function InstructorDashboard({ user, onLogout }) {
         return
       }
       try {
-        const res = await window.api.invoke('instructor:resumen')
+        const res = await globalThis.window.api.invoke('instructor:resumen')
         if (!activo) return
         if (res.success) {
           setData(res.data)
