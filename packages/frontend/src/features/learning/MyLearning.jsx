@@ -23,7 +23,7 @@ export default function MyLearning({ user, onContinue }) {
     let activo = true
 
     async function cargar() {
-      if (!window.api) {
+      if (!globalThis.window?.api) {
         setEstado('no-api')
         return
       }
@@ -32,7 +32,7 @@ export default function MyLearning({ user, onContinue }) {
         return
       }
       try {
-        const res = await window.api.invoke('aprendizaje:listar')
+        const res = await globalThis.window.api.invoke('aprendizaje:listar')
         if (!activo) return
         if (res.success) {
           setFilas(res.data)
