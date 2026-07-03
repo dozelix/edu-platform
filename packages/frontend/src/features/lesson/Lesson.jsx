@@ -12,6 +12,16 @@ function formatearFecha(iso) {
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
+// Construye la URL de incrustacion de YouTube: usa el dominio estandar y pasa el
+// parametro origin (YouTube lo exige para validar el sitio que incrusta y reproducir).
+function urlEmbed(url) {
+  const m = /(?:youtube-nocookie\.com|youtube\.com)\/embed\/([\w-]+)/.exec(url || '')
+  if (!m) return url
+  const origin = typeof globalThis.location !== 'undefined' ? globalThis.location.origin : ''
+  const params = `rel=0&playsinline=1${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`
+  return `https://www.youtube.com/embed/${m[1]}?${params}`
+}
+
 export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   const [leccion, setLeccion] = useState(null)
   const [comentarios, setComentarios] = useState([])
@@ -20,6 +30,21 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   const [nuevo, setNuevo] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [completando, setCompletando] = useState(false)
+  // El video se incrusta desde YouTube, que necesita conexion. La leccion funciona
+  // igual sin red: si esta offline, el reproductor muestra un aviso en vez del iframe.
+  const [online, setOnline] = useState(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  )
+
+  useEffect(() => {
+    const marcar = () => setOnline(navigator.onLine)
+    globalThis.addEventListener?.('online', marcar)
+    globalThis.addEventListener?.('offline', marcar)
+    return () => {
+      globalThis.removeEventListener?.('online', marcar)
+      globalThis.removeEventListener?.('offline', marcar)
+    }
+  }, [])
 
   async function cargar() {
     if (!window.api) {
@@ -123,9 +148,20 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
         <div className="les-layout">
           <section className="les-player">
             {leccion.videoUrl ? (
-              <figure className="les-video">
-                <video controls src={leccion.videoUrl} />
-              </figure>
+              online ? (
+                <figure className="les-video">
+                  <iframe
+                    src={urlEmbed(leccion.videoUrl)}
+                    title={`Video de la lección: ${leccion.titulo}`}
+                    allow="accelerometer; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
+                </figure>
+              ) : (
+                <figure className="les-video les-video--empty">
+                  Video no disponible sin conexión. El resto de la lección funciona igual.
+                </figure>
+              )
             ) : (
               <figure className="les-video les-video--empty">Sin video</figure>
             )}
