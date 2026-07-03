@@ -95,12 +95,12 @@ export default function Catalog({ user, onRequireLogin }) {
   const [inscribiendo, setInscribiendo] = useState(null)
 
   async function cargar() {
-    if (!window.api) {
+    if (!globalThis.window?.api) {
       setEstado('no-api')
       return
     }
     try {
-      const res = await window.api.invoke('curso:listar')
+      const res = await globalThis.window.api.invoke('curso:listar')
       if (res.success) {
         setCursos(res.data)
         setEstado('ready')
@@ -143,11 +143,11 @@ export default function Catalog({ user, onRequireLogin }) {
   })
 
   const inscribir = async (cursoId) => {
-    if (!window.api || !user?.id) return
+    if (!globalThis.window?.api || !user?.id) return
     setInscribiendo(cursoId)
     setError('')
     try {
-      const res = await window.api.invoke('inscripcion:crear', { cursoId })
+      const res = await globalThis.window.api.invoke('inscripcion:crear', { cursoId })
       if (res.success) {
         await cargar()
       } else {
