@@ -15,11 +15,28 @@ function formatearFecha(iso) {
 // Construye la URL de incrustacion de YouTube: usa el dominio estandar y pasa el
 // parametro origin (YouTube lo exige para validar el sitio que incrusta y reproducir).
 function urlEmbed(url) {
-  const m = /(?:youtube-nocookie\.com|youtube\.com)\/embed\/([\w-]+)/.exec(url || '')
-  if (!m) return url
-  const origin = typeof globalThis.location !== 'undefined' ? globalThis.location.origin : ''
+  if (!url) return ''
+
+  const rawOrigin = typeof globalThis.location !== 'undefined' ? globalThis.location.origin : ''
+  const origin = rawOrigin && /^https?:\/\//.test(rawOrigin) ? rawOrigin : ''
   const params = `rel=0&playsinline=1${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`
-  return `https://www.youtube.com/embed/${m[1]}?${params}`
+
+  const extractIdFromYoutube = (input) => {
+    const embedMatch = /(?:youtube-nocookie\.com|youtube\.com)\/embed\/([\w-]+)/.exec(input)
+    if (embedMatch) return embedMatch[1]
+
+    const watchMatch = /[?&]v=([\w-]+)/.exec(input)
+    if (watchMatch) return watchMatch[1]
+
+    const shortMatch = /youtu\.be\/([\w-]+)/.exec(input)
+    if (shortMatch) return shortMatch[1]
+
+    return null
+  }
+
+  const id = extractIdFromYoutube(url)
+  if (!id) return url
+  return `https://www.youtube.com/embed/${id}?${params}`
 }
 
 export default function Lesson({ leccionId, user, onNavigate, onBack }) {
@@ -153,7 +170,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
                   <iframe
                     src={urlEmbed(leccion.videoUrl)}
                     title={`Video de la lección: ${leccion.titulo}`}
-                    allow="accelerometer; encrypted-media; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
                 </figure>

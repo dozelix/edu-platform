@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "homepage": "https://dozelix.github.io/EduPlataform",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "workspaces": [
     "packages/*"
   ],
@@ -10,9 +13,9 @@
     "dev:frontend": "vite --config packages/frontend/vite.config.js",
     "dev:main": "cross-env NODE_ENV=development electron packages/main/src/index.js",
     "dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && npm run dev:main\"",
-    "build:main": "echo 'No build step for main process'",
+    "build:main": "echo 'Main process does not require transpilation'",
     "build:frontend": "vite build --config packages/frontend/vite.config.js",
-    "build": "npm run build:main && npm run build:frontend",
+    "build": "npm run build:frontend",
     "electron": "cross-env NODE_ENV=production electron packages/main/src/index.js",
     "electron:dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron packages/main/src/index.js\"",
     "shot": "concurrently -k -s first \"npm run dev:frontend\" \"wait-on http://localhost:5173 && node scripts/shot-electron.cjs\"",
