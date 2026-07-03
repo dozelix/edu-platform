@@ -5,7 +5,7 @@ mongoose.set('strictQuery', true)
 // Conecta a MongoDB. Devuelve true/false segun el resultado.
 export async function connectDB() {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/eduplatform'
+    const mongoUri = process.env.MONGODB_URI
     await mongoose.connect(mongoUri, {
       autoIndex: false,
       maxPoolSize: 10,
