@@ -1,12 +1,16 @@
 import mongoose from 'mongoose'
 
-// Conecta a MongoDB. Ante un fallo NO mata el proceso: la ventana se abre igual y
-// las vistas muestran su estado de error (los handlers devuelven success:false),
-// en vez de cerrarse sin avisar. Devuelve true/false segun el resultado.
+mongoose.set('strictQuery', true)
+
+// Conecta a MongoDB. Devuelve true/false segun el resultado.
 export async function connectDB() {
   try {
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/eduplatform'
-    await mongoose.connect(mongoUri)
+    await mongoose.connect(mongoUri, {
+      autoIndex: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+    })
     console.log('MongoDB conectado')
     return true
   } catch (error) {
@@ -17,8 +21,10 @@ export async function connectDB() {
 
 export async function disconnectDB() {
   try {
-    await mongoose.disconnect()
-    console.log('MongoDB desconectado')
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect()
+      console.log('MongoDB desconectado')
+    }
   } catch (error) {
     console.error('Error desconectando de MongoDB:', error.message)
   }

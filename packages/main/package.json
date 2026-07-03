@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "echo 'No build step required'",
     "build:watch": "echo 'No build:watch step required'"
