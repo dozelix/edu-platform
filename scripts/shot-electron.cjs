@@ -88,6 +88,10 @@ async function main() {
     await shot(page, '2-mi-aprendizaje');
     await page.locator('.lrn-continue:not([disabled])').first().click();
     await page.waitForSelector('.les-content__body', { timeout: 15000 });
+    // Da tiempo a que el iframe de YouTube cargue su poster antes de capturar, para
+    // verificar de verdad que el video del tema se incrusta (no un recuadro en blanco).
+    await page.waitForSelector('.les-video iframe', { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(3500);
     await shot(page, '3-leccion-markdown');
     // Captura de pagina completa para ver todo el contenido markdown (listas, codigo, cita, enlace).
     await shot(page, '4-leccion-contenido-completo', true);

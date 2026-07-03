@@ -22,6 +22,24 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const NOMBRES = ['Carlos','Ana','Luis','Maria','Jose','Sofia','Diego','Valentina','Mateo','Camila','Javier','Daniela','Andres','Fernanda','Pablo','Catalina','Ignacio','Antonia','Felipe','Isidora'];
 const APELLIDOS = ['Ramirez','Soto','Lopez','Garcia','Martinez','Rojas','Munoz','Vargas','Castro','Morales','Silva','Reyes','Fuentes','Torres','Araya','Espinoza','Nunez','Gonzalez','Perez','Diaz'];
 const TEMAS = ['Python','JavaScript','React','Node','MongoDB','Django','SQL','Docker','Linux','UX','Data Science','Machine Learning','CSS','HTML','TypeScript','Vue','Angular','Go','Rust','Java'];
+
+// Video real (curso introductorio de YouTube) por tema, para que el video de la
+// leccion este relacionado con el tema del curso. Se usa el dominio youtube-nocookie
+// y se incrusta por iframe; la app funciona igual sin conexion (el reproductor cae a
+// "Video no disponible sin conexion" y el resto de la leccion sigue operativa).
+// IDs verificados como embebibles (canal freeCodeCamp.org salvo MongoDB, que no tiene
+// un curso unico en ese canal; ahi se usa Amigoscode, tambien embebible). rel=0 evita
+// que al terminar el video se muestren recomendaciones de otros canales.
+const YT = (id) => `https://www.youtube-nocookie.com/embed/${id}?rel=0`;
+const VIDEO_POR_TEMA = {
+  'Python': YT('rfscVS0vtbw'), 'JavaScript': YT('PkZNo7MFNFg'), 'React': YT('bMknfKXIFA8'),
+  'Node': YT('Oe421EPjeBE'), 'MongoDB': YT('Www6cTUymCY'), 'Django': YT('F5mRW0jo-U4'),
+  'SQL': YT('HXV3zeQKqGY'), 'Docker': YT('fqMOX6JJhGo'), 'Linux': YT('sWbUDq4S6Y8'),
+  'UX': YT('c9Wg6Cb_YlU'), 'Data Science': YT('ua-CiDNNj30'), 'Machine Learning': YT('i_LwzRVP7bg'),
+  'CSS': YT('OXGznpKZ_sA'), 'HTML': YT('kUMe1FH4CHE'), 'TypeScript': YT('SpwzRDUQ1GI'),
+  'Vue': YT('4deVCNJq3qc'), 'Angular': YT('3qBXWUpoPHo'), 'Go': YT('YS4e4q9oBaU'),
+  'Rust': YT('BpPEoZW5IiY'), 'Java': YT('grEKMHGYyns'),
+};
 const NIVELES = ['desde cero','intermedio','avanzado','practico','profesional'];
 const ESPECIALIDADES = ['Python, Django','React, JavaScript','Node, APIs','Data Science','UX/UI','DevOps','Bases de datos','Machine Learning'];
 const ESTADOS_CURSO = ['activo','activo','activo','borrador','inactivo'];
@@ -80,6 +98,7 @@ for (let i = 1; i <= 100; i++) {
   cursos.push({
     _id: ObjectId(),
     nombre: `${tema} ${pick(NIVELES)}`,
+    tema,
     descripcion: `Curso de ${tema} orientado a la practica.`,
     instructor_id: pick(instructores)._id,
     fecha_inicio: new Date(2026, randInt(0, 11), randInt(1, 28)),
@@ -105,9 +124,9 @@ cursos.forEach((curso) => {
       curso_id: curso._id,
       numero: n,
       orden: n,
-      titulo: `Leccion ${n}: ${pick(TEMAS)}`,
-      contenido_text: contenidoMarkdown(n, curso.nombre.split(' ')[0]),
-      video_url: randInt(0, 1) ? 'https://example.com/video.mp4' : null,
+      titulo: `Leccion ${n}: ${curso.tema}`,
+      contenido_text: contenidoMarkdown(n, curso.tema),
+      video_url: VIDEO_POR_TEMA[curso.tema] || null,
       duracion_minutos: randInt(8, 60),
     });
   }

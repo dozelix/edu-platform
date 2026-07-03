@@ -6,6 +6,14 @@ import * as dotenv from 'dotenv'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// Si el proceso padre cierra la tuberia de stdout/stderr (p. ej. al terminar el
+// arnes de dev), escribir un log lanza EPIPE. Sin este guard esa escritura durante
+// el cierre tumba el proceso main con una excepcion no capturada y su dialogo.
+process.stdout.on('error', (err) => {
+  if (err.code === 'EPIPE') process.exit(0)
+})
+process.stderr.on('error', () => {})
+
 // Load environment variables from workspace root
 dotenv.config({ path: path.join(__dirname, '../../../.env.local') })
 dotenv.config({ path: path.join(__dirname, '../../../.env') })
@@ -30,6 +38,8 @@ function aplicarCSP() {
     "img-src 'self' data: https://images.unsplash.com",
     // Los videos de leccion son externos (video_url); se permiten fuentes https.
     "media-src 'self' https:",
+    // El video de la leccion se incrusta por iframe de YouTube (dominio nocookie).
+    "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
     connect,
   ].join('; ')
 
@@ -69,6 +79,11 @@ function createWindow() {
 }
 
 app.on('ready', async () => {
+  // YouTube rechaza reproducir el video embebido si detecta "Electron" en el User-Agent
+  // (lo trata como navegador no soportado). Se elimina ese token para presentarse como
+  // Chrome estandar; asi el reproductor de la leccion funciona.
+  app.userAgentFallback = app.userAgentFallback.replace(/ Electron\/[\d.]+/, '')
+
   aplicarCSP()
   // Si la BD falla, connectDB no aborta: la ventana se abre y las vistas avisan del error.
   await connectDB()
