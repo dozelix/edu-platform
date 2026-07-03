@@ -27,17 +27,25 @@ const isDev = process.env.NODE_ENV !== 'production'
 // de tipos de cambio.
 function aplicarCSP() {
   const script = isDev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self'"
+  // El player embebido de YouTube descarga el video por fetch desde *.googlevideo.com y
+  // toma sus iconos de gstatic; sin estos origenes en connect-src el video queda cargando.
+  const ytData = 'https://*.googlevideo.com https://www.gstatic.com https://fonts.gstatic.com'
   const connect = isDev
-    ? "connect-src 'self' https://open.er-api.com ws://localhost:5173 http://localhost:5173"
-    : "connect-src 'self' https://open.er-api.com"
+    ? `connect-src 'self' https://open.er-api.com ${ytData} ws://localhost:5173 http://localhost:5173`
+    : `connect-src 'self' https://open.er-api.com ${ytData}`
   const csp = [
     "default-src 'self'",
     script,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https://images.unsplash.com",
-    // Los videos de leccion son externos (video_url); se permiten fuentes https.
-    "media-src 'self' https:",
+    // Se permiten los CDN de imagenes propios de YouTube (miniatura/avatar/iconos del player
+    // embebido). NO se habilitan doubleclick/googleads: esos son anuncios y se dejan bloqueados.
+    'img-src ' +
+      "'self' data: https://images.unsplash.com https://i.ytimg.com https://yt3.ggpht.com " +
+      'https://www.gstatic.com https://fonts.gstatic.com',
+    // El player de YouTube reproduce vía MediaSource con URLs blob:; hay que permitir blob:
+    // ademas de las fuentes https externas del video de la leccion.
+    "media-src 'self' https: blob:",
     // El video de la leccion se incrusta por iframe de YouTube (dominio nocookie).
     "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
     connect,

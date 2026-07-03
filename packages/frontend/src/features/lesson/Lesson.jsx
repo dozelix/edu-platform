@@ -12,14 +12,15 @@ function formatearFecha(iso) {
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
-// Construye la URL de incrustacion de YouTube: usa el dominio estandar y pasa el
-// parametro origin (YouTube lo exige para validar el sitio que incrusta y reproducir).
+// Construye la URL de incrustacion de YouTube en modo privado (youtube-nocookie.com):
+// evita las cookies de rastreo y la mayoria de las llamadas a anuncios que la CSP bloquea.
+// Pasa el parametro origin, que YouTube exige para validar el sitio que incrusta y reproducir.
 function urlEmbed(url) {
   const m = /(?:youtube-nocookie\.com|youtube\.com)\/embed\/([\w-]+)/.exec(url || '')
   if (!m) return url
   const origin = typeof globalThis.location !== 'undefined' ? globalThis.location.origin : ''
   const params = `rel=0&playsinline=1${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`
-  return `https://www.youtube.com/embed/${m[1]}?${params}`
+  return `https://www.youtube-nocookie.com/embed/${m[1]}?${params}`
 }
 
 export default function Lesson({ leccionId, user, onNavigate, onBack }) {
