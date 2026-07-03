@@ -104,15 +104,17 @@ app.on('ready', async () => {
     return
   }
 
-  createWindow()
-
-  // Carga dinámica de handlers IPC nativos
+  // Carga dinámica de handlers IPC nativos antes de mostrar la ventana.
+  // Evita la condición de carrera en que el renderer llama IPC antes de que los
+  // canales estén registrados.
   await import('./ipc/authHandlers.js')
   await import('./ipc/courseHandlers.js')
   await import('./ipc/learningHandlers.js')
   await import('./ipc/lessonHandlers.js')
   await import('./ipc/instructorHandlers.js')
   await import('./ipc/dbHandlers.js')
+
+  createWindow()
 })
 
 app.on('window-all-closed', async () => {

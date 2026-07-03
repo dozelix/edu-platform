@@ -64,7 +64,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   }, [])
 
   async function cargar() {
-    if (!window.api) {
+    if (!globalThis.window?.api) {
       setEstado('no-api')
       return
     }
@@ -75,8 +75,8 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     }
     try {
       const [lecRes, comRes] = await Promise.all([
-        window.api.invoke('leccion:obtener', { leccionId }),
-        window.api.invoke('comentario:listar', leccionId),
+        globalThis.window.api.invoke('leccion:obtener', { leccionId }),
+        globalThis.window.api.invoke('comentario:listar', leccionId),
       ])
       if (lecRes.success) {
         setLeccion(lecRes.data)
@@ -103,13 +103,13 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     setEnviando(true)
     setError('')
     try {
-      const res = await window.api.invoke('comentario:crear', {
+      const res = await globalThis.window.api.invoke('comentario:crear', {
         leccionId,
         texto: nuevo,
       })
       if (res.success) {
         setNuevo('')
-        const comRes = await window.api.invoke('comentario:listar', leccionId)
+        const comRes = await globalThis.window.api.invoke('comentario:listar', leccionId)
         if (comRes.success) setComentarios(comRes.data)
       } else {
         setError(res.error)
@@ -126,7 +126,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     setCompletando(true)
     setError('')
     try {
-      const res = await window.api.invoke('leccion:completar', { leccionId })
+      const res = await globalThis.window.api.invoke('leccion:completar', { leccionId })
       if (res.success) {
         setLeccion((prev) => ({ ...prev, completada: true }))
       } else {

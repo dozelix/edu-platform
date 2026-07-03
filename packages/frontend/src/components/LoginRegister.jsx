@@ -53,11 +53,11 @@ export function LoginRegister({ onSuccess, onCancel }) {
     setSuccess('')
     setLoading(true)
     try {
-      if (!window.api) {
+      if (!globalThis.window?.api) {
         setError('API no disponible')
         return
       }
-      const res = await window.api.invoke('auth:login', {
+      const res = await globalThis.window.api.invoke('auth:login', {
         email: loginEmail,
         password: loginPassword,
       })
@@ -81,11 +81,11 @@ export function LoginRegister({ onSuccess, onCancel }) {
     setSuccess('')
     setLoading(true)
     try {
-      if (!window.api) {
+      if (!globalThis.window?.api) {
         setError('API no disponible')
         return
       }
-      const res = await window.api.invoke('auth:register', {
+      const res = await globalThis.window.api.invoke('auth:register', {
         nombre: regNombre,
         email: regEmail,
         password: regPassword,
