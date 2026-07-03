@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session } from 'electron'
+import { app, BrowserWindow, dialog, session } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { connectDB, disconnectDB } from './db/connection.js'
@@ -62,6 +62,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'), // Inyecta el puente IPC seguro window.api
       nodeIntegration: false,
@@ -69,17 +70,23 @@ function createWindow() {
     },
   })
 
-  // En desarrollo carga el dev server de Vite (localhost:5173); en produccion, el
-  // bundle publicado en GitHub Pages.
-  const url = isDev
-    ? 'http://localhost:5173'
-    : 'https://dozelix.github.io/EduPlataform/'
+  // En desarrollo carga el dev server de Vite (localhost:5173); en producción, usa
+  // el bundle local generado por Vite.
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173')
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '../../frontend/dist/index.html'))
+  }
 
-  mainWindow.loadURL(url)
+  mainWindow.webContents.setUserAgent(app.userAgentFallback)
 
   if (isDev) {
     mainWindow.webContents.openDevTools()
   }
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow?.show()
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -88,22 +95,34 @@ function createWindow() {
 
 app.on('ready', async () => {
   // YouTube rechaza reproducir el video embebido si detecta "Electron" en el User-Agent
-  // (lo trata como navegador no soportado). Se elimina ese token para presentarse como
-  // Chrome estandar; asi el reproductor de la leccion funciona.
-  app.userAgentFallback = app.userAgentFallback.replace(/ Electron\/[\d.]+/, '')
+  // (lo trata como navegador no soportado). Reescribimos el UA a una variante Chrome.
+  const sanitizedUA = (app.userAgentFallback || '')
+    .replace(/ Electron\/[\d.]+/, '')
+    .replace(/Electron\/[\d.]+/, '')
+    .trim()
+
+  app.userAgentFallback = sanitizedUA ||
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
   aplicarCSP()
-  // Si la BD falla, connectDB no aborta: la ventana se abre y las vistas avisan del error.
-  await connectDB()
-  createWindow()
+  const dbConnected = await connectDB()
+  if (!dbConnected) {
+    dialog.showErrorBox('Error de inicio', 'No se pudo conectar a MongoDB. La aplicación se cerrará.')
+    app.quit()
+    return
+  }
 
-  // Carga dinámica de handlers IPC nativos
+  // Carga dinámica de handlers IPC nativos antes de mostrar la ventana.
+  // Evita la condición de carrera en que el renderer llama IPC antes de que los
+  // canales estén registrados.
   await import('./ipc/authHandlers.js')
   await import('./ipc/courseHandlers.js')
   await import('./ipc/learningHandlers.js')
   await import('./ipc/lessonHandlers.js')
   await import('./ipc/instructorHandlers.js')
   await import('./ipc/dbHandlers.js')
+
+  createWindow()
 })
 
 app.on('window-all-closed', async () => {
