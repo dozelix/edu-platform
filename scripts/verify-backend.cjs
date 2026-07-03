@@ -8,7 +8,7 @@
 
 const mongoose = require('mongoose');
 
-const URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/eduplatform';
+const URI = process.env.MONGODB_URI;
 let pass = 0;
 let fail = 0;
 

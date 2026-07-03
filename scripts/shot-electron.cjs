@@ -14,7 +14,7 @@ const OUT = process.env.SHOT_DIR || path.join(require('os').tmpdir(), 'eduplatfo
 const MAIN = path.join(__dirname, '..', 'packages', 'main', 'src', 'index.js');
 const FLOW = process.env.SHOT_FLOW || 'inscripcion';
 const CREDS = {
-  email: process.env.SHOT_EMAIL || 'estudiante1@edu.cl',
+  email: process.env.SHOT_EMAIL || 'alumno.test@edu.cl',
   password: process.env.SHOT_PASS || 'edu12345',
 };
 
@@ -88,10 +88,43 @@ async function main() {
     await shot(page, '2-mi-aprendizaje');
     await page.locator('.lrn-continue:not([disabled])').first().click();
     await page.waitForSelector('.les-content__body', { timeout: 15000 });
+    // Da tiempo a que el iframe de YouTube cargue su poster antes de capturar, para
+    // verificar de verdad que el video del tema se incrusta (no un recuadro en blanco).
+    await page.waitForSelector('.les-video iframe', { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(3500);
     await shot(page, '3-leccion-markdown');
     // Captura de pagina completa para ver todo el contenido markdown (listas, codigo, cita, enlace).
     await shot(page, '4-leccion-contenido-completo', true);
     console.log('OK: flujo leccion recorrido, capturas en ' + OUT);
+  } else if (FLOW === 'logout') {
+    // Login estudiante con inscripciones -> catalogo (debe verse "Inscrito") ->
+    // Cerrar sesion -> catalogo publico. Tras el logout NO debe quedar ningun curso
+    // marcado "Inscrito": prueba que auth:logout limpio la sesion del main y ya no se
+    // filtran los cursos del usuario anterior al siguiente que use la app.
+    await page.click('.db-topbar__login');
+    await page.waitForSelector('#login-email', { timeout: 10000 });
+    await page.fill('#login-email', CREDS.email);
+    await page.fill('#login-password', CREDS.password);
+    await page.click('button[type="submit"]');
+    await page.waitForSelector('text=Mi Aprendizaje', { timeout: 15000 });
+    // Ir al catalogo estando logueado y contar los cursos marcados "Inscrito".
+    await page.locator('.db-sidebar__nav-item', { hasText: 'Catálogo' }).click();
+    await page.waitForSelector('.cat-card__enroll', { timeout: 15000 });
+    await page.waitForTimeout(400);
+    const inscritosAntes = await page.locator('.cat-card__enroll--done').count();
+    await shot(page, '2-catalogo-logueado');
+    // Cerrar sesion desde el sidebar y volver a contar en el catalogo publico.
+    await page.click('.db-sidebar__logout');
+    await page.waitForSelector('.db-topbar__login', { timeout: 10000 });
+    await page.waitForSelector('.cat-card__enroll', { timeout: 15000 });
+    await page.waitForTimeout(400);
+    const inscritosDespues = await page.locator('.cat-card__enroll--done').count();
+    await shot(page, '3-catalogo-tras-logout');
+    console.log('  inscritos(logueado)=' + inscritosAntes + '  inscritos(tras logout)=' + inscritosDespues);
+    if (inscritosDespues !== 0) {
+      throw new Error('FUGA: quedaron ' + inscritosDespues + ' cursos marcados inscrito tras logout');
+    }
+    console.log('OK: logout limpia la sesion del main (0 fugas), capturas en ' + OUT);
   } else {
     // 2. Inscribirse sin sesion -> debe abrir el login.
     await page.locator('.cat-card__enroll').first().click();

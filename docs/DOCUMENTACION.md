@@ -46,7 +46,7 @@ Ante discrepancias, manda el código y la base real, luego el material del caso,
 
 ## Credenciales de prueba
 
-Base sembrada con el seed de volumen (contraseña `edu12345`):
+Base sembrada con el seed de volumen (contraseña `edu12345`). Las dos cuentas de testeo son:
 
-- Estudiantes: `estudiante1@edu.cl`, `alumno.test@edu.cl`
-- Docentes (instructor): `instructor1@edu.cl`, `profe.test@edu.cl`
+- Estudiante: `alumno.test@edu.cl`
+- Docente (instructor): `profe.test@edu.cl`

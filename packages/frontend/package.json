@@ -7,6 +7,11 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions"
+  ],
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
     "lucide-react": "^1.22.0",

@@ -24,7 +24,7 @@ packages/frontend/src/
 packages/main/src/
 ├── index.js                 arranque: CSP, connectDB, ventana y carga de handlers
 ├── preload.cjs              puente IPC (window.api) con lista blanca de canales
-├── db/connection.js         conexión a mongodb://localhost:27017/eduplatform
+├── db/connection.js         conexión a .env.local
 ├── db/models/Usuario.js     colección `usuarios` (bcrypt)
 ├── session.js               sesión del proceso main (identidad para los handlers)
 └── ipc/                     authHandlers, courseHandlers, learningHandlers,
