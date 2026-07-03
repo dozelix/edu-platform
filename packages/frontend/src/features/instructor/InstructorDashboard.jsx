@@ -109,14 +109,14 @@ export default function InstructorDashboard({ user, onLogout }) {
       icon: BookOpen,
       label: 'Cursos publicados',
       value: totales ? totales.cursos : '—',
-      color: '#3b1c8c',
+      color: '#dabf27',
       bg: 'var(--color-primary-soft)',
     },
     {
       icon: Users,
       label: 'Estudiantes',
       value: totales ? totales.estudiantes : '—',
-      color: '#2d8a4e',
+      color: '#ac2199',
       bg: 'var(--color-success-soft)',
     },
     {
@@ -153,7 +153,7 @@ export default function InstructorDashboard({ user, onLogout }) {
           </span>
           <hgroup>
             <p className="text-sm text-[#c4aff5] mb-0.5">Bienvenido, instructor</p>
-            <h1 className="text-2xl font-extrabold">{nombre}</h1>
+            <h1 className="text-2xl font-extrabold text-white">{nombre}</h1>
             <p className="text-sm text-[#c4aff5] mt-0.5">Tus cursos y quién está aprendiendo.</p>
           </hgroup>
         </section>
