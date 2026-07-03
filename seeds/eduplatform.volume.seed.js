@@ -23,13 +23,7 @@ const NOMBRES = ['Carlos','Ana','Luis','Maria','Jose','Sofia','Diego','Valentina
 const APELLIDOS = ['Ramirez','Soto','Lopez','Garcia','Martinez','Rojas','Munoz','Vargas','Castro','Morales','Silva','Reyes','Fuentes','Torres','Araya','Espinoza','Nunez','Gonzalez','Perez','Diaz'];
 const TEMAS = ['Python','JavaScript','React','Node','MongoDB','Django','SQL','Docker','Linux','UX','Data Science','Machine Learning','CSS','HTML','TypeScript','Vue','Angular','Go','Rust','Java'];
 
-// Video real (curso introductorio de YouTube) por tema, para que el video de la
-// leccion este relacionado con el tema del curso. Se usa el dominio youtube-nocookie
-// y se incrusta por iframe; la app funciona igual sin conexion (el reproductor cae a
-// "Video no disponible sin conexion" y el resto de la leccion sigue operativa).
-// IDs verificados como embebibles (canal freeCodeCamp.org salvo MongoDB, que no tiene
-// un curso unico en ese canal; ahi se usa Amigoscode, tambien embebible). rel=0 evita
-// que al terminar el video se muestren recomendaciones de otros canales.
+// Video real (curso introductorio de YouTube) por tema
 const YT = (id) => `https://www.youtube-nocookie.com/embed/${id}?rel=0`;
 const VIDEO_POR_TEMA = {
   'Python': YT('rfscVS0vtbw'), 'JavaScript': YT('PkZNo7MFNFg'), 'React': YT('bMknfKXIFA8'),
@@ -46,8 +40,6 @@ const ESTADOS_CURSO = ['activo','activo','activo','borrador','inactivo'];
 
 const nombreCompleto = () => pick(NOMBRES) + ' ' + pick(APELLIDOS);
 
-// Contenido de leccion en Markdown (Vista 4 pide "texto/markdown"): encabezados,
-// listas, negrita, codigo inline, bloque de codigo y un enlace.
 function contenidoMarkdown(n, tema) {
   return [
     '## Objetivos de la leccion ' + n,
@@ -73,8 +65,6 @@ function contenidoMarkdown(n, tema) {
 }
 
 // --- Usuarios: instructores (99 + 1 testeo) y estudiantes (999 + 1 testeo) ---
-// El perfil de instructor (bio, especialidades) se embebe en el usuario en vez de
-// una coleccion aparte: en NoSQL el perfil pertenece al instructor.
 const instructores = [
   { _id: ObjectId(), nombre: 'Profe Testeo', email: 'profe.test@edu.cl', tipo: 'instructor', password: PASS, bio: 'Cuenta de profesor para pruebas.', especialidades: 'Python, Django', fecha_registro: new Date() },
 ];
@@ -91,16 +81,48 @@ for (let i = 1; i <= 999; i++) {
 db.usuarios.insertMany(instructores);
 db.usuarios.insertMany(estudiantes);
 
-// --- Cursos: 100, cada uno referencia a un instructor por _id ---
+// --- Cursos: 100 (2 específicos para Profe Testeo, 98 aleatorios) ---
 const cursos = [];
-for (let i = 1; i <= 100; i++) {
+
+const idCursoTest1 = ObjectId();
+const idCursoTest2 = ObjectId();
+
+// Cursos para el profesor de testeo (garantiza que tenga contenido)
+cursos.push({
+  _id: idCursoTest1,
+  nombre: `Python para Pruebas Automatizadas`,
+  tema: 'Python',
+  descripcion: `Curso principal de prueba asignado al profesor de testeo.`,
+  instructor_id: instructores[0]._id,
+  fecha_inicio: new Date(2026, randInt(0, 11), randInt(1, 28)),
+  precio: 0,
+  portada_url: null,
+  estado: 'activo',
+  calificacion: 4.8,
+});
+
+cursos.push({
+  _id: idCursoTest2,
+  nombre: `Django desde cero (Testeo)`,
+  tema: 'Django',
+  descripcion: `Segundo curso del profesor de testeo para verificar el listado de múltiples cursos.`,
+  instructor_id: instructores[0]._id,
+  fecha_inicio: new Date(2026, randInt(0, 11), randInt(1, 28)),
+  precio: 19.99,
+  portada_url: null,
+  estado: 'activo',
+  calificacion: 4.5,
+});
+
+// Resto de los cursos aleatorios
+for (let i = 1; i <= 98; i++) {
   const tema = pick(TEMAS);
   cursos.push({
     _id: ObjectId(),
     nombre: `${tema} ${pick(NIVELES)}`,
     tema,
     descripcion: `Curso de ${tema} orientado a la practica.`,
-    instructor_id: pick(instructores)._id,
+    instructor_id: pick(instructores.slice(1))._id, // Excluimos al profe de testeo de la aleatoriedad
     fecha_inicio: new Date(2026, randInt(0, 11), randInt(1, 28)),
     precio: randInt(0, 1) ? Number((randInt(1999, 9999) / 100).toFixed(2)) : 0,
     portada_url: null,
@@ -133,10 +155,10 @@ cursos.forEach((curso) => {
 });
 db.lecciones.insertMany(lecciones);
 
-// --- Inscripciones: cada estudiante en 1 a 5 cursos distintos. El progreso se deriva
-//     de cuantas lecciones completo, para ser consistente con leccion:completar ---
+// --- Inscripciones: cada estudiante en 1 a 5 cursos distintos ---
 const inscripciones = [];
 const ESTADOS_INS = ['activo', 'activo', 'completado', 'abandonado'];
+
 function inscribir(estudianteId, cursoId, forzarProgreso) {
   const lecs = leccionesPorCurso[cursoId.toString()] || [];
   const completadasN = forzarProgreso != null ? Math.round((forzarProgreso / 100) * lecs.length) : randInt(0, lecs.length);
@@ -152,15 +174,23 @@ function inscribir(estudianteId, cursoId, forzarProgreso) {
     lecciones_completadas: completadas,
   });
 }
-// El alumno de testeo (estudiantes[0]) recibe inscripciones deterministas que cubren
-// los estados que verifica scripts/verify-backend.cjs: uno en progreso con la leccion 1
-// completada (curso incompleto), uno completado y uno sin empezar. Asi la verificacion
-// no depende del azar del sembrado. El resto de estudiantes se inscribe al azar.
-const cursosTest = cursos.slice(0, 3).map((c) => c._id);
-inscribir(estudiantes[0]._id, cursosTest[0], 40);
-inscribir(estudiantes[0]._id, cursosTest[1], 100);
-inscribir(estudiantes[0]._id, cursosTest[2], 0);
-estudiantes.slice(1).forEach((est) => {
+
+// 1. Inscripciones del alumno de testeo (estudiantes[0])
+// Lo inscribimos en los cursos del profe de testeo para cruzar la data de pruebas
+inscribir(estudiantes[0]._id, idCursoTest1, 40);
+inscribir(estudiantes[0]._id, idCursoTest2, 100);
+inscribir(estudiantes[0]._id, cursos[2]._id, 0); // Un curso aleatorio incompleto
+
+// 2. Alumnos de relleno obligados para los cursos del Profe de Testeo
+// Tomamos 10 estudiantes al azar para que el profesor tenga alumnos activos
+const alumnosDelProfe = estudiantes.slice(1, 11);
+alumnosDelProfe.forEach((est) => {
+  inscribir(est._id, idCursoTest1);
+  inscribir(est._id, idCursoTest2);
+});
+
+// 3. Inscripciones aleatorias para el resto de estudiantes
+estudiantes.slice(11).forEach((est) => {
   const n = randInt(1, 5);
   const elegidos = new Set();
   while (elegidos.size < n) elegidos.add(pick(cursos)._id.toString());
@@ -176,15 +206,14 @@ for (let i = 0; i < 800; i++) {
 }
 db.comentarios.insertMany(comentarios);
 
-// --- Calificaciones (fidelidad con el schema relacional): puntaje 0-100 por usuario/leccion.
-//     Muestra acotada; la app no la consume hoy, pero conserva la entidad del modelo ---
+// --- Calificaciones ---
 const calificaciones = [];
 for (let i = 0; i < 800; i++) {
   calificaciones.push({ _id: ObjectId(), usuario_id: pick(estudiantes)._id, leccion_id: pick(lecciones)._id, puntaje: randInt(0, 100), fecha: new Date() });
 }
 db.calificaciones.insertMany(calificaciones);
 
-// --- Indices en los campos de cruce (faltaban; el schema relacional los define) ---
+// --- Indices en los campos de cruce ---
 db.usuarios.createIndex({ email: 1 }, { unique: true });
 db.cursos.createIndex({ instructor_id: 1 });
 db.lecciones.createIndex({ curso_id: 1 });
