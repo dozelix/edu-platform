@@ -12,8 +12,9 @@ function formatearFecha(iso) {
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
-// Construye la URL de incrustacion de YouTube: usa el dominio estandar y pasa el
-// parametro origin (YouTube lo exige para validar el sitio que incrusta y reproducir).
+// Construye la URL de incrustacion de YouTube en modo privado (youtube-nocookie.com):
+// evita las cookies de rastreo y la mayoria de las llamadas a anuncios que la CSP bloquea.
+// Pasa el parametro origin, que YouTube exige para validar el sitio que incrusta y reproducir.
 function urlEmbed(url) {
   if (!url) return ''
 
