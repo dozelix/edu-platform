@@ -7,13 +7,12 @@ import path from 'path'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  base: './', // 👈 OBLIGATORIO: Fuerza a Vite a usar rutas relativas para GitHub Pages
+  base: './', // Rutas relativas, obligatorio para GitHub Pages
   root: __dirname,
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@shared': path.resolve(__dirname, '../shared/src')
+      '@': path.resolve(__dirname, 'src')
     }
   },
   server: {

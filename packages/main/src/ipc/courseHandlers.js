@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
+import { getUsuarioId } from '../session.js'
 
 // ======================================================
 // IPC Course Handlers
@@ -14,7 +15,7 @@ import mongoose from 'mongoose'
 // Un curso puede apuntar a un instructor inexistente (dato huérfano del seed);
 // en ese caso se muestra "Instructor desconocido" en vez de romper.
 // Si se pasa usuarioId, marca `inscrito` por curso (para el botón "Inscribirse").
-ipcMain.handle('curso:listar', async (_, usuarioId) => {
+ipcMain.handle('curso:listar', async () => {
   try {
     const db = mongoose.connection.db
     const cursos = await db.collection('cursos').find().toArray()
@@ -22,6 +23,8 @@ ipcMain.handle('curso:listar', async (_, usuarioId) => {
 
     const nombrePorId = new Map(instructores.map((u) => [u._id.toString(), u.nombre]))
 
+    // Catalogo publico: si hay sesion, marca los cursos ya inscritos del usuario.
+    const usuarioId = getUsuarioId()
     let inscritos = new Set()
     if (usuarioId) {
       try {

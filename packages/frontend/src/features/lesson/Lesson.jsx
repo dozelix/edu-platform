@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Markdown from './Markdown'
 
 // Vista 4 del Caso 3: Lección (Reproductor).
 // Muestra el video (si existe), contenido y duración (con fallback porque el seed
@@ -11,6 +12,17 @@ function formatearFecha(iso) {
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
+// Construye la URL de incrustacion de YouTube en modo privado (youtube-nocookie.com):
+// evita las cookies de rastreo y la mayoria de las llamadas a anuncios que la CSP bloquea.
+// Pasa el parametro origin, que YouTube exige para validar el sitio que incrusta y reproducir.
+function urlEmbed(url) {
+  const m = /(?:youtube-nocookie\.com|youtube\.com)\/embed\/([\w-]+)/.exec(url || '')
+  if (!m) return url
+  const origin = typeof globalThis.location !== 'undefined' ? globalThis.location.origin : ''
+  const params = `rel=0&playsinline=1${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`
+  return `https://www.youtube-nocookie.com/embed/${m[1]}?${params}`
+}
+
 export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   const [leccion, setLeccion] = useState(null)
   const [comentarios, setComentarios] = useState([])
@@ -19,6 +31,21 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   const [nuevo, setNuevo] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [completando, setCompletando] = useState(false)
+  // El video se incrusta desde YouTube, que necesita conexion. La leccion funciona
+  // igual sin red: si esta offline, el reproductor muestra un aviso en vez del iframe.
+  const [online, setOnline] = useState(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  )
+
+  useEffect(() => {
+    const marcar = () => setOnline(navigator.onLine)
+    globalThis.addEventListener?.('online', marcar)
+    globalThis.addEventListener?.('offline', marcar)
+    return () => {
+      globalThis.removeEventListener?.('online', marcar)
+      globalThis.removeEventListener?.('offline', marcar)
+    }
+  }, [])
 
   async function cargar() {
     if (!window.api) {
@@ -32,7 +59,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     }
     try {
       const [lecRes, comRes] = await Promise.all([
-        window.api.invoke('leccion:obtener', { leccionId, usuarioId: user?.id }),
+        window.api.invoke('leccion:obtener', { leccionId }),
         window.api.invoke('comentario:listar', leccionId),
       ])
       if (lecRes.success) {
@@ -62,7 +89,6 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     try {
       const res = await window.api.invoke('comentario:crear', {
         leccionId,
-        usuarioId: user.id,
         texto: nuevo,
       })
       if (res.success) {
@@ -84,7 +110,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     setCompletando(true)
     setError('')
     try {
-      const res = await window.api.invoke('leccion:completar', { usuarioId: user.id, leccionId })
+      const res = await window.api.invoke('leccion:completar', { leccionId })
       if (res.success) {
         setLeccion((prev) => ({ ...prev, completada: true }))
       } else {
@@ -99,19 +125,19 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
 
   return (
     <>
-      <div className="db-page-header">
-        <div>
+      <header className="db-page-header">
+        <hgroup>
           <h1 className="db-page-header__title">
             {leccion ? leccion.titulo : 'Lección'}
           </h1>
           <p className="db-page-header__sub">{leccion ? leccion.cursoNombre : ''}</p>
-        </div>
+        </hgroup>
         {onBack && (
           <button className="db-link-btn" onClick={onBack}>
             ← Mi Aprendizaje
           </button>
         )}
-      </div>
+      </header>
 
       {estado === 'loading' && <p className="les-msg">Cargando...</p>}
       {estado === 'no-api' && (
@@ -123,24 +149,42 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
         <div className="les-layout">
           <section className="les-player">
             {leccion.videoUrl ? (
-              <div className="les-video">
-                <video controls src={leccion.videoUrl} />
-                <p className="les-video__src">Fuente: {leccion.videoUrl}</p>
-              </div>
+              online ? (
+                <figure className="les-video">
+                  <iframe
+                    src={urlEmbed(leccion.videoUrl)}
+                    title={`Video de la lección: ${leccion.titulo}`}
+                    allow="accelerometer; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
+                </figure>
+              ) : (
+                <figure className="les-video les-video--empty">
+                  Video no disponible sin conexión. El resto de la lección funciona igual.
+                </figure>
+              )
             ) : (
-              <div className="les-video les-video--empty">Sin video</div>
+              <figure className="les-video les-video--empty">Sin video</figure>
             )}
 
             <div className="les-meta">
               <span>Lección {leccion.numero ?? '—'}</span>
               <span>Duración: {leccion.duracion != null ? `${leccion.duracion} min` : '—'}</span>
-              <span>{leccion.completada ? 'Completada' : 'Pendiente'}</span>
+              <span className={`les-status${leccion.completada ? ' les-status--done' : ''}`}>
+                {leccion.completada ? 'Completada' : 'Pendiente'}
+              </span>
             </div>
 
-            <div className="les-content">
+            <section className="les-content">
               <h2 className="les-content__title">Contenido</h2>
-              <p>{leccion.contenido || 'Sin contenido (no provisto en los datos).'}</p>
-            </div>
+              {leccion.contenido ? (
+                <div className="les-content__body">
+                  <Markdown texto={leccion.contenido} />
+                </div>
+              ) : (
+                <p>Sin contenido (no provisto en los datos).</p>
+              )}
+            </section>
 
             <div className="les-actions">
               <button className="les-btn" onClick={completar} disabled={leccion.completada || completando}>
