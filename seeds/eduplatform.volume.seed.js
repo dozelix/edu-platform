@@ -1,10 +1,11 @@
 // Seed de volumen del Caso 3 (issue #22): 100 cursos, 999 estudiantes, 99 profesores
 // + 1 profesor de testeo y 1 alumno de testeo. Transformacion del modelo relacional
 // (Documentacion docente/CASO_3_EduPlatform_schema.sql) a un modelo documental por referencia.
-// Decisiones de modelado en docs/MODELO_NOSQL.md.
+// Decisiones de modelado en docs/ARQUITECTURA.md.
 //
 // Idempotente: limpia las colecciones antes de sembrar.
 // Cargar con:  mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+/* global use, db, ObjectId, print */
 use ('eduplatform');
 
 // Password de desarrollo "edu12345" (bcrypt) compartida, para iniciar sesion con cualquier usuario.
@@ -21,11 +22,55 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const NOMBRES = ['Carlos','Ana','Luis','Maria','Jose','Sofia','Diego','Valentina','Mateo','Camila','Javier','Daniela','Andres','Fernanda','Pablo','Catalina','Ignacio','Antonia','Felipe','Isidora'];
 const APELLIDOS = ['Ramirez','Soto','Lopez','Garcia','Martinez','Rojas','Munoz','Vargas','Castro','Morales','Silva','Reyes','Fuentes','Torres','Araya','Espinoza','Nunez','Gonzalez','Perez','Diaz'];
 const TEMAS = ['Python','JavaScript','React','Node','MongoDB','Django','SQL','Docker','Linux','UX','Data Science','Machine Learning','CSS','HTML','TypeScript','Vue','Angular','Go','Rust','Java'];
+
+// Video real (curso introductorio de YouTube) por tema, para que el video de la
+// leccion este relacionado con el tema del curso. Se usa el dominio youtube-nocookie
+// y se incrusta por iframe; la app funciona igual sin conexion (el reproductor cae a
+// "Video no disponible sin conexion" y el resto de la leccion sigue operativa).
+// IDs verificados como embebibles (canal freeCodeCamp.org salvo MongoDB, que no tiene
+// un curso unico en ese canal; ahi se usa Amigoscode, tambien embebible). rel=0 evita
+// que al terminar el video se muestren recomendaciones de otros canales.
+const YT = (id) => `https://www.youtube-nocookie.com/embed/${id}?rel=0`;
+const VIDEO_POR_TEMA = {
+  'Python': YT('rfscVS0vtbw'), 'JavaScript': YT('PkZNo7MFNFg'), 'React': YT('bMknfKXIFA8'),
+  'Node': YT('Oe421EPjeBE'), 'MongoDB': YT('Www6cTUymCY'), 'Django': YT('F5mRW0jo-U4'),
+  'SQL': YT('HXV3zeQKqGY'), 'Docker': YT('fqMOX6JJhGo'), 'Linux': YT('sWbUDq4S6Y8'),
+  'UX': YT('c9Wg6Cb_YlU'), 'Data Science': YT('ua-CiDNNj30'), 'Machine Learning': YT('i_LwzRVP7bg'),
+  'CSS': YT('OXGznpKZ_sA'), 'HTML': YT('kUMe1FH4CHE'), 'TypeScript': YT('SpwzRDUQ1GI'),
+  'Vue': YT('4deVCNJq3qc'), 'Angular': YT('3qBXWUpoPHo'), 'Go': YT('YS4e4q9oBaU'),
+  'Rust': YT('BpPEoZW5IiY'), 'Java': YT('grEKMHGYyns'),
+};
 const NIVELES = ['desde cero','intermedio','avanzado','practico','profesional'];
 const ESPECIALIDADES = ['Python, Django','React, JavaScript','Node, APIs','Data Science','UX/UI','DevOps','Bases de datos','Machine Learning'];
 const ESTADOS_CURSO = ['activo','activo','activo','borrador','inactivo'];
 
 const nombreCompleto = () => pick(NOMBRES) + ' ' + pick(APELLIDOS);
+
+// Contenido de leccion en Markdown (Vista 4 pide "texto/markdown"): encabezados,
+// listas, negrita, codigo inline, bloque de codigo y un enlace.
+function contenidoMarkdown(n, tema) {
+  return [
+    '## Objetivos de la leccion ' + n,
+    '',
+    'En esta leccion de **' + tema + '** repasaras los conceptos clave y los aplicaras con ejercicios guiados.',
+    '',
+    '### Que veras',
+    '- Fundamentos de ' + tema,
+    '- Errores comunes y como evitarlos',
+    '- Un ejercicio practico paso a paso',
+    '',
+    '### Ejemplo',
+    '```',
+    '// ejemplo minimo de ' + tema,
+    'const resultado = practicar(' + n + ')',
+    'console.log(resultado)',
+    '```',
+    '',
+    'Usa `practicar()` con distintos valores para afianzar la idea.',
+    '',
+    '> Consejo: repite el ejemplo antes de pasar a la [documentacion oficial](https://developer.mozilla.org).',
+  ].join('\n');
+}
 
 // --- Usuarios: instructores (99 + 1 testeo) y estudiantes (999 + 1 testeo) ---
 // El perfil de instructor (bio, especialidades) se embebe en el usuario en vez de
@@ -34,14 +79,14 @@ const instructores = [
   { _id: ObjectId(), nombre: 'Profe Testeo', email: 'profe.test@edu.cl', tipo: 'instructor', password: PASS, bio: 'Cuenta de profesor para pruebas.', especialidades: 'Python, Django', fecha_registro: new Date() },
 ];
 for (let i = 1; i <= 99; i++) {
-  instructores.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `instructor${i}@edu.cl`, tipo: 'instructor', password: PASS, bio: 'Instructor de ' + pick(TEMAS) + '.', especialidades: pick(ESPECIALIDADES), fecha_registro: new Date() });
+  instructores.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `profe.bulk${i}@edu.cl`, tipo: 'instructor', password: PASS, bio: 'Instructor de ' + pick(TEMAS) + '.', especialidades: pick(ESPECIALIDADES), fecha_registro: new Date() });
 }
 
 const estudiantes = [
   { _id: ObjectId(), nombre: 'Alumno Testeo', email: 'alumno.test@edu.cl', tipo: 'estudiante', password: PASS, fecha_registro: new Date() },
 ];
 for (let i = 1; i <= 999; i++) {
-  estudiantes.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `estudiante${i}@edu.cl`, tipo: 'estudiante', password: PASS, fecha_registro: new Date() });
+  estudiantes.push({ _id: ObjectId(), nombre: nombreCompleto(), email: `alumno.bulk${i}@edu.cl`, tipo: 'estudiante', password: PASS, fecha_registro: new Date() });
 }
 db.usuarios.insertMany(instructores);
 db.usuarios.insertMany(estudiantes);
@@ -53,6 +98,7 @@ for (let i = 1; i <= 100; i++) {
   cursos.push({
     _id: ObjectId(),
     nombre: `${tema} ${pick(NIVELES)}`,
+    tema,
     descripcion: `Curso de ${tema} orientado a la practica.`,
     instructor_id: pick(instructores)._id,
     fecha_inicio: new Date(2026, randInt(0, 11), randInt(1, 28)),
@@ -78,9 +124,9 @@ cursos.forEach((curso) => {
       curso_id: curso._id,
       numero: n,
       orden: n,
-      titulo: `Leccion ${n}: ${pick(TEMAS)}`,
-      contenido_text: `Contenido de la leccion ${n}. Conceptos y ejercicios.`,
-      video_url: randInt(0, 1) ? 'https://example.com/video.mp4' : null,
+      titulo: `Leccion ${n}: ${curso.tema}`,
+      contenido_text: contenidoMarkdown(n, curso.tema),
+      video_url: VIDEO_POR_TEMA[curso.tema] || null,
       duracion_minutos: randInt(8, 60),
     });
   }
@@ -106,7 +152,15 @@ function inscribir(estudianteId, cursoId, forzarProgreso) {
     lecciones_completadas: completadas,
   });
 }
-estudiantes.forEach((est) => {
+// El alumno de testeo (estudiantes[0]) recibe inscripciones deterministas que cubren
+// los estados que verifica scripts/verify-backend.cjs: uno en progreso con la leccion 1
+// completada (curso incompleto), uno completado y uno sin empezar. Asi la verificacion
+// no depende del azar del sembrado. El resto de estudiantes se inscribe al azar.
+const cursosTest = cursos.slice(0, 3).map((c) => c._id);
+inscribir(estudiantes[0]._id, cursosTest[0], 40);
+inscribir(estudiantes[0]._id, cursosTest[1], 100);
+inscribir(estudiantes[0]._id, cursosTest[2], 0);
+estudiantes.slice(1).forEach((est) => {
   const n = randInt(1, 5);
   const elegidos = new Set();
   while (elegidos.size < n) elegidos.add(pick(cursos)._id.toString());
