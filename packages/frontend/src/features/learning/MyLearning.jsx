@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react' // 👈 Issue #27: Eliminado 'React'
-import Barra from './common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
+import Barra from '../../components/common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
 
 export default function MyLearning({ user, onContinue }) {
   const [filas, setFilas] = useState([])
