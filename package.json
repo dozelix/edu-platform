@@ -1,8 +1,8 @@
 {
-  "name": "EduPlataform",
-  "version": "1.0.0",
+  "name": "edu-platform",
+  "version": "2.0.0",
   "private": true,
-  "homepage": "https://dozelix.github.io/edu-plataform",
+  "homepage": "https://dozelix.github.io/edu-platform",
   "engines": {
     "node": ">=18.0.0"
   },
