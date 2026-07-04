@@ -189,8 +189,8 @@ export default function InstructorDashboard({ user, onLogout }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {curso.estudiantes.map((e, i) => (
-                            <tr key={i} className="border-b border-[#f7f9fa] last:border-0">
+                          {curso.estudiantes.map((e) => (
+                            <tr key={e.id || e.nombre} className="border-b border-[#f7f9fa] last:border-0">
                               <td className="px-5 py-2.5 text-[#1c1d1f]">{e.nombre}</td>
                               <td className="px-5 py-2.5">
                                 <Barra valor={e.progreso} />
