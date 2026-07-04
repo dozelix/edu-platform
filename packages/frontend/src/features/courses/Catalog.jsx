@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from 'react' // 👈 Issue #27: Eliminado 'React'
-import { Search, Star } from 'lucide-react'
-
-// Vista 2 del Caso 3: Catalogo de Cursos.
-// Lee los cursos reales desde Mongo via IPC (curso:listar), permite buscar por
-// nombre y filtrar por instructor. El handler resuelve el instructor null-safe.
-// Incluye inscripcion (inscripcion:crear) y conversion de precio a varias monedas
-// usando una API publica de tipos de cambio. Diseno tipo Udemy, marcado semantico.
+import { Search } from 'lucide-react'
+import Estrellas from './common/Estrellas.jsx' // 🛠️ Issue #21: Componente unificado
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
 
@@ -65,23 +60,6 @@ export function portadaDeCurso(nombre) {
   const gradiente = COVER_GRADIENTS[idx % COVER_GRADIENTS.length]
   const imagen = `${COVER_IMAGES[idx % COVER_IMAGES.length]}?w=480&h=270&fit=crop&auto=format`
   return { iniciales: iniciales || '?', tema, gradiente, imagen }
-}
-
-// Estrellas de calificacion (0-5) con lucide; las llenas se pintan, el resto en gris.
-function Estrellas({ valor }) {
-  const llenas = Math.round(valor)
-  return (
-    <span className="cat-card__stars" aria-hidden="true">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          size={13}
-          className={i <= llenas ? 'is-on' : 'is-off'}
-          fill={i <= llenas ? 'currentColor' : 'none'}
-        />
-      ))}
-    </span>
-  )
 }
 
 export default function Catalog({ user, onRequireLogin }) {
@@ -247,10 +225,7 @@ export default function Catalog({ user, onRequireLogin }) {
                       <p className="cat-card__instructor">{c.instructor}</p>
                       <p className="cat-card__rating">
                         {c.calificacion != null ? (
-                          <>
-                            <strong>{c.calificacion.toFixed(1)}</strong>
-                            <Estrellas valor={c.calificacion} />
-                          </>
+                          <Estrellas valor={c.calificacion} className="cat-card__stars" />
                         ) : (
                           <span className="cat-card__rating--none">Sin calificacion</span>
                         )}

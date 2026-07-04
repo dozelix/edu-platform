@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { BookOpen, Users, Star, LogOut, GraduationCap } from 'lucide-react'
+import Estrellas from './common/Estrellas.jsx' // 🛠️ Issue #21: Componente unificado
 
-// Vista del instructor (Caso 3): "permitir que instructores vean quien esta aprendiendo".
-// Muestra los cursos del instructor con sus estudiantes inscritos y el progreso real
-// (canal instructor:resumen, scopeado por instructor_id). Solo datos reales de la BD.
-
-// Barra de progreso accesible reutilizable.
+// Barra de progreso accessible reutilizable.
 function Barra({ valor }) {
   return (
     <span
@@ -19,32 +16,6 @@ function Barra({ valor }) {
         <span className="block h-full bg-[#3b1c8c] rounded-full" style={{ width: `${valor}%` }} />
       </span>
       <span className="text-xs font-semibold text-[#3e4143] w-9 text-right">{valor}%</span>
-    </span>
-  )
-}
-
-// Estrellas de calificacion (0-5); null-safe.
-function Estrellas({ valor }) {
-  if (valor == null) return <span className="text-sm text-[#9ba0a6]">Sin calificación</span>
-  const llenas = Math.round(valor)
-  
-  // 🛠️ Issue #26: .toFixed(1) se usa exclusivamente para renderizar la UI como string.
-  // Cualquier lógica aritmética interna o de ordenamiento debe usar la variable original de tipo number.
-  const valorFormateado = valor.toFixed(1)
-
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span className="text-sm font-bold text-[#b4690e]">{valorFormateado}</span>
-      <span aria-hidden="true" className="flex">
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star
-            key={s}
-            size={13}
-            className={s <= llenas ? 'text-[#e59819]' : 'text-[#d1d7dc]'}
-            fill={s <= llenas ? '#e59819' : '#d1d7dc'}
-          />
-        ))}
-      </span>
     </span>
   )
 }
@@ -110,7 +81,6 @@ export default function InstructorDashboard({ user, onLogout }) {
   const nombre = user?.nombre || 'Instructor'
   const totales = data?.totales
   
-  // 🛠️ Issue #26: Garantizar que si el total numérico existe, mantenga su formato de número o string descriptivo limpio
   const calificacionMostrada = totales?.calificacionPromedio != null
     ? Number(totales.calificacionPromedio).toFixed(1)
     : 'Sin calificación'
@@ -207,7 +177,7 @@ export default function InstructorDashboard({ user, onLogout }) {
                   <article key={curso.id} className="bg-white border border-[#d1d7dc]">
                     <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 border-b border-[#d1d7dc]">
                       <h3 className="text-base font-bold text-[#1c1d1f]">{curso.nombre}</h3>
-                      <Estrellas valor={curso.calificacion} />
+                      <Estrellas valor={curso.calificacion} className="inline-flex items-center gap-1" />
                       <EstadoBadge estado={curso.estado} />
                       <span className="ml-auto flex items-center gap-2 text-sm text-[#6a6f73]">
                         <Users size={15} /> {curso.nEstudiantes} estudiantes
