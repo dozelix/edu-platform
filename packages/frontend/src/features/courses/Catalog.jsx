@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react' // 👈 Issue #27: Eliminado 'React'
 import { Search, Star } from 'lucide-react'
 
 // Vista 2 del Caso 3: Catalogo de Cursos.
@@ -118,14 +118,19 @@ export default function Catalog({ user, onRequireLogin }) {
     cargar()
   }, [user])
 
+  // 🛠️ Issue #29: Modificado el useEffect para leer el endpoint desde variables de entorno.
   useEffect(() => {
     let activo = true
-    fetch('https://open.er-api.com/v6/latest/USD')
+    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL;
+
+    fetch(apiUrl)
       .then((r) => r.json())
       .then((d) => {
         if (activo && d && d.rates) setTasas(d.rates)
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Error in exchange rate request:', err)
+      })
     return () => {
       activo = false
     }
