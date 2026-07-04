@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BookOpen, Users, Star, LogOut, GraduationCap } from 'lucide-react'
-import Estrellas from './common/Estrellas.jsx'
-import Barra from './common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
+import Estrellas from '../../components/common/Estrellas.jsx'
+import Barra from '../../components/common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
 
 // Se elimina la función local 'function Barra({ valor }) { ... }' ya que se usa el import
 

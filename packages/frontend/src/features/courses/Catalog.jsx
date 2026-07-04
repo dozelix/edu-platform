@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react' // 👈 Issue #12: Añadido useCallback
 import { Search } from 'lucide-react'
-import Estrellas from './common/Estrellas.jsx' 
+import Estrellas from '../../components/common/Estrellas.jsx'
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
 
