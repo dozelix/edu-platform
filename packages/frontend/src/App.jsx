@@ -52,7 +52,8 @@ function App() {
 
   // Inscribe al usuario en un curso; no bloquea el post-login si ya estaba inscrito o falla.
   const enrollCourse = async (cursoId) => {
-    if (!globalThis.window?.api) return
+    // 🛠️ Issue #11: Corregido. Se utiliza el patrón unificado 'isElectron' en lugar del bypass directo a window.
+    if (!isElectron) return
     try {
       await globalThis.window.api.invoke('inscripcion:crear', { cursoId })
     } catch {
@@ -73,10 +74,13 @@ function App() {
 
   // Cierra la sesion y devuelve la app al catalogo publico.
   const handleLogout = async () => {
-    try {
-      await globalThis.window?.api?.invoke('auth:logout')
-    } catch {
-      // Un fallo al notificar el logout no debe bloquear el cierre en el renderer.
+    // 🛠️ Corrección por extensión: Se unifica también el flujo de logout usando 'isElectron'.
+    if (isElectron) {
+      try {
+        await globalThis.window.api.invoke('auth:logout')
+      } catch {
+        // Un fallo al notificar el logout no debe bloquear el cierre en el renderer.
+      }
     }
     setCurrentUser(null)
     setActiveNav('courses')
