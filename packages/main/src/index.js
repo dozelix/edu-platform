@@ -19,7 +19,10 @@ dotenv.config({ path: path.join(__dirname, '../../../.env.local') })
 dotenv.config({ path: path.join(__dirname, '../../../.env') })
 
 let mainWindow = null
-const isDev = process.env.NODE_ENV !== 'production'
+
+// 🛠️ Issue #16: Validación robusta y segura por defecto (fail-safe)
+// Asume siempre producción a menos que se declare explícitamente lo contrario.
+const isDev = process.env.NODE_ENV === 'development'
 
 // Aplica una Content-Security-Policy a las respuestas de la sesion. En dev se relaja
 // (inline/eval y ws) para no romper el HMR de Vite; en prod queda estricta y solo
