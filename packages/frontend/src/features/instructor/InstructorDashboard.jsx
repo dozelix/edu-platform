@@ -1,24 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { BookOpen, Users, Star, LogOut, GraduationCap } from 'lucide-react'
-import Estrellas from './common/Estrellas.jsx' // 🛠️ Issue #21: Componente unificado
+import Estrellas from './common/Estrellas.jsx'
+import Barra from './common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
 
-// Barra de progreso accessible reutilizable.
-function Barra({ valor }) {
-  return (
-    <span
-      className="inline-flex items-center gap-2"
-      role="progressbar"
-      aria-valuenow={valor}
-      aria-valuemin={0}
-      aria-valuemax={100}
-    >
-      <span className="block w-28 h-2 bg-[#f0ebff] rounded-full overflow-hidden">
-        <span className="block h-full bg-[#3b1c8c] rounded-full" style={{ width: `${valor}%` }} />
-      </span>
-      <span className="text-xs font-semibold text-[#3e4143] w-9 text-right">{valor}%</span>
-    </span>
-  )
-}
+// Se elimina la función local 'function Barra({ valor }) { ... }' ya que se usa el import
 
 function EstadoBadge({ estado }) {
   const activo = estado === 'activo'
