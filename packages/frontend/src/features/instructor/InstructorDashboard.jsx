@@ -27,9 +27,14 @@ function Barra({ valor }) {
 function Estrellas({ valor }) {
   if (valor == null) return <span className="text-sm text-[#9ba0a6]">Sin calificación</span>
   const llenas = Math.round(valor)
+  
+  // 🛠️ Issue #26: .toFixed(1) se usa exclusivamente para renderizar la UI como string.
+  // Cualquier lógica aritmética interna o de ordenamiento debe usar la variable original de tipo number.
+  const valorFormateado = valor.toFixed(1)
+
   return (
     <span className="inline-flex items-center gap-1">
-      <span className="text-sm font-bold text-[#b4690e]">{valor.toFixed(1)}</span>
+      <span className="text-sm font-bold text-[#b4690e]">{valorFormateado}</span>
       <span aria-hidden="true" className="flex">
         {[1, 2, 3, 4, 5].map((s) => (
           <Star
@@ -104,6 +109,12 @@ export default function InstructorDashboard({ user, onLogout }) {
 
   const nombre = user?.nombre || 'Instructor'
   const totales = data?.totales
+  
+  // 🛠️ Issue #26: Garantizar que si el total numérico existe, mantenga su formato de número o string descriptivo limpio
+  const calificacionMostrada = totales?.calificacionPromedio != null
+    ? Number(totales.calificacionPromedio).toFixed(1)
+    : 'Sin calificación'
+
   const stats = [
     {
       icon: BookOpen,
@@ -122,7 +133,7 @@ export default function InstructorDashboard({ user, onLogout }) {
     {
       icon: Star,
       label: 'Calificación promedio',
-      value: totales?.calificacionPromedio ?? 'Sin calificación',
+      value: calificacionMostrada,
       color: '#b4690e',
       bg: 'var(--color-warning-soft)',
     },
