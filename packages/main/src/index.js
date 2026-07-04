@@ -14,9 +14,11 @@ process.stdout.on('error', (err) => {
 })
 process.stderr.on('error', () => {})
 
-// Load environment variables from workspace root
-dotenv.config({ path: path.join(__dirname, '../../../.env.local') })
-dotenv.config({ path: path.join(__dirname, '../../../.env') })
+// 🛠️ Issue #14: Reemplazar rutas relativas fijas (../../../) por resolución dinámica basada en la raíz
+// app.getAppPath() apunta de forma consistente a la raíz donde reside el package.json de ejecución principal.
+const rootPath = app.getAppPath()
+dotenv.config({ path: path.join(rootPath, '.env.local') })
+dotenv.config({ path: path.join(rootPath, '.env') })
 
 let mainWindow = null
 
