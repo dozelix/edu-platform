@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react' // 👈 Issue #27: Eliminado 'React'
+import { useEffect, useMemo, useState, useCallback } from 'react' // 👈 Issue #12: Añadido useCallback
 import { Search } from 'lucide-react'
-import Estrellas from './common/Estrellas.jsx' // 🛠️ Issue #21: Componente unificado
+import Estrellas from './common/Estrellas.jsx' 
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
 
@@ -72,7 +72,8 @@ export default function Catalog({ user, onRequireLogin }) {
   const [tasas, setTasas] = useState({})
   const [inscribiendo, setInscribiendo] = useState(null)
 
-  async function cargar() {
+  // 🛠️ Issue #12: Memorización de la función con useCallback para estabilizar su referencia
+  const cargar = useCallback(async () => {
     if (!globalThis.window?.api) {
       setEstado('no-api')
       return
@@ -90,11 +91,12 @@ export default function Catalog({ user, onRequireLogin }) {
       setError(err.message)
       setEstado('error')
     }
-  }
+  }, [])
 
+  // 🛠️ Issue #12: Ahora el array de dependencias incluye de forma segura todas sus llamadas reactivas
   useEffect(() => {
     cargar()
-  }, [user])
+  }, [user, cargar])
 
   // 🛠️ Issue #29: Modificado el useEffect para leer el endpoint desde variables de entorno.
   useEffect(() => {
@@ -125,7 +127,8 @@ export default function Catalog({ user, onRequireLogin }) {
     return coincideNombre && coincideInstructor
   })
 
-  const inscribir = async (cursoId) => {
+  // Optimizada también con useCallback por consistencia estructural
+  const inscribir = useCallback(async (cursoId) => {
     if (!globalThis.window?.api || !user?.id) return
     setInscribiendo(cursoId)
     setError('')
@@ -141,7 +144,7 @@ export default function Catalog({ user, onRequireLogin }) {
     } finally {
       setInscribiendo(null)
     }
-  }
+  }, [user?.id, cargar])
 
   return (
     <>
