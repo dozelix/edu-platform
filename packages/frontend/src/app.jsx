@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react' // 👈 Quitamos 'React' por el issue #27
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -7,6 +7,10 @@ import MyLearning from './features/learning/MyLearning'
 import Lesson from './features/lesson/Lesson'
 import InstructorDashboard from './features/instructor/InstructorDashboard'
 import { LoginRegister } from './components/LoginRegister'
+
+// 👈 DECLARACIÓN FUERA DEL COMPONENTE: 
+// Se evalúa una sola vez al cargar el archivo, liberando al componente de esta carga.
+const isElectron = typeof globalThis.window !== 'undefined' && !!globalThis.window.api;
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null)
@@ -17,14 +21,10 @@ function App() {
   const [activeLeccionId, setActiveLeccionId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Flujo de inscripcion sin sesion (issue #21): al intentar inscribirse deslogueado
-  // se recuerda el curso y se pide login; tras entrar se inscribe y se va a Mi Aprendizaje.
   const [showLogin, setShowLogin] = useState(false)
   const [pendingCourseId, setPendingCourseId] = useState(null)
 
-  const [isElectron] = useState(
-    () => typeof globalThis.window !== 'undefined' && !!globalThis.window.api
-  )
+  // ❌ Se eliminó el useState de isElectron que estaba aquí
 
   // Estado real de la BD (no decorativo): consulta db:estado al proceso main.
   useEffect(() => {
@@ -41,7 +41,7 @@ function App() {
     return () => {
       activo = false
     }
-  }, [isElectron])
+  }, []) // 👈 Ahora puedes dejar el array de dependencias vacío [], ya que isElectron es una constante externa
 
   // Abre el login recordando (opcional) el curso que el usuario intentaba inscribir.
   const requireLogin = (cursoId = null) => {
@@ -51,7 +51,6 @@ function App() {
   }
 
   // Inscribe al usuario en un curso; no bloquea el post-login si ya estaba inscrito o falla.
-  // El usuario a inscribir lo determina la sesion del proceso main, no el renderer.
   const enrollCourse = async (cursoId) => {
     if (!globalThis.window?.api) return
     try {
@@ -61,8 +60,7 @@ function App() {
     }
   }
 
-  // Tras un login/registro exitoso: si habia un curso pendiente lo inscribe y lleva
-  // al usuario a la seccion de aprendizaje del curso.
+  // Tras un login/registro exitoso
   const handleLoginSuccess = async (user) => {
     setCurrentUser(user)
     setShowLogin(false)
@@ -73,10 +71,7 @@ function App() {
     setActiveNav('learning')
   }
 
-  // Cierra la sesion y devuelve la app al catalogo publico. Limpia tambien la
-  // sesion del proceso main (auth:logout): si no, el main seguiria autenticado y
-  // los handlers que usan la sesion (p. ej. curso:listar) filtrarian datos del
-  // usuario anterior al siguiente que use la app.
+  // Cierra la sesion y devuelve la app al catalogo publico.
   const handleLogout = async () => {
     try {
       await globalThis.window?.api?.invoke('auth:logout')
@@ -89,7 +84,7 @@ function App() {
     setSidebarOpen(false)
   }
 
-  // ── Pantalla de login (inscripcion sin sesion o "Iniciar sesion") ──
+  // ── Pantalla de login ──
   if (showLogin) {
     return (
       <LoginRegister
@@ -102,7 +97,7 @@ function App() {
     )
   }
 
-  // Los instructores tienen su propio panel: ven sus cursos, estudiantes y progreso.
+  // Los instructores tienen su propio panel
   if (isAuthenticated && currentUser.tipo === 'instructor') {
     return <InstructorDashboard user={currentUser} onLogout={handleLogout} />
   }
@@ -119,7 +114,6 @@ function App() {
       }
     : null
 
-  // Las vistas privadas exigen sesion; deslogueado se redirige al login.
   const handleNav = (id) => {
     if (!isAuthenticated && (id === 'learning' || id === 'lesson')) {
       requireLogin()
