@@ -54,6 +54,9 @@ function aplicarCSP() {
     connect,
   ].join('; ')
 
+  // 🛠️ Issue #15: Se limpian los posibles listeners previos antes de registrar uno nuevo
+  session.defaultSession.webRequest.onHeadersReceived(null)
+
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [csp] },
