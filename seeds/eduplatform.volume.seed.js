@@ -4,12 +4,15 @@
 // Decisiones de modelado en docs/ARQUITECTURA.md.
 //
 // Idempotente: limpia las colecciones antes de sembrar.
-// Cargar con:  mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
-/* global use, db, ObjectId, print */
+// Cargar con:  export SEED_PASSWORD_HASH='$2a$10$...' && mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+/* global use, db, ObjectId, print, process */
 use ('eduplatform');
 
-// Password de desarrollo "edu12345" (bcrypt) compartida, para iniciar sesion con cualquier usuario.
-const PASS = '$2a$10$u5bCbkxGWzJlxymEoyt7BeX/TDTQON7pcQkK7.a52hJ58N/y8cmo6';
+// 🛠️ Issue #25: Seguridad comprometida. Se remueve el hash quemado y se lee del entorno del sistema.
+// Fallback dinámico temporal para que el script no falle si no se define, simulando la misma firma estructural.
+const PASS = (typeof process !== 'undefined' && process.env && process.env.SEED_PASSWORD_HASH) 
+  ? process.env.SEED_PASSWORD_HASH 
+  : '$2a$10$DUMMYHASHFORLOCALDEVELOPMENTONLYNOTREALPASSWORDUNUSABLE67890';
 
 // Limpieza para un sembrado reproducible.
 ['usuarios', 'cursos', 'lecciones', 'inscripciones', 'comentarios', 'calificaciones'].forEach(
@@ -64,7 +67,7 @@ function contenidoMarkdown(n, tema) {
   ].join('\n');
 }
 
-// --- Usuarios: instructores (99 + 1 testeo) y estudiantes (999 + 1 testeo) ---
+// --- Usuarios: instructores (99 + 1 testeo) und estudiantes (999 + 1 testeo) ---
 const instructores = [
   { _id: ObjectId(), nombre: 'Profe Testeo', email: 'profe.test@edu.cl', tipo: 'instructor', password: PASS, bio: 'Cuenta de profesor para pruebas.', especialidades: 'Python, Django', fecha_registro: new Date() },
 ];
@@ -229,4 +232,3 @@ print('  lecciones: ' + db.lecciones.countDocuments());
 print('  inscripciones: ' + db.inscripciones.countDocuments());
 print('  comentarios: ' + db.comentarios.countDocuments());
 print('  calificaciones: ' + db.calificaciones.countDocuments());
-print('Testeo: profe.test@edu.cl / alumno.test@edu.cl (password edu12345)');
