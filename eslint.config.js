@@ -1,11 +1,15 @@
-const js = require('@eslint/js');
-const globals = require('globals');
+import js from '@eslint/js';
+import globals from 'globals';
+import reactPlugin from 'eslint-plugin-react';
 
-module.exports = [
+export default [
   { ignores: ['dist', 'dist-gh', 'release', '**/node_modules/**'] },
   js.configs.recommended,
   {
     files: ['packages/*/src/**/*.{js,jsx}'],
+    plugins: {
+      react: reactPlugin,
+    },
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
@@ -17,9 +21,13 @@ module.exports = [
         ecmaFeatures: { jsx: true },
       },
     },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     rules: {
-      // React no se referencia explícitamente con el JSX transform moderno (Vite),
-      // y permitimos variables/argumentos intencionalmente descartados con prefijo "_".
+      'react/react-in-jsx-scope': 'off',
       'no-unused-vars': [
         'error',
         { varsIgnorePattern: '^(React|_)', argsIgnorePattern: '^_' },
@@ -27,19 +35,7 @@ module.exports = [
     },
   },
   {
-    // Preload de Electron: CommonJS (require), por eso usa extensión .cjs.
     files: ['packages/*/src/**/*.cjs'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    // Scripts de utilidad/verificación que corren en Node (require, process, console).
-    files: ['scripts/**/*.{js,cjs}'],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'commonjs',
