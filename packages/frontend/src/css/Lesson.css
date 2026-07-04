@@ -38,7 +38,7 @@
   overflow: hidden;
 }
 
-.les-video video,
+/* 🛠️ Issue #30: Eliminado el selector muerto '.les-video video' */
 .les-video iframe {
   width: 100%;
   display: block;
