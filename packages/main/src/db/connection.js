@@ -6,6 +6,10 @@ mongoose.set('strictQuery', true)
 export async function connectDB() {
   try {
     const mongoUri = process.env.MONGODB_URI
+    if (!mongoUri) {
+      console.error('MONGODB_URI no está definida. Revisa la configuración y docs/SETUP.md')
+      return false
+    }
     await mongoose.connect(mongoUri, {
       autoIndex: false,
       maxPoolSize: 10,
