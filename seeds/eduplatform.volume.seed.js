@@ -12,7 +12,7 @@ use ('eduplatform');
 // Fallback dinámico temporal para que el script no falle si no se define, simulando la misma firma estructural.
 const PASS = (typeof process !== 'undefined' && process.env && process.env.SEED_PASSWORD_HASH) 
   ? process.env.SEED_PASSWORD_HASH 
-  : '$2a$10$DUMMYHASHFORLOCALDEVELOPMENTONLYNOTREALPASSWORDUNUSABLE67890';
+  : '$2a$12$Kmuq//rN49WvTlnUbbxxpOKj9vpY9m7gUaBEvTDiSt21rduNDfwgm';
 
 // Limpieza para un sembrado reproducible.
 ['usuarios', 'cursos', 'lecciones', 'inscripciones', 'comentarios', 'calificaciones'].forEach(
