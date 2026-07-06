@@ -13,16 +13,14 @@ process.stdout.on('error', (err) => {
 })
 process.stderr.on('error', () => {})
 
-// 🛠️ Issue #14: Reemplazar rutas relativas fijas (../../../) por resolución dinámica basada en la raíz
+// 🛠️ Issue #14: Resolución dinámica de entornos ultra-limpia basada en CWD (desarrollo) y AppPath (producción)
 const isDev = process.env.NODE_ENV === 'development'
-const rootPath = app.getAppPath()
 
-// Si es dev, subimos niveles desde 'packages/main' hasta la raíz del monorrepo
+// ⚡ FIX: Usar process.cwd() en desarrollo apunta directo a la raíz del monorrepo sin importar el comportamiento de Electron
 const envPath = isDev 
-  ? path.join(rootPath, '../../.env.local') 
-  : path.join(rootPath, '.env.local')
+  ? path.join(process.cwd(), '.env.local') 
+  : path.join(app.getAppPath(), '.env.local')
 
-// ⚡ FIX: Asegurar la carga de variables de entorno ANTES de importar la base de datos
 dotenv.config({ path: envPath })
 
 let mainWindow = null
