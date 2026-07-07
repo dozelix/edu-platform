@@ -12,12 +12,12 @@ function EstadoBadge({ estado }) {
       className="inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full"
       style={{
         background: activo ? 'var(--color-success-soft)' : '#f7f9fa',
-        color: activo ? '#2d8a4e' : '#6a6f73',
+        color: activo ? 'var(--color-success)' : 'var(--color-text-muted)',
       }}
     >
       <span
         className="w-1.5 h-1.5 rounded-full"
-        style={{ background: activo ? '#2d8a4e' : '#9ba0a6' }}
+        style={{ background: activo ? 'var(--color-success)' : 'var(--color-text-subtle)' }}
         aria-hidden="true"
       />
       {estado || 'sin estado'}
@@ -27,7 +27,7 @@ function EstadoBadge({ estado }) {
 
 export default function InstructorDashboard({ user, onLogout }) {
   const [data, setData] = useState(null)
-  const [estado, setEstado] = useState('loading') // loading | ready | error | no-api | no-user
+  const [estado, setEstado] = useState('loading')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -95,17 +95,17 @@ export default function InstructorDashboard({ user, onLogout }) {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f7f9fa] flex flex-col" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <header className="bg-white border-b border-[#d1d7dc] sticky top-0 z-40">
+    <div className="min-h-screen bg-body flex flex-col" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <header className="bg-white border-b border-default sticky top-0 z-40">
         <div className="max-w-[1100px] mx-auto px-6 h-14 flex items-center gap-3">
-          <BookOpen size={20} className="text-[#3b1c8c]" />
-          <span className="text-lg font-extrabold text-[#3b1c8c]">EduPlatform</span>
-          <span className="text-xs font-semibold text-white bg-[#3b1c8c] px-2 py-0.5 rounded-full">
+          <BookOpen size={20} className="text-primary" />
+          <span className="text-lg font-extrabold text-primary">EduPlatform</span>
+          <span className="text-xs font-semibold text-white bg-primary px-2 py-0.5 rounded-full">
             Instructor
           </span>
           <button
             onClick={onLogout}
-            className="ml-auto inline-flex items-center gap-1.5 text-sm text-[#6a6f73] hover:text-[#e53935] border border-[#d1d7dc] hover:border-[#e53935] px-3 py-1.5 transition-colors"
+            className="ml-auto inline-flex items-center gap-1.5 text-sm text-muted-color hover:text-danger border border-default hover:border-danger px-3 py-1.5 transition-colors"
           >
             <LogOut size={14} /> Cerrar sesión
           </button>
@@ -118,45 +118,45 @@ export default function InstructorDashboard({ user, onLogout }) {
             <GraduationCap size={24} />
           </span>
           <hgroup>
-            <p className="text-sm text-[#c4aff5] mb-0.5">Bienvenido, instructor</p>
+            <p className="text-sm text-on-primary mb-0.5">Bienvenido, instructor</p>
             <h1 className="text-2xl font-extrabold text-white">{nombre}</h1>
-            <p className="text-sm text-[#c4aff5] mt-0.5">Tus cursos y quién está aprendiendo.</p>
+            <p className="text-sm text-on-primary mt-0.5">Tus cursos y quién está aprendiendo.</p>
           </hgroup>
         </section>
 
-        {estado === 'loading' && <p className="text-[#6a6f73]">Cargando...</p>}
+        {estado === 'loading' && <p className="text-muted-color">Cargando...</p>}
         {estado === 'no-api' && (
-          <p className="text-[#6a6f73]">
+          <p className="text-muted-color">
             Esta vista necesita Electron (window.api). Ejecuta la app con <code>npm run dev</code>.
           </p>
         )}
-        {estado === 'no-user' && <p className="text-[#6a6f73]">Inicia sesión como instructor.</p>}
-        {estado === 'error' && <p className="text-[#c0392b]">Error: {error}</p>}
+        {estado === 'no-user' && <p className="text-muted-color">Inicia sesión como instructor.</p>}
+        {estado === 'error' && <p className="text-danger">Error: {error}</p>}
 
         {estado === 'ready' && data && (
           <>
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="Resumen">
               {stats.map(({ icon: Icon, label, value, color, bg }) => (
-                <article key={label} className="bg-white border border-[#d1d7dc] p-5">
+                <article key={label} className="bg-white border border-default p-5">
                   <span
                     className="w-9 h-9 rounded-full flex items-center justify-center mb-3"
                     style={{ background: bg }}
                   >
                     <Icon size={16} style={{ color }} />
                   </span>
-                  <p className="text-2xl font-extrabold text-[#1c1d1f]">{value}</p>
-                  <p className="text-xs font-semibold text-[#6a6f73] mt-0.5">{label}</p>
+                  <p className="text-2xl font-extrabold text-body">{value}</p>
+                  <p className="text-xs font-semibold text-muted-color mt-0.5">{label}</p>
                 </article>
               ))}
             </section>
 
             <section className="space-y-6" aria-label="Mis cursos">
-              <h2 className="text-xl font-extrabold text-[#1c1d1f]">
-                Mis cursos <span className="text-[#6a6f73] font-normal text-base">({data.cursos.length})</span>
+              <h2 className="text-xl font-extrabold text-body">
+                Mis cursos <span className="text-muted-color font-normal text-base">({data.cursos.length})</span>
               </h2>
 
               {data.cursos.length === 0 ? (
-                <p className="text-[#6a6f73]">Aún no tienes cursos publicados.</p>
+                <p className="text-muted-color">Aún no tienes cursos publicados.</p>
               ) : (
                 data.cursos.map((curso) => (
                   <article key={curso.id} className="bg-white border border-[#d1d7dc]">
@@ -164,26 +164,26 @@ export default function InstructorDashboard({ user, onLogout }) {
                       <h3 className="text-base font-bold text-[#1c1d1f]">{curso.nombre}</h3>
                       <Estrellas valor={curso.calificacion} className="inline-flex items-center gap-1" />
                       <EstadoBadge estado={curso.estado} />
-                      <span className="ml-auto flex items-center gap-2 text-sm text-[#6a6f73]">
+                      <span className="ml-auto flex items-center gap-2 text-sm text-muted-color">
                         <Users size={15} /> {curso.nEstudiantes} estudiantes
                       </span>
-                      <span className="flex items-center gap-2 text-sm text-[#6a6f73]">
+                      <span className="flex items-center gap-2 text-sm text-muted-color">
                         Progreso promedio <Barra valor={curso.progresoPromedio} />
                       </span>
                     </header>
 
                     {curso.estudiantes.length === 0 ? (
-                      <p className="px-5 py-4 text-sm text-[#6a6f73]">
+                      <p className="px-5 py-4 text-sm text-muted-color">
                         Aún no hay estudiantes inscritos.
                       </p>
                     ) : (
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="bg-[#f7f9fa] border-b border-[#d1d7dc]">
-                            <th className="text-left px-5 py-2.5 text-xs font-semibold text-[#6a6f73] uppercase tracking-wide">
+                          <tr className="bg-body border-b border-default">
+                            <th className="text-left px-5 py-2.5 text-xs font-semibold text-muted-color uppercase tracking-wide">
                               Estudiante
                             </th>
-                            <th className="text-left px-5 py-2.5 text-xs font-semibold text-[#6a6f73] uppercase tracking-wide">
+                            <th className="text-left px-5 py-2.5 text-xs font-semibold text-muted-color uppercase tracking-wide">
                               Progreso
                             </th>
                           </tr>

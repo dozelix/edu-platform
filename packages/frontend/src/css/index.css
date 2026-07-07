@@ -117,6 +117,155 @@ a:hover {
   border-width: 0;
 }
 
+/* Shared surface / card */
+.surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* Shared button system */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn--primary {
+  background: var(--gradient-brand);
+  color: #fff;
+}
+.btn--primary:hover {
+  opacity: 0.9;
+}
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+.btn--ghost:hover {
+  background: var(--color-surface-2);
+}
+.btn--done {
+  background: var(--color-surface-2);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+.btn--sm {
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+.btn--md {
+  height: 38px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+.btn--lg {
+  height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Shared progress bar */
+.progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-track--thick {
+  height: 8px;
+  background: var(--color-surface-2);
+  border-radius: 4px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-brand);
+  border-radius: inherit;
+  transition: width 0.6s ease;
+}
+.progress-fill--done {
+  background: var(--color-success);
+}
+
+/* Shared status messages */
+.msg {
+  color: var(--color-text-muted);
+  padding: 24px 0;
+}
+.msg--error {
+  color: var(--color-danger);
+}
+.msg--sm {
+  padding: 16px 0;
+}
+
+/* Shared badge system */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.badge--success {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-success);
+}
+.badge--primary {
+  background: rgba(59, 28, 140, 0.12);
+  color: var(--color-primary-light);
+}
+.badge--warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-accent-2);
+}
+.badge--accent {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--color-accent);
+}
+
+/* Text truncation */
+.truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Token utility classes (for JSX Tailwind interop) */
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-hover { background-color: var(--color-primary-hover); }
+.bg-surface { background-color: var(--color-surface); }
+.bg-body { background-color: var(--color-bg); }
+.bg-primary-soft { background-color: var(--color-primary-soft); }
+.text-primary { color: var(--color-primary); }
+.text-primary-light { color: var(--color-primary-light); }
+.text-on-primary { color: var(--color-on-primary-soft); }
+.text-muted-color { color: var(--color-text-muted); }
+.text-subtle { color: var(--color-text-subtle); }
+.text-body { color: var(--color-text); }
+.text-danger { color: var(--color-danger); }
+.text-star { color: #e59819; }
+.border-default { border-color: var(--color-border); }
+.border-primary { border-color: var(--color-primary); }
+
 /* ── Scrollbar ───────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;

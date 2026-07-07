@@ -20,6 +20,9 @@
     "shot": "concurrently -k -s first \"npm run dev:frontend\" \"wait-on http://localhost:5173 && node scripts/shot-electron.cjs\"",
     "lint": "eslint \"packages/*/src/**/*.{js,cjs,jsx}\" \"scripts/**/*.{js,cjs}\"",
     "format": "prettier --write \"packages/*/src/**/*.{js,cjs,jsx,json,css}\"",
+    "seed:docker": "bash scripts/seed-docker.sh",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
     "test": "vitest",
     "predeploy": "vite build --config packages/frontend/vite.config.js --outDir ../../dist-gh",
     "deploy": "gh-pages -d dist-gh"
