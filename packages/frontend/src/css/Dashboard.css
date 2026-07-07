@@ -50,6 +50,7 @@
   justify-content: center;
   font-size: 18px;
   flex-shrink: 0;
+  color:white;
 }
 
 .db-sidebar__brand-text {

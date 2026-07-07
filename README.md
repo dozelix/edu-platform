@@ -24,7 +24,7 @@ que los instructores vean quién está aprendiendo.
 ## Stack
 
 | Capa | Tecnologías |
-|------|-------------|
+| ------ | ------------- |
 | Escritorio | Electron 39, Electron Builder |
 | Frontend | React 18 (JSX), Vite 8 |
 | Estilos | Tailwind v4 + lucide-react |
@@ -40,7 +40,7 @@ cd EduPlataform
 npm install
 
 # Con MongoDB corriendo en localhost:27017, sembrar la base:
-mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+mongosh "mongodb://localhost:27017" seeds/eduplatform.volume.seed.js
 
 # Iniciar Vite + Electron:
 npm run dev
@@ -66,7 +66,7 @@ npm run shot           # verificación visual con Playwright (capturas)
 ## Documentación
 
 | Documento | Propósito |
-|-----------|-----------|
+| ----------- | ----------- |
 | [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md) | Visión del proyecto y correspondencia con la pauta del Caso 3. |
 | [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Estructura, modelo de datos, canales IPC y seguridad. |
 | [docs/SETUP.md](docs/SETUP.md) | Instalación, seed y ejecución. |

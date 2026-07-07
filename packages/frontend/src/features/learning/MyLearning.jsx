@@ -1,17 +1,11 @@
-import React, { useEffect, useState } from 'react'
-
-// Vista 3 del Caso 3: Mi Aprendizaje.
-// Muestra los cursos en los que está inscrito el usuario en sesión, con su
-// progreso y la última lección. El handler resuelve curso/instructor de forma
-// null-safe, así que una inscripción a un curso inexistente aparece como
-// "Curso no disponible" en vez de romper la tabla.
+import { useEffect, useState } from 'react' // 👈 Issue #27: Eliminado 'React'
+import Barra from '../../components/common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
 
 export default function MyLearning({ user, onContinue }) {
   const [filas, setFilas] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api | no-user
   const [error, setError] = useState('')
 
-  // Resumen real para el banner: cursos en progreso y completados del usuario.
   const primerNombre = user?.nombre ? user.nombre.split(' ')[0] : ''
   const iniciales = user?.nombre
     ? user.nombre.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -112,21 +106,7 @@ export default function MyLearning({ user, onContinue }) {
                   <td>{f.curso}</td>
                   <td>{f.instructor}</td>
                   <td>
-                    <div className="lrn-progress">
-                      <div
-                        className="lrn-progress__track"
-                        role="progressbar"
-                        aria-valuenow={f.progreso}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      >
-                        <div
-                          className={`lrn-progress__fill${f.progreso === 100 ? ' lrn-progress__fill--done' : ''}`}
-                          style={{ width: `${f.progreso}%` }}
-                        />
-                      </div>
-                      <span className="lrn-progress__pct">{f.progreso}%</span>
-                    </div>
+                    <Barra valor={f.progreso} isCustomCss={true} />
                   </td>
                   <td>{f.ultimaLeccion}</td>
                   <td>
