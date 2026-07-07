@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   BookOpen,
   Mail,
@@ -29,6 +29,19 @@ export function LoginRegister({ onSuccess, onCancel }) {
   const [success, setSuccess] = useState('')
   const [currentUser, setCurrentUser] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
+  const _timeouts = useRef([])
+
+  useEffect(() => {
+    return () => {
+      // Limpiar todos los timeouts pendientes al desmontar
+      for (const t of _timeouts.current) {
+        try {
+          clearTimeout(t)
+        } catch {}
+      }
+      _timeouts.current = []
+    }
+  }, [])
 
   // Login
   const [loginEmail, setLoginEmail] = useState('')
@@ -64,7 +77,8 @@ export function LoginRegister({ onSuccess, onCancel }) {
       if (res.success) {
         setCurrentUser(res.data)
         setSuccess(`Bienvenido ${res.data.nombre}`)
-        setTimeout(() => onSuccess?.(res.data), 1000)
+        const id = setTimeout(() => onSuccess?.(res.data), 1000)
+        _timeouts.current.push(id)
       } else {
         setError(res.error)
       }
@@ -98,10 +112,11 @@ export function LoginRegister({ onSuccess, onCancel }) {
         setRegEmail('')
         setRegPassword('')
         setRegConfirm('')
-        setTimeout(() => {
+        const id = setTimeout(() => {
           setMode('login')
           setSuccess('')
         }, 1800)
+        _timeouts.current.push(id)
       } else {
         setError(res.error)
       }
