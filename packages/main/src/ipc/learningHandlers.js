@@ -26,9 +26,30 @@ ipcMain.handle('aprendizaje:listar', async () => {
 
     const db = mongoose.connection.db
     const inscripciones = await db.collection('inscripciones').find({ usuario_id: uid }).toArray()
-    const cursos = await db.collection('cursos').find().toArray()
-    const instructores = await db.collection('usuarios').find({ tipo: 'instructor' }).toArray()
-    const lecciones = await db.collection('lecciones').find().toArray()
+
+    // Limitar consultas: solo traer cursos, instructores y lecciones relacionados
+    const cursoIds = Array.from(new Set(inscripciones.map((i) => i.curso_id?.toString()).filter(Boolean)))
+    const cursos = cursoIds.length
+      ? await db
+          .collection('cursos')
+          .find({ _id: { $in: cursoIds.map((s) => new mongoose.Types.ObjectId(s)) } })
+          .toArray()
+      : []
+
+    const instructorIds = Array.from(new Set(cursos.map((c) => c.instructor_id?.toString()).filter(Boolean)))
+    const instructores = instructorIds.length
+      ? await db
+          .collection('usuarios')
+          .find({ _id: { $in: instructorIds.map((s) => new mongoose.Types.ObjectId(s)) } }, { projection: { nombre: 1 } })
+          .toArray()
+      : []
+
+    const lecciones = cursoIds.length
+      ? await db
+          .collection('lecciones')
+          .find({ curso_id: { $in: cursoIds.map((s) => new mongoose.Types.ObjectId(s)) } })
+          .toArray()
+      : []
 
     const cursoPorId = new Map(cursos.map((c) => [c._id.toString(), c]))
     const instructorPorId = new Map(instructores.map((u) => [u._id.toString(), u.nombre]))

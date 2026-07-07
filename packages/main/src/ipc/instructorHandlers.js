@@ -31,8 +31,21 @@ ipcMain.handle('instructor:resumen', async () => {
     const inscripciones = cursoIds.length
       ? await db.collection('inscripciones').find({ curso_id: { $in: cursoIds } }).toArray()
       : []
-    const usuarios = await db.collection('usuarios').find().toArray()
-    const nombrePorId = new Map(usuarios.map((u) => [u._id.toString(), u.nombre]))
+    // Traer solo los usuarios que aparecen en las inscripciones (evita cargar toda la coleccion)
+    const usuarioIds = Array.from(
+      new Set(inscripciones.map((i) => i.usuario_id?.toString()).filter(Boolean))
+    )
+    const nombrePorId = new Map()
+    if (usuarioIds.length) {
+      const ids = usuarioIds.map((s) => new mongoose.Types.ObjectId(s))
+      const usuarios = await db
+        .collection('usuarios')
+        .find({ _id: { $in: ids } }, { projection: { nombre: 1 } })
+        .toArray()
+      for (const u of usuarios) {
+        nombrePorId.set(u._id.toString(), u.nombre)
+      }
+    }
 
     // Inscripciones agrupadas por curso para resolver estudiantes y progreso.
     const inscPorCurso = new Map()

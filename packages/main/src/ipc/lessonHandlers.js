@@ -108,16 +108,36 @@ ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
       .findOne({ usuario_id: uid, curso_id: leccion.curso_id })
     if (!insc) return { success: false, error: 'No estás inscrito en este curso' }
 
-    await db
-      .collection('inscripciones')
-      .updateOne({ _id: insc._id }, { $addToSet: { lecciones_completadas: lid } })
-
+    // Recalculo atómico: añadir la lección al set y calcular progreso en una sola operación
     const total = await db.collection('lecciones').countDocuments({ curso_id: leccion.curso_id })
-    const actualizada = await db.collection('inscripciones').findOne({ _id: insc._id })
-    const completadas = (actualizada.lecciones_completadas || []).length
-    const progreso = total > 0 ? Math.round((completadas / total) * 100) : 0
-
-    await db.collection('inscripciones').updateOne({ _id: insc._id }, { $set: { progreso } })
+    if (total <= 0) {
+      await db.collection('inscripciones').updateOne(
+        { _id: insc._id },
+        { $addToSet: { lecciones_completadas: lid }, $set: { progreso: 0 } }
+      )
+    } else {
+      // Update usando pipeline para evitar condiciones de carrera
+      await db.collection('inscripciones').updateOne(
+        { _id: insc._id },
+        [
+          {
+            $set: {
+              lecciones_completadas: { $setUnion: ['$lecciones_completadas', [lid]] },
+            },
+          },
+          {
+            $set: {
+              progreso: {
+                $round: [
+                  { $multiply: [{ $divide: [{ $size: '$lecciones_completadas' }, total] }, 100] },
+                  0,
+                ],
+              },
+            },
+          },
+        ]
+      )
+    }
 
     return { success: true, data: { progreso, completada: true } }
   } catch (error) {
@@ -144,8 +164,17 @@ ipcMain.handle('comentario:listar', async (_, leccionId) => {
       .limit(5)
       .toArray()
 
-    const usuarios = await db.collection('usuarios').find().toArray()
-    const nombrePorId = new Map(usuarios.map((u) => [u._id.toString(), u.nombre]))
+    // Traer solo los autores de los comentarios listados para evitar cargar toda la coleccion
+    const autorIds = Array.from(new Set(docs.map((d) => d.usuario_id?.toString()).filter(Boolean)))
+    const nombrePorId = new Map()
+    if (autorIds.length) {
+      const ids = autorIds.map((s) => new mongoose.Types.ObjectId(s))
+      const usuarios = await db
+        .collection('usuarios')
+        .find({ _id: { $in: ids } }, { projection: { nombre: 1 } })
+        .toArray()
+      for (const u of usuarios) nombrePorId.set(u._id.toString(), u.nombre)
+    }
 
     const data = docs.map((c) => ({
       id: c._id.toString(),
