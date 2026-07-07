@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -15,23 +14,21 @@ export default function Markdown({ texto }) {
       remarkPlugins={[remarkGfm]}
       components={{
         // Mapeo de encabezados (+2 niveles) para respetar la jerarquía de la app
-        h1: ({ children }) => <h3>{children}</h3>,
-        h2: ({ children }) => <h4>{children}</h4>,
-        h3: ({ children }) => <h5>{children}</h5>,
+        h1: ({ _node, ...props }) => <h3 {...props} />,
+        h2: ({ _node, ...props }) => <h4 {...props} />,
+        h3: ({ _node, ...props }) => <h5 {...props} />,
         
-        // Bloques de código
-        pre: ({ children }) => <pre className="md-pre">{children}</pre>,
+        // Bloques de código utilizando la clase mapeada en tu CSS
+        pre: ({ _node, ...props }) => <pre className="md-pre" {...props} />,
         
-        // Citas (blockquotes)
-        blockquote: ({ children }) => <blockquote className="md-quote">{children}</blockquote>,
+        // Citas (blockquotes) utilizando la clase mapeada en tu CSS
+        blockquote: ({ _node, ...props }) => <blockquote className="md-quote" {...props} />,
         
         // Enlaces seguros (evita javascript: o data:) con target="_blank"
-        a: ({ href, children }) => {
+        a: ({ _node, href, ...props }) => {
           const urlSegura = hrefSeguro(href)
           return (
-            <a href={urlSegura} target="_blank" rel="noopener noreferrer">
-              {children}
-            </a>
+            <a href={urlSegura} target="_blank" rel="noopener noreferrer" {...props} />
           )
         }
       }}

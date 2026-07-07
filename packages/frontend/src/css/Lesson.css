@@ -29,7 +29,7 @@
   overflow: hidden;
 }
 
-.les-video video,
+/* 🛠️ Issue #30: Eliminado el selector muerto '.les-video video' */
 .les-video iframe {
   width: 100%;
   display: block;
@@ -251,10 +251,4 @@
 .les-comment__text {
   font-size: 14px;
   color: var(--color-text);
-}
-
-/* Legacy aliases — componen con shared utilities desde index.css */
-.les-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

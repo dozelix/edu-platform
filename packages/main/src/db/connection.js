@@ -5,13 +5,19 @@ mongoose.set('strictQuery', true)
 // Conecta a MongoDB. Devuelve true/false segun el resultado.
 export async function connectDB() {
   try {
+    // ⚡ FIX: Cambiado de process.env.local.MONGODB_URI a process.env.MONGODB_URI
     const mongoUri = process.env.MONGODB_URI
+    
+    if (!mongoUri) {
+      throw new Error('La variable de entorno MONGODB_URI no está definida.')
+    }
+
     await mongoose.connect(mongoUri, {
       autoIndex: false,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
     })
-    console.log('MongoDB conectado')
+    console.log('MongoDB conectado exitosamente')
     return true
   } catch (error) {
     console.error('Error conectando a MongoDB:', error.message)

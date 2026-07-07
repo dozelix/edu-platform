@@ -1,42 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { BookOpen, Users, Star, LogOut, GraduationCap } from 'lucide-react'
+import Estrellas from '../../components/common/Estrellas.jsx'
+import Barra from '../../components/common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
 
-function Barra({ valor }) {
-  return (
-    <span
-      className="inline-flex items-center gap-2"
-      role="progressbar"
-      aria-valuenow={valor}
-      aria-valuemin={0}
-      aria-valuemax={100}
-    >
-      <span className="block w-28 h-2 bg-primary-soft rounded-full overflow-hidden">
-        <span className="block h-full bg-primary rounded-full" style={{ width: `${valor}%` }} />
-      </span>
-      <span className="text-xs font-semibold text-body w-9 text-right">{valor}%</span>
-    </span>
-  )
-}
-
-function Estrellas({ valor }) {
-  if (valor == null) return <span className="text-sm text-subtle">Sin calificación</span>
-  const llenas = Math.round(valor)
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span className="text-sm font-bold text-star">{valor.toFixed(1)}</span>
-      <span aria-hidden="true" className="flex">
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star
-            key={s}
-            size={13}
-            className={s <= llenas ? 'text-star' : 'text-subtle'}
-            fill={s <= llenas ? '#e59819' : '#d1d7dc'}
-          />
-        ))}
-      </span>
-    </span>
-  )
-}
+// Se elimina la función local 'function Barra({ valor }) { ... }' ya que se usa el import
 
 function EstadoBadge({ estado }) {
   const activo = estado === 'activo'
@@ -98,6 +65,11 @@ export default function InstructorDashboard({ user, onLogout }) {
 
   const nombre = user?.nombre || 'Instructor'
   const totales = data?.totales
+  
+  const calificacionMostrada = totales?.calificacionPromedio != null
+    ? Number(totales.calificacionPromedio).toFixed(1)
+    : 'Sin calificación'
+
   const stats = [
     {
       icon: BookOpen,
@@ -116,7 +88,7 @@ export default function InstructorDashboard({ user, onLogout }) {
     {
       icon: Star,
       label: 'Calificación promedio',
-      value: totales?.calificacionPromedio ?? 'Sin calificación',
+      value: calificacionMostrada,
       color: '#b4690e',
       bg: 'var(--color-warning-soft)',
     },
@@ -187,10 +159,10 @@ export default function InstructorDashboard({ user, onLogout }) {
                 <p className="text-muted-color">Aún no tienes cursos publicados.</p>
               ) : (
                 data.cursos.map((curso) => (
-                  <article key={curso.id} className="bg-white border border-default">
-                    <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 border-b border-default">
-                      <h3 className="text-base font-bold text-body">{curso.nombre}</h3>
-                      <Estrellas valor={curso.calificacion} />
+                  <article key={curso.id} className="bg-white border border-[#d1d7dc]">
+                    <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 border-b border-[#d1d7dc]">
+                      <h3 className="text-base font-bold text-[#1c1d1f]">{curso.nombre}</h3>
+                      <Estrellas valor={curso.calificacion} className="inline-flex items-center gap-1" />
                       <EstadoBadge estado={curso.estado} />
                       <span className="ml-auto flex items-center gap-2 text-sm text-muted-color">
                         <Users size={15} /> {curso.nEstudiantes} estudiantes
@@ -217,9 +189,9 @@ export default function InstructorDashboard({ user, onLogout }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {curso.estudiantes.map((e, i) => (
-                            <tr key={i} className="border-b border-[#f7f9fa] last:border-0">
-                              <td className="px-5 py-2.5 text-body">{e.nombre}</td>
+                          {curso.estudiantes.map((e) => (
+                            <tr key={e.id || e.nombre} className="border-b border-[#f7f9fa] last:border-0">
+                              <td className="px-5 py-2.5 text-[#1c1d1f]">{e.nombre}</td>
                               <td className="px-5 py-2.5">
                                 <Barra valor={e.progreso} />
                               </td>

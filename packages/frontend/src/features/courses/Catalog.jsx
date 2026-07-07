@@ -1,11 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Search, Star } from 'lucide-react'
-
-// Vista 2 del Caso 3: Catalogo de Cursos.
-// Lee los cursos reales desde Mongo via IPC (curso:listar), permite buscar por
-// nombre y filtrar por instructor. El handler resuelve el instructor null-safe.
-// Incluye inscripcion (inscripcion:crear) y conversion de precio a varias monedas
-// usando una API publica de tipos de cambio. Diseno tipo Udemy, marcado semantico.
+import { useEffect, useMemo, useState, useCallback } from 'react' // 👈 Issue #12: Añadido useCallback
+import { Search } from 'lucide-react'
+import Estrellas from '../../components/common/Estrellas.jsx'
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
 
@@ -67,23 +62,6 @@ export function portadaDeCurso(nombre) {
   return { iniciales: iniciales || '?', tema, gradiente, imagen }
 }
 
-// Estrellas de calificacion (0-5) con lucide; las llenas se pintan, el resto en gris.
-function Estrellas({ valor }) {
-  const llenas = Math.round(valor)
-  return (
-    <span className="cat-card__stars" aria-hidden="true">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          size={13}
-          className={i <= llenas ? 'is-on' : 'is-off'}
-          fill={i <= llenas ? 'currentColor' : 'none'}
-        />
-      ))}
-    </span>
-  )
-}
-
 export default function Catalog({ user, onRequireLogin }) {
   const [cursos, setCursos] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
@@ -94,7 +72,8 @@ export default function Catalog({ user, onRequireLogin }) {
   const [tasas, setTasas] = useState({})
   const [inscribiendo, setInscribiendo] = useState(null)
 
-  async function cargar() {
+  // 🛠️ Issue #12: Memorización de la función con useCallback para estabilizar su referencia
+  const cargar = useCallback(async () => {
     if (!globalThis.window?.api) {
       setEstado('no-api')
       return
@@ -112,20 +91,26 @@ export default function Catalog({ user, onRequireLogin }) {
       setError(err.message)
       setEstado('error')
     }
-  }
+  }, [])
 
+  // 🛠️ Issue #12: Ahora el array de dependencias incluye de forma segura todas sus llamadas reactivas
   useEffect(() => {
     cargar()
-  }, [user])
+  }, [user, cargar])
 
+  // 🛠️ Issue #29: Modificado el useEffect para leer el endpoint desde variables de entorno.
   useEffect(() => {
     let activo = true
-    fetch('https://open.er-api.com/v6/latest/USD')
+    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL;
+
+    fetch(apiUrl)
       .then((r) => r.json())
       .then((d) => {
         if (activo && d && d.rates) setTasas(d.rates)
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Error in exchange rate request:', err)
+      })
     return () => {
       activo = false
     }
@@ -142,7 +127,8 @@ export default function Catalog({ user, onRequireLogin }) {
     return coincideNombre && coincideInstructor
   })
 
-  const inscribir = async (cursoId) => {
+  // Optimizada también con useCallback por consistencia estructural
+  const inscribir = useCallback(async (cursoId) => {
     if (!globalThis.window?.api || !user?.id) return
     setInscribiendo(cursoId)
     setError('')
@@ -158,7 +144,7 @@ export default function Catalog({ user, onRequireLogin }) {
     } finally {
       setInscribiendo(null)
     }
-  }
+  }, [user?.id, cargar])
 
   return (
     <>
@@ -242,10 +228,7 @@ export default function Catalog({ user, onRequireLogin }) {
                       <p className="cat-card__instructor">{c.instructor}</p>
                       <p className="cat-card__rating">
                         {c.calificacion != null ? (
-                          <>
-                            <strong>{c.calificacion.toFixed(1)}</strong>
-                            <Estrellas valor={c.calificacion} />
-                          </>
+                          <Estrellas valor={c.calificacion} className="cat-card__stars" />
                         ) : (
                           <span className="cat-card__rating--none">Sin calificacion</span>
                         )}
