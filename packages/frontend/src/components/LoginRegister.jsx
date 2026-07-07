@@ -18,9 +18,9 @@ import {
 // ======================================================
 
 const FIELD_WRAP =
-  'flex items-center gap-2 border bg-white px-3 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[#3b1c8c] border-[#d1d7dc] focus-within:border-[#3b1c8c]'
-const FIELD = 'flex-1 text-sm text-[#1c1d1f] outline-none bg-transparent placeholder:text-[#9ba0a6]'
-const FIELD_LABEL = 'text-sm font-semibold text-[#1c1d1f]'
+  'flex items-center gap-2 border bg-white px-3 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[#3b1c8c] border-default focus-within:border-[#3b1c8c]'
+const FIELD = 'flex-1 text-sm text-body outline-none bg-transparent placeholder:text-subtle'
+const FIELD_LABEL = 'text-sm font-semibold text-body'
 
 export function LoginRegister({ onSuccess, onCancel }) {
   const [mode, setMode] = useState('login')
@@ -130,15 +130,15 @@ export function LoginRegister({ onSuccess, onCancel }) {
   // Confirmacion breve antes de entrar
   if (currentUser) {
     return (
-      <div className="min-h-screen bg-[#f7f9fa] flex items-center justify-center px-4">
-        <div className="bg-white border border-[#d1d7dc] shadow-lg p-10 max-w-sm w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-[#3b1c8c] flex items-center justify-center mx-auto mb-5">
+      <div className="min-h-screen bg-body flex items-center justify-center px-4">
+        <div className="bg-white border border-default shadow-lg p-10 max-w-sm w-full text-center">
+          <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-5">
             <Check size={30} className="text-white" />
           </div>
-          <h2 className="text-2xl font-extrabold text-[#1c1d1f] mb-2">Bienvenido de vuelta</h2>
-          <p className="text-sm text-[#6a6f73]">
+          <h2 className="text-2xl font-extrabold text-body mb-2">Bienvenido de vuelta</h2>
+          <p className="text-sm text-muted-color">
             Sesión iniciada como{' '}
-            <strong className="text-[#1c1d1f]">{currentUser.nombre}</strong> ({currentUser.tipo}).
+            <strong className="text-body">{currentUser.nombre}</strong> ({currentUser.tipo}).
           </p>
         </div>
       </div>
@@ -146,25 +146,25 @@ export function LoginRegister({ onSuccess, onCancel }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fa] flex flex-col">
+    <div className="min-h-screen bg-body flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-[#d1d7dc] px-6 py-4 flex items-center justify-between">
+      <header className="bg-white border-b border-default px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <BookOpen size={22} className="text-[#3b1c8c]" />
-          <span className="text-xl font-extrabold text-[#3b1c8c]">EduPlatform</span>
+          <BookOpen size={22} className="text-primary" />
+          <span className="text-xl font-extrabold text-primary">EduPlatform</span>
         </div>
         <div className="flex items-center gap-5">
           {onCancel && (
             <button
               onClick={onCancel}
-              className="text-sm text-[#6a6f73] font-medium hover:text-[#1c1d1f] hover:underline"
+              className="text-sm text-muted-color font-medium hover:text-body hover:underline"
             >
               Volver al catálogo
             </button>
           )}
-          <p className="text-sm text-[#6a6f73]">
+          <p className="text-sm text-muted-color">
             {mode === 'login' ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
-            <button onClick={switchMode} className="text-[#3b1c8c] font-semibold hover:underline">
+            <button onClick={switchMode} className="text-primary font-semibold hover:underline">
               {mode === 'login' ? 'Regístrate gratis' : 'Inicia sesión'}
             </button>
           </p>
@@ -176,7 +176,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
         {mode === 'login' ? (
           <aside className="hidden lg:flex flex-col justify-between bg-[#1c1d1f] text-white p-10 w-[420px] flex-shrink-0">
             <div>
-              <p className="text-xs font-semibold tracking-widest text-[#c4aff5] uppercase mb-4">
+              <p className="text-xs font-semibold tracking-widest text-on-primary uppercase mb-4">
                 Continúa aprendiendo
               </p>
               <h2 className="text-3xl font-extrabold leading-tight mb-4 text-white">
@@ -184,9 +184,9 @@ export function LoginRegister({ onSuccess, onCancel }) {
                 <br />
                 habilidad te
                 <br />
-                <span className="text-[#c4aff5]">está esperando.</span>
+                <span className="text-on-primary">está esperando.</span>
               </h2>
-              <p className="text-[#9ba0a6] text-sm leading-relaxed">
+              <p className="text-subtle text-sm leading-relaxed">
                 Inicia sesión para retomar donde lo dejaste, ver tu progreso y acceder a tus cursos.
               </p>
             </div>
@@ -199,9 +199,9 @@ export function LoginRegister({ onSuccess, onCancel }) {
               ].map((texto) => (
                 <li key={texto} className="flex items-center gap-3">
                   <span className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <Check size={16} className="text-[#c4aff5]" />
+                    <Check size={16} className="text-on-primary" />
                   </span>
-                  <span className="text-sm text-[#c4aff5]">{texto}</span>
+                  <span className="text-sm text-on-primary">{texto}</span>
                 </li>
               ))}
             </ul>
@@ -209,13 +209,13 @@ export function LoginRegister({ onSuccess, onCancel }) {
             <div />
           </aside>
         ) : (
-          <aside className="hidden lg:flex flex-col justify-between bg-[#3b1c8c] text-white p-10 w-[420px] flex-shrink-0">
+          <aside className="hidden lg:flex flex-col justify-between bg-primary text-white p-10 w-[420px] flex-shrink-0">
             <div>
               <h2 className="text-3xl font-extrabold leading-tight mb-4 text-white">
                 Únete a<br />
-                <span className="text-[#c4aff5]">EduPlatform</span>
+                <span className="text-on-primary">EduPlatform</span>
               </h2>
-              <p className="text-[#c4aff5] text-sm leading-relaxed">
+              <p className="text-on-primary text-sm leading-relaxed">
                 Accede a los cursos, sigue tu progreso y aprende a tu propio ritmo, desde cualquier
                 dispositivo.
               </p>
@@ -229,11 +229,11 @@ export function LoginRegister({ onSuccess, onCancel }) {
               ].map((item) => (
                 <li key={item.label} className="flex items-center gap-4">
                   <span className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <Check size={18} className="text-[#c4aff5]" />
+                    <Check size={18} className="text-on-primary" />
                   </span>
                   <span>
                     <span className="block text-base font-extrabold text-white">{item.stat}</span>
-                    <span className="block text-[#c4aff5] text-xs">{item.label}</span>
+                    <span className="block text-on-primary text-xs">{item.label}</span>
                   </span>
                 </li>
               ))}
@@ -246,12 +246,12 @@ export function LoginRegister({ onSuccess, onCancel }) {
         {/* Formulario */}
         <main className="flex-1 flex items-center justify-center px-4 py-12">
           <div className="w-full max-w-md">
-            <div className="bg-white border border-[#d1d7dc] shadow-sm p-8 flex flex-col gap-5">
+            <div className="bg-white border border-default shadow-sm p-8 flex flex-col gap-5">
               <div>
-                <h1 className="text-2xl font-extrabold text-[#1c1d1f]">
+                <h1 className="text-2xl font-extrabold text-body">
                   {mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
                 </h1>
-                <p className="text-sm text-[#6a6f73] mt-1">
+                <p className="text-sm text-muted-color mt-1">
                   {mode === 'login'
                     ? 'Bienvenido de vuelta. Accede a tu cuenta.'
                     : 'Regístrate como estudiante o instructor.'}
@@ -278,7 +278,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       Correo electrónico
                     </label>
                     <div className={FIELD_WRAP}>
-                      <Mail size={16} className="text-[#6a6f73] flex-shrink-0" />
+                      <Mail size={16} className="text-muted-color flex-shrink-0" />
                       <input
                         id="login-email"
                         type="email"
@@ -297,7 +297,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       Contraseña
                     </label>
                     <div className={FIELD_WRAP}>
-                      <Lock size={16} className="text-[#6a6f73] flex-shrink-0" />
+                      <Lock size={16} className="text-muted-color flex-shrink-0" />
                       <input
                         id="login-password"
                         type={showPassword ? 'text' : 'password'}
@@ -311,7 +311,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
-                        className="text-[#6a6f73] hover:text-[#3b1c8c]"
+                        className="text-muted-color hover:text-primary"
                         aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -328,7 +328,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       Nombre completo
                     </label>
                     <div className={FIELD_WRAP}>
-                      <User size={16} className="text-[#6a6f73] flex-shrink-0" />
+                      <User size={16} className="text-muted-color flex-shrink-0" />
                       <input
                         id="reg-nombre"
                         type="text"
@@ -347,7 +347,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       Correo electrónico
                     </label>
                     <div className={FIELD_WRAP}>
-                      <Mail size={16} className="text-[#6a6f73] flex-shrink-0" />
+                      <Mail size={16} className="text-muted-color flex-shrink-0" />
                       <input
                         id="reg-email"
                         type="email"
@@ -367,7 +367,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                         Contraseña
                       </label>
                       <div className={FIELD_WRAP}>
-                        <Lock size={16} className="text-[#6a6f73] flex-shrink-0" />
+                        <Lock size={16} className="text-muted-color flex-shrink-0" />
                         <input
                           id="reg-pass"
                           type="password"
@@ -385,7 +385,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                         Confirmar
                       </label>
                       <div className={FIELD_WRAP}>
-                        <Lock size={16} className="text-[#6a6f73] flex-shrink-0" />
+                        <Lock size={16} className="text-muted-color flex-shrink-0" />
                         <input
                           id="reg-confirm"
                           type="password"
@@ -409,7 +409,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       value={regTipo}
                       onChange={(e) => setRegTipo(e.target.value)}
                       disabled={loading}
-                      className="border border-[#d1d7dc] bg-white px-3 py-2.5 text-sm text-[#1c1d1f] outline-none focus:border-[#3b1c8c] focus:ring-2 focus:ring-[#3b1c8c]"
+                      className="border border-default bg-white px-3 py-2.5 text-sm text-body outline-none focus:border-primary focus:ring-2 focus:ring-primary"
                     >
                       <option value="estudiante">Estudiante</option>
                       <option value="instructor">Instructor</option>
@@ -421,7 +421,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
               )}
             </div>
 
-            <p className="text-center text-xs text-[#9ba0a6] mt-5">
+            <p className="text-center text-xs text-subtle mt-5">
               EduPlatform · Plataforma Educativa
             </p>
           </div>
@@ -436,7 +436,7 @@ function SubmitButton({ loading, label }) {
     <button
       type="submit"
       disabled={loading}
-      className="w-full bg-[#3b1c8c] hover:bg-[#2d1470] disabled:opacity-60 text-white font-bold py-3 text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
+      className="w-full bg-primary hover:bg-primary-hover disabled:opacity-60 text-white font-bold py-3 text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
     >
       {loading ? (
         <>

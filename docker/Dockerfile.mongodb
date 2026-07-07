@@ -1,0 +1,30 @@
+FROM mongo:7.0-jammy AS full
+
+# Segunda etapa: solo binarios esenciales, sin documentación ni paquetes innecesarios
+FROM ubuntu:jammy-minimal
+
+COPY --from=full /usr/bin/mongod /usr/bin/mongod
+COPY --from=full /usr/bin/mongos /usr/bin/mongos
+COPY --from=full /usr/bin/mongosh /usr/bin/mongosh
+COPY --from=full /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=full /usr/lib/x86_64-linux-gnu/libssl* /usr/lib/x86_64-linux-gnu/
+COPY --from=full /usr/lib/x86_64-linux-gnu/libcrypto* /usr/lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libc* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libm* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libresolv* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-g64/libz* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libgcc* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libpthread* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/librt* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libdl* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libnss* /lib/x86_64-linux-gnu/
+COPY --from=full /lib/x86_64-linux-gnu/libkeyutils* /lib/x86_64-linux-gnu/
+
+RUN mkdir -p /data/db /var/log/mongodb && \
+    groupadd -r mongodb && useradd -r -g mongodb mongodb && \
+    chown -R mongodb:mongodb /data/db /var/log/mongodb
+
+USER mongodb
+EXPOSE 27017
+
+ENTRYPOINT ["mongod", "--bind_ip_all", "--logpath", "/var/log/mongodb/mongod.log"]

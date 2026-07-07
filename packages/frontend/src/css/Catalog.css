@@ -1,6 +1,5 @@
 /* ==========================================================================
    Catalog.css — Vista Catalogo de Cursos (tema claro tipo Udemy)
-   Marcado semantico: header / search / ul-li / article / figure / section.
    Prefijo: .cat-
    ========================================================================== */
 
@@ -76,15 +75,6 @@
   border-color: var(--color-primary);
 }
 
-.cat-msg {
-  color: var(--color-text-muted);
-  padding: 24px 0;
-}
-
-.cat-msg--error {
-  color: var(--color-danger);
-}
-
 /* ── Grid de cursos ───────────────────────────────── */
 .cat-grid {
   list-style: none;
@@ -101,9 +91,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   overflow: hidden;
   transition:
     transform var(--transition),
@@ -127,7 +114,6 @@
   aspect-ratio: 16 / 9;
   padding: 14px 16px;
   color: #fff;
-  /* El gradiente varia por curso y se aplica inline (portadaDeCurso). */
 }
 
 .cat-card__monogram {
@@ -146,7 +132,6 @@
   opacity: 0.92;
 }
 
-/* Foto de portada encima del cover generado; si falla (onError) queda el gradiente. */
 .cat-card__cover {
   position: absolute;
   inset: 0;
@@ -167,10 +152,6 @@
   font-size: 15px;
   font-weight: 700;
   line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   transition: color var(--transition);
 }
 
@@ -219,30 +200,13 @@
   color: var(--color-text);
 }
 
+/* Legacy aliases — componen con shared utilities desde index.css */
 .cat-card__enroll {
   margin-top: 10px;
-  height: 40px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--color-primary);
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background var(--transition);
 }
-
-.cat-card__enroll:hover:not(:disabled) {
-  background: #2d1470;
-}
-
 .cat-card__enroll:disabled {
   cursor: not-allowed;
 }
-
-.cat-card__enroll--done {
-  background: var(--color-surface-2);
-  color: var(--color-success);
-  border: 1px solid var(--color-success);
+.cat-msg {
+  padding: 24px 0;
 }
