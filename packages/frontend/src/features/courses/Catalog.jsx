@@ -3,6 +3,15 @@ import { Search } from 'lucide-react'
 import Estrellas from '../../components/common/Estrellas.jsx'
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
+const MONEDA_LOCALES = {
+  USD: 'en-US',
+  EUR: 'de-DE',
+  CLP: 'es-CL',
+  MXN: 'es-MX',
+  GBP: 'en-GB',
+  BRL: 'pt-BR',
+}
+const DEFAULT_EXCHANGE_RATE_API_URL = 'https://api.exchangerate-api.com/v4/latest/USD'
 
 // Palabras de nivel que no aportan al tema del curso (se omiten en el monograma).
 const NIVELES = new Set([
@@ -41,9 +50,12 @@ const COVER_IMAGES = [
 export function formatearPrecio(precioUSD, moneda, tasas) {
   if (precioUSD == null) return 'Sin precio'
   const tasa = moneda === 'USD' ? 1 : tasas[moneda]
-  if (!tasa) return `${precioUSD.toFixed(2)} USD`
+  if (!tasa) {
+    return `${precioUSD.toFixed(2)} USD`
+  }
+  const locale = MONEDA_LOCALES[moneda] || 'en-US'
   const convertido = precioUSD * tasa
-  return convertido.toLocaleString('es-CL', { style: 'currency', currency: moneda })
+  return convertido.toLocaleString(locale, { style: 'currency', currency: moneda })
 }
 
 // Portada generada a partir del nombre: monograma, tema y un gradiente estable por curso.
@@ -101,10 +113,13 @@ export default function Catalog({ user, onRequireLogin }) {
   // 🛠️ Issue #29: Modificado el useEffect para leer el endpoint desde variables de entorno.
   useEffect(() => {
     let activo = true
-    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL;
+    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL || DEFAULT_EXCHANGE_RATE_API_URL
 
     fetch(apiUrl)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`Exchange rate API returned ${r.status}`)
+        return r.json()
+      })
       .then((d) => {
         if (activo && d && d.rates) setTasas(d.rates)
       })

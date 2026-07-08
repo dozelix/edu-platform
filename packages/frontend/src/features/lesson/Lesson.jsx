@@ -204,6 +204,14 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
             </section>
 
             <div className="les-actions">
+              <button
+                className="les-btn les-btn--ghost"
+                onClick={() => onNavigate?.(leccion.anteriorId)}
+                disabled={!leccion.anteriorId}
+                title={leccion.anteriorId ? '' : 'No hay lección anterior'}
+              >
+                ← Lección anterior
+              </button>
               <button className="les-btn" onClick={completar} disabled={leccion.completada || completando}>
                 {leccion.completada
                   ? 'Completada'
