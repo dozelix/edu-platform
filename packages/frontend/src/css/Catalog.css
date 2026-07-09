@@ -26,6 +26,27 @@
   margin-bottom: 24px;
 }
 
+.cat-back-btn {
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.cat-back-btn:hover {
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+}
+
+.cat-header {
+  margin-bottom: 20px;
+}
+
 .cat-search {
   flex: 1 1 280px;
   display: flex;
