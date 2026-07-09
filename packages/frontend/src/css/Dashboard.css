@@ -357,6 +357,24 @@
   animation: fadeUp 0.35s ease both;
 }
 
+.db-page-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.db-link-btn--back {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.db-link-btn--back:hover {
+  background: var(--color-surface-2);
+}
+
 .db-page-header__title {
   font-size: 28px;
   font-weight: 800;

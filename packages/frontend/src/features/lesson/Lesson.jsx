@@ -143,17 +143,19 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   return (
     <>
       <header className="db-page-header">
-        <hgroup>
-          <h1 className="db-page-header__title">
-            {leccion ? leccion.titulo : 'Lección'}
-          </h1>
-          <p className="db-page-header__sub">{leccion ? leccion.cursoNombre : ''}</p>
-        </hgroup>
-        {onBack && (
-          <button className="db-link-btn" onClick={onBack}>
-            ← Mi Aprendizaje
-          </button>
-        )}
+        <div className="db-page-header__left">
+          {onBack && (
+            <button className="db-link-btn db-link-btn--back" onClick={onBack}>
+              ← Volver a Mi Aprendizaje
+            </button>
+          )}
+          <hgroup>
+            <h1 className="db-page-header__title">
+              {leccion ? leccion.titulo : 'Lección'}
+            </h1>
+            <p className="db-page-header__sub">{leccion ? leccion.cursoNombre : ''}</p>
+          </hgroup>
+        </div>
       </header>
 
       {estado === 'loading' && <p className="les-msg">Cargando...</p>}
@@ -204,11 +206,21 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
             </section>
 
             <div className="les-actions">
+              {onBack && (
+                <button
+                  className="les-btn les-btn--ghost"
+                  onClick={onBack}
+                  type="button"
+                >
+                  ← Volver a Mi Aprendizaje
+                </button>
+              )}
               <button
                 className="les-btn les-btn--ghost"
                 onClick={() => onNavigate?.(leccion.anteriorId)}
                 disabled={!leccion.anteriorId}
                 title={leccion.anteriorId ? '' : 'No hay lección anterior'}
+                type="button"
               >
                 ← Lección anterior
               </button>
@@ -224,6 +236,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
                 onClick={() => onNavigate?.(leccion.siguienteId)}
                 disabled={!leccion.siguienteId}
                 title={leccion.siguienteId ? '' : 'No hay más lecciones'}
+                type="button"
               >
                 Siguiente lección →
               </button>
