@@ -12,33 +12,40 @@ EduPlatform es un monorepo de escritorio que combina Electron, React/Vite y Mong
 
 ## 2. Estructura del proyecto
 
-```text
-packages/
-  frontend/
-    src/
-      App.jsx                  # navegación por estado y estado global de la UI
-      components/              # sidebar, topbar, login/register, etc.
-      features/                # catálogo, aprendizaje, lección, instructor
-      css/                     # estilos legacy + Tailwind
-  main/
-    src/
-      index.js                # arranque de Electron, CSP, conexión a MongoDB
-      preload.cjs             # puente IPC con whitelist
-      session.js              # identidad de sesión del proceso main
-      db/
-        connection.js         # conexión a MongoDB (MONGODB_URI)
-        models/Usuario.js     # modelo de usuarios con bcrypt
-      ipc/
-        authHandlers.js       # login, registro, logout
-        courseHandlers.js     # catálogo y matrícula
-        learningHandlers.js   # progreso y cursos del usuario
-        lessonHandlers.js     # lecciones, comentarios y completado
-        instructorHandlers.js # resumen del instructor
-        dbHandlers.js         # estado de la conexión
-scripts/
-  seed-docker.sh              # seed via Docker
-seeds/
-  eduplatform.volume.seed.js  # seed de volumen con datos de prueba
+```mermaid
+graph TD
+  A[packages] --> B[frontend]
+  A --> C[main]
+  A --> D[scripts]
+  A --> E[seeds]
+
+  B --> B1[src]
+  B1 --> B2[App.jsx]
+  B1 --> B3[components/]
+  B1 --> B4[features/]
+  B1 --> B5[css/]
+
+  C --> C1[src]
+  C1 --> C2[index.js]
+  C1 --> C3[preload.cjs]
+  C1 --> C4[session.js]
+  C1 --> C5[db]
+  C1 --> C6[ipc]
+
+  C5 --> C51[connection.js]
+  C5 --> C52[models/Usuario.js]
+
+  C6 --> C61[authHandlers.js]
+  C6 --> C62[courseHandlers.js]
+  C6 --> C63[learningHandlers.js]
+  C6 --> C64[lessonHandlers.js]
+  C6 --> C65[instructorHandlers.js]
+  C6 --> C66[dbHandlers.js]
+
+  D --> D1[seed-docker.sh]
+
+  E --> E1[eduplatform.volume.seed.js]
+
 ```
 
 ## 3. Flujo de ejecución
