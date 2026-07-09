@@ -18,7 +18,7 @@ import {
 // ======================================================
 
 const FIELD_WRAP =
-  'flex items-center gap-2 border bg-white px-3 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[#3b1c8c] border-default focus-within:border-[#3b1c8c]'
+  'flex items-center gap-2 border bg-white px-3 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[var(--color-primary)] border-default focus-within:border-[var(--color-primary)]'
 const FIELD = 'flex-1 text-sm text-body outline-none bg-transparent placeholder:text-subtle'
 const FIELD_LABEL = 'text-sm font-semibold text-body'
 
@@ -259,13 +259,13 @@ export function LoginRegister({ onSuccess, onCancel }) {
               </div>
 
               {error && (
-                <div className="flex items-start gap-2.5 bg-[#fff3f3] border border-[#fca5a5] px-4 py-3 text-sm text-[#c0392b]">
+                <div className="flex items-start gap-2.5 px-4 py-3 text-sm" style={{ background: '#fff3f3', border: '1px solid #fca5a5', color: 'var(--color-danger)' }}>
                   <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
                   {error}
                 </div>
               )}
               {success && (
-                <div className="flex items-start gap-2.5 bg-[#eafaf1] border border-[#86e3b4] px-4 py-3 text-sm text-[#1d7a4d]">
+                <div className="flex items-start gap-2.5 px-4 py-3 text-sm" style={{ background: '#eafaf1', border: '1px solid #86e3b4', color: 'var(--color-success)' }}>
                   <Check size={15} className="flex-shrink-0 mt-0.5" />
                   {success}
                 </div>
@@ -409,7 +409,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       value={regTipo}
                       onChange={(e) => setRegTipo(e.target.value)}
                       disabled={loading}
-                      className="border border-default bg-white px-3 py-2.5 text-sm text-body outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+                      className="border border-default bg-white px-3 py-2.5 text-sm text-body outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]"
                     >
                       <option value="estudiante">Estudiante</option>
                       <option value="instructor">Instructor</option>

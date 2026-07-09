@@ -221,13 +221,60 @@
   color: var(--color-text);
 }
 
-/* Legacy aliases — componen con shared utilities desde index.css */
+/* ── Enroll button ──────────────────────────────────── */
 .cat-card__enroll {
   margin-top: 10px;
+  height: 36px;
+  padding: 0 16px;
+  background: var(--gradient-brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.cat-card__enroll:hover:not(:disabled) {
+  opacity: 0.9;
 }
 .cat-card__enroll:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
+.cat-card__enroll--done {
+  background: transparent;
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+  cursor: default;
+}
+.cat-card__enroll--done:hover {
+  opacity: 1;
+}
+
+/* ── Status messages ───────────────────────────────── */
 .cat-msg {
   padding: 24px 0;
+  color: var(--color-text-muted);
+}
+.cat-msg--error {
+  color: var(--color-danger);
+}
+
+/* ── Responsive ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .cat-toolbar {
+    flex-direction: column;
+  }
+  .cat-search {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .cat-grid {
+    grid-template-columns: 1fr;
+  }
 }

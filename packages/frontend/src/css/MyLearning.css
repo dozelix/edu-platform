@@ -80,13 +80,29 @@
   font-style: italic;
 }
 
+/* ── Progress bar (Barra component) ─────────────────── */
 .lrn-progress {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 140px;
 }
-
+.lrn-progress__track {
+  flex: 1;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.lrn-progress__fill {
+  height: 100%;
+  background: var(--gradient-brand);
+  border-radius: inherit;
+  transition: width 0.6s ease;
+}
+.lrn-progress__fill--done {
+  background: var(--color-success);
+}
 .lrn-progress__pct {
   font-size: 12px;
   color: var(--color-text-muted);
@@ -94,13 +110,32 @@
   text-align: right;
 }
 
-/* Legacy aliases — componen con shared utilities desde index.css */
+/* ── Status messages ───────────────────────────────── */
+.lrn-msg {
+  padding: 24px 0;
+  color: var(--color-text-muted);
+}
+.lrn-msg--error {
+  color: var(--color-danger);
+}
+
+/* ── Continue button ───────────────────────────────── */
 .lrn-continue {
   height: 34px;
   padding: 0 14px;
   font-family: var(--font-body);
   font-size: 13px;
   white-space: nowrap;
+  background: var(--gradient-brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.lrn-continue:hover:not(:disabled) {
+  opacity: 0.9;
 }
 .lrn-continue:disabled {
   opacity: 0.5;

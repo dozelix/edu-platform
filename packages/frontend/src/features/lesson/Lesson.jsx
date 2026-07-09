@@ -210,7 +210,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
               >
                 ← Volver a la lección anterior
               </button>
-              <button className="btn" onClick={completar} disabled={leccion.completada || completando}>
+              <button className="btn btn--primary" onClick={completar} disabled={leccion.completada || completando}>
                 {leccion.completada
                   ? 'Completada'
                   : completando
@@ -241,7 +241,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
                 rows={3}
                 disabled={enviando || !user?.id}
               />
-              <button className="btn" type="submit" disabled={enviando || !nuevo.trim()}>
+              <button className="btn btn--primary" type="submit" disabled={enviando || !nuevo.trim()}>
                 {enviando ? 'Enviando...' : 'Comentar'}
               </button>
             </form>

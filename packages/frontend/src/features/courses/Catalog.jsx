@@ -184,7 +184,7 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
         )}
       </header>
 
-      <search className="cat-toolbar">
+      <div className="cat-toolbar" role="search">
         <label className="cat-search">
           <Search size={16} className="cat-search__icon" aria-hidden="true" />
           <span className="sr-only">Buscar curso por nombre</span>
@@ -217,7 +217,7 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
             ))}
           </select>
         </label>
-      </search>
+      </div>
 
       {estado === 'loading' && <p className="cat-msg">Cargando cursos...</p>}
       {estado === 'no-api' && (

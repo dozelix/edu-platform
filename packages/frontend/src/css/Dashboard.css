@@ -338,6 +338,25 @@
   opacity: 0.85;
 }
 
+.db-topbar__login {
+  height: 38px;
+  padding: 0 18px;
+  background: var(--gradient-brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition);
+  white-space: nowrap;
+}
+
+.db-topbar__login:hover {
+  opacity: 0.9;
+}
+
 /* ── Content area ────────────────────────────────────── */
 .db-content {
   flex: 1;
