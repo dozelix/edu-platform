@@ -40,7 +40,7 @@ function urlEmbed(url) {
   return `https://www.youtube.com/embed/${id}?${params}`
 }
 
-export default function Lesson({ leccionId, user, onNavigate, onBack }) {
+export default function Lesson({ leccionId, user, onNavigate }) {
   const [leccion, setLeccion] = useState(null)
   const [comentarios, setComentarios] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
@@ -144,11 +144,6 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
     <>
       <header className="db-page-header">
         <div className="db-page-header__left">
-          {onBack && (
-            <button className="db-link-btn db-link-btn--back" onClick={onBack}>
-              ← Volver a Mi Aprendizaje
-            </button>
-          )}
           <hgroup>
             <h1 className="db-page-header__title">
               {leccion ? leccion.titulo : 'Lección'}
@@ -206,15 +201,6 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
             </section>
 
             <div className="les-actions">
-              {onBack && (
-                <button
-                  className="les-btn les-btn--ghost"
-                  onClick={onBack}
-                  type="button"
-                >
-                  ← Volver a Mi Aprendizaje
-                </button>
-              )}
               <button
                 className="les-btn les-btn--ghost"
                 onClick={() => onNavigate?.(leccion.anteriorId)}
@@ -222,7 +208,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
                 title={leccion.anteriorId ? '' : 'No hay lección anterior'}
                 type="button"
               >
-                ← Lección anterior
+                ← Volver a la lección anterior
               </button>
               <button className="les-btn" onClick={completar} disabled={leccion.completada || completando}>
                 {leccion.completada
