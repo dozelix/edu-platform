@@ -18,6 +18,7 @@ function App() {
 
   const [dbStatus, setDbStatus] = useState('idle')
   const [activeNav, setActiveNav] = useState('courses')
+  const [navHistory, setNavHistory] = useState(['courses'])
   const [activeLeccionId, setActiveLeccionId] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -50,6 +51,22 @@ function App() {
     setSidebarOpen(false)
   }
 
+  const handleBack = () => {
+    setNavHistory((prevHistory) => {
+      if (prevHistory.length <= 1) {
+        setActiveLeccionId(null)
+        setActiveNav('courses')
+        return ['courses']
+      }
+      const nextHistory = prevHistory.slice(0, -1)
+      setActiveNav(nextHistory[nextHistory.length - 1])
+      if (nextHistory[nextHistory.length - 1] !== 'lesson') {
+        setActiveLeccionId(null)
+      }
+      return nextHistory
+    })
+  }
+
   // Inscribe al usuario en un curso; no bloquea el post-login si ya estaba inscrito o falla.
   const enrollCourse = async (cursoId) => {
     // 🛠️ Issue #11: Corregido. Se utiliza el patrón unificado 'isElectron' en lugar del bypass directo a window.
@@ -70,6 +87,9 @@ function App() {
       setPendingCourseId(null)
     }
     setActiveNav('learning')
+    setNavHistory((prevHistory) =>
+      prevHistory[prevHistory.length - 1] === 'learning' ? prevHistory : [...prevHistory, 'learning']
+    )
   }
 
   // Cierra la sesion y devuelve la app al catalogo publico.
@@ -125,12 +145,15 @@ function App() {
     }
     setActiveNav(id)
     setSidebarOpen(false)
+    setNavHistory((prevHistory) =>
+      prevHistory[prevHistory.length - 1] === id ? prevHistory : [...prevHistory, id]
+    )
   }
 
   const renderContent = () => {
     switch (activeNav) {
       case 'courses':
-        return <Catalog user={currentUser} onRequireLogin={requireLogin} />
+        return <Catalog user={currentUser} onRequireLogin={requireLogin} onBack={handleBack} />
       case 'learning':
         return (
           <MyLearning
@@ -138,6 +161,9 @@ function App() {
             onContinue={(leccionId) => {
               setActiveLeccionId(leccionId)
               setActiveNav('lesson')
+              setNavHistory((prevHistory) =>
+                prevHistory[prevHistory.length - 1] === 'lesson' ? prevHistory : [...prevHistory, 'lesson']
+              )
             }}
           />
         )
@@ -147,7 +173,6 @@ function App() {
             leccionId={activeLeccionId}
             user={currentUser}
             onNavigate={(leccionId) => setActiveLeccionId(leccionId)}
-            onBack={() => setActiveNav('learning')}
           />
         )
       default:

@@ -3,7 +3,7 @@
    Prefijo: .lrn-
    ========================================================================== */
 
-/* Banner de bienvenida con resumen real (cursos en progreso / completados) */
+/* Banner de bienvenida con resumen real */
 .lrn-hero {
   display: flex;
   align-items: center;
@@ -48,15 +48,6 @@
   flex-shrink: 0;
 }
 
-.lrn-msg {
-  color: var(--color-text-muted);
-  padding: 24px 0;
-}
-
-.lrn-msg--error {
-  color: var(--color-danger);
-}
-
 .lrn-table {
   width: 100%;
   border-collapse: collapse;
@@ -89,32 +80,29 @@
   font-style: italic;
 }
 
+/* ── Progress bar (Barra component) ─────────────────── */
 .lrn-progress {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 140px;
 }
-
 .lrn-progress__track {
   flex: 1;
-  height: 8px;
-  background: var(--color-surface-2);
-  border-radius: 4px;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
   overflow: hidden;
 }
-
 .lrn-progress__fill {
   height: 100%;
   background: var(--gradient-brand);
+  border-radius: inherit;
   transition: width 0.6s ease;
 }
-
-/* Curso completado: barra verde, como en la referencia */
 .lrn-progress__fill--done {
   background: var(--color-success);
 }
-
 .lrn-progress__pct {
   font-size: 12px;
   color: var(--color-text-muted);
@@ -122,25 +110,33 @@
   text-align: right;
 }
 
+/* ── Status messages ───────────────────────────────── */
+.lrn-msg {
+  padding: 24px 0;
+  color: var(--color-text-muted);
+}
+.lrn-msg--error {
+  color: var(--color-danger);
+}
+
+/* ── Continue button ───────────────────────────────── */
 .lrn-continue {
   height: 34px;
   padding: 0 14px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--gradient-brand);
-  color: #fff;
   font-family: var(--font-body);
   font-size: 13px;
+  white-space: nowrap;
+  background: var(--gradient-brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
   transition: opacity var(--transition);
 }
-
 .lrn-continue:hover:not(:disabled) {
   opacity: 0.9;
 }
-
 .lrn-continue:disabled {
   opacity: 0.5;
   cursor: not-allowed;

@@ -40,7 +40,7 @@ cd EduPlataform
 npm install
 
 # Con MongoDB corriendo en localhost:27017, sembrar la base:
-mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
+mongosh "mongodb://localhost:27017" seeds/eduplatform.volume.seed.js
 
 # Iniciar Vite + Electron:
 npm run dev

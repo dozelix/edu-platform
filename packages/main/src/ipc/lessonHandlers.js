@@ -41,6 +41,7 @@ ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
       .sort({ numero: 1 })
       .toArray()
     const idx = hermanas.findIndex((l) => l._id.toString() === lid.toString())
+    const anterior = idx > 0 ? hermanas[idx - 1] : null
     const siguiente = idx >= 0 && idx < hermanas.length - 1 ? hermanas[idx + 1] : null
 
     let completada = false
@@ -71,6 +72,7 @@ ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
         duracion: typeof leccion.duracion_minutos === 'number' ? leccion.duracion_minutos : null,
         cursoId: leccion.curso_id ? leccion.curso_id.toString() : null,
         cursoNombre: curso ? curso.nombre : 'Curso no disponible',
+        anteriorId: anterior ? anterior._id.toString() : null,
         siguienteId: siguiente ? siguiente._id.toString() : null,
         completada,
       },
