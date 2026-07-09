@@ -49,10 +49,19 @@ const COVER_IMAGES = [
 // Convierte el precio en USD a la moneda elegida con las tasas de la API publica.
 export function formatearPrecio(precioUSD, moneda, tasas) {
   if (precioUSD == null) return 'Sin precio'
-  const tasa = moneda === 'USD' ? 1 : tasas[moneda]
-  if (!tasa) {
+
+  if (moneda === 'USD') {
+    return precioUSD.toLocaleString(MONEDA_LOCALES.USD, {
+      style: 'currency',
+      currency: 'USD',
+    })
+  }
+
+  const tasa = Number(tasas?.[moneda])
+  if (!tasa || Number.isNaN(tasa)) {
     return `${precioUSD.toFixed(2)} USD`
   }
+
   const locale = MONEDA_LOCALES[moneda] || 'en-US'
   const convertido = precioUSD * tasa
   return convertido.toLocaleString(locale, { style: 'currency', currency: moneda })
