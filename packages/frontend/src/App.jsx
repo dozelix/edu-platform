@@ -173,7 +173,6 @@ function App() {
             leccionId={activeLeccionId}
             user={currentUser}
             onNavigate={(leccionId) => setActiveLeccionId(leccionId)}
-            onBack={handleBack}
           />
         )
       default:
