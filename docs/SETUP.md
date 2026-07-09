@@ -1,80 +1,116 @@
 
 # Setup — EduPlatform
 
-```markdown
 ## Requisitos
 
-- Node.js v18 o superior
-- MongoDB corriendo en `localhost:27017` (o accesible por `MONGODB_URI`)
-- Git
+- Node.js 18 o superior con npm.
+- MongoDB 7.x o compatible, accesible en `localhost:27017` o a través de `MONGODB_URI`.
+- Git.
+- Docker opcional para levantar MongoDB de forma local.
 
-## 1. Clonar e instalar
+## 1. Clonar e instalar dependencias
 
 ```bash
-git clone [https://github.com/dozelix/edu-platform.git](https://github.com/dozelix/edu-platform.git)
-cd EduPlataform
+git clone https://github.com/dozelix/edu-platform.git
+cd edu-platform
 npm install
-
 ```
 
-`npm install` usa workspaces e instala todos los paquetes (frontend, main) de una vez.
+El comando instala los workspaces definidos en [package.json](../package.json), es decir, el frontend y el proceso principal de Electron.
 
-Stack: Electron 39, React 18, Vite 8, Tailwind v4, lucide-react, Mongoose 8, bcryptjs, Vitest.
+## 2. Configurar variables de entorno
 
-## 2. Base de datos
-
-MongoDB debe estar corriendo. Toda la configuración de entorno de la aplicación se gestiona a través del archivo `.env`. Antes de continuar, asegúrate de haber copiado el archivo de ejemplo y configurado tus variables locales:
-
-cp .env.example .env
-
-### Sembrado de Datos (Seeds)
-
-Por motivos de seguridad, los scripts requieren que inyectes el hash de la contraseña por entorno. Copia el contenido de `.env.example` a tu propio archivo `.env` o pásalo directamente por la terminal:
+El proceso principal espera un archivo `.env.local` en la raíz del proyecto. Puedes partir desde el ejemplo incluido:
 
 ```bash
-# Definir el hash de desarrollo de forma temporal en tu terminal (Ej: edu12345)
+cp .env.example .env.local
+```
+
+Variables relevantes:
+
+- `MONGODB_URI`: URI de conexión a MongoDB. El valor por defecto del ejemplo apunta a `mongodb://localhost:27017`.
+- `SEED_PASSWORD_HASH`: hash bcrypt usado por el seed para crear usuarios de prueba.
+- `NODE_ENV`: deja `development` para ejecutar la app localmente.
+- `VITE_EXCHANGE_RATE_API_URL`: endpoint usado por la UI para convertir monedas.
+
+## 3. Levantar MongoDB
+
+### Opción A: MongoDB local
+
+Si ya tienes MongoDB instalado, asegúrate de que esté corriendo y de que la base `eduplatform` sea accesible.
+
+```bash
+mongod
+```
+
+### Opción B: Docker
+
+El repositorio incluye un compose listo para levantar MongoDB en local:
+
+```bash
+docker compose -f docker/docker-compose.yml up -d
+```
+
+Para detenerlo:
+
+```bash
+docker compose -f docker/docker-compose.yml down
+```
+
+## 4. Sembrar datos de prueba
+
+El seed de volumen crea usuarios, cursos, lecciones, inscripciones y comentarios. El script requiere la variable `SEED_PASSWORD_HASH` para generar las contraseñas de prueba con el mismo formato que la app usa en producción.
+
+### Opción local
+
+```bash
 export SEED_PASSWORD_HASH='$2a$10$u5bCbkxGWzJlxymEoyt7BeX/TDTQON7pcQkK7.a52hJ58N/y8cmo6'
-
-# Dataset de volumen (Recomendado): 100 cursos, 999 estudiantes, 99 profesores + 2 cuentas de testeo.
-# Las lecciones traen contenido en Markdown, duración y calificación. Idempotente.
-mongosh "mongodb://localhost:27017" < seeds/eduplatform.volume.seed.js
-
+mongosh "mongodb://localhost:27017/eduplatform" < seeds/eduplatform.volume.seed.js
 ```
 
-> 💡 **Nota histórica:** El script de inicialización mínima alternativo (`seeds/eduplatform.seed.js`) ha sido unificado dentro de la carga del volumen estructurado de la plataforma para mantener la integridad referencial del entorno de pruebas.
-
-Credenciales de prueba (contraseña `edu12345`) — las dos cuentas de testeo del seed de volumen:
-
-* Estudiante: `alumno.test@edu.cl`
-* Docente (instructor): `profe.test@edu.cl`
-
-## 3. Correr
+### Opción Docker
 
 ```bash
-npm run dev      # Vite (:5173) + Electron coordinados
-
+npm run seed:docker
 ```
 
-En desarrollo la app carga `localhost:5173`; en producción, el bundle publicado en GitHub Pages.
+## 5. Ejecutar la aplicación
 
-## Scripts útiles
+Desarrollo completo (Vite + Electron):
 
 ```bash
-npm run dev:frontend   # solo Vite
-npm run build          # build de producción del frontend
-npm run lint           # ESLint
-npm run format         # Prettier
-npm run test           # Vitest
-npm run shot           # abre la app con Playwright y guarda capturas (verificación visual)
-
-``` text
-
-## Checklist
-
-* [ ] Node 18+ y MongoDB corriendo en `localhost:27017`.
-* [ ] `npm install` desde la raíz.
-* [ ] Seed de volumen cargado en la base `eduplatform` proveyendo la variable `SEED_PASSWORD_HASH`.
-* [ ] `npm run dev` abre la ventana y el login entra como estudiante (`alumno.test@edu.cl`) y como
-docente (`profe.test@edu.cl`), contraseña `edu12345`.
-
+npm run dev
 ```
+
+Solo frontend (Vite):
+
+```bash
+npm run dev:frontend
+```
+
+## 6. Credenciales de prueba
+
+Tras cargar el seed, puedes entrar con las cuentas de ejemplo:
+
+- Estudiante: `alumno.test@edu.cl`
+- Instructor: `profe.test@edu.cl`
+- Contraseña para ambas: `edu12345`
+
+## 7. Scripts útiles
+
+```bash
+npm run build          # build del frontend
+npm run lint           # eslint
+npm run format         # prettier
+npm run test           # vitest
+npm run shot           # captura visual con Playwright
+```
+
+## 8. Verificación rápida
+
+- [ ] Node 18+ y npm instalados.
+- [ ] MongoDB reachable en `localhost:27017` o `MONGODB_URI` configurado.
+- [ ] Archivo `.env.local` creado a partir de `.env.example`.
+- [ ] Seed cargado en la base `eduplatform`.
+- [ ] `npm run dev` inicia la app y permite entrar con las credenciales de prueba.
+

@@ -1,92 +1,59 @@
-# Security Policy — EduPlataform
+# Security Policy — EduPlatform
 
-**Estado**: Beta / En desarrollo. No usar en producción sin completar el checklist de abajo.
+Estado: beta / escritorio local. No usar en producción sin completar el checklist de abajo.
 
-## Versiones soportadas
+## 1. Configuración de seguridad actual
 
-| Versión | Soporte activo |
-| --- | --- |
-| 1.0.x (actual) | Sí |
-| < 1.0 | No |
-
----
-
-## Configuración de seguridad de Electron
-
-EduPlataform implementa las recomendaciones de seguridad de la guía oficial de Electron:
+La aplicación sigue las recomendaciones básicas de seguridad para Electron:
 
 | Configuración | Valor | Propósito |
 | --- | --- | --- |
-| `nodeIntegration` | `false` | El renderer no tiene acceso directo a Node.js |
-| `contextIsolation` | `true` | El contexto del renderer está aislado del preload |
-| `preload` | `preload.cjs` | Único puente de comunicación autorizado |
+| `nodeIntegration` | `false` | El renderer no tiene acceso directo a Node.js. |
+| `contextIsolation` | `true` | El contexto del renderer queda aislado del preload. |
+| `preload` | `preload.cjs` | Único puente de comunicación autorizado. |
 
-El preload expone únicamente `window.api.invoke`, y solo para una lista blanca de canales
-conocidos, mediante `contextBridge.exposeInMainWorld`.
+El preload expone únicamente `window.api.invoke` y solo para una whitelist de canales conocidos. Cualquier canal no listado se rechaza con un error.
 
----
+## 2. Estado de endurecimiento
 
-## Estado de endurecimiento
+### Implementado
 
-Resuelto:
+- Whitelist de canales IPC en [packages/main/src/preload.cjs](packages/main/src/preload.cjs).
+- CSP por sesión aplicada desde [packages/main/src/index.js](packages/main/src/index.js).
+- Identidad del usuario derivada de la sesión del proceso main, no del renderer, en [packages/main/src/session.js](packages/main/src/session.js).
+- Hashing de contraseñas con `bcryptjs` y validación mínima de longitud en [packages/main/src/db/models/Usuario.js](packages/main/src/db/models/Usuario.js).
+- Normalización de email y contraseña en los handlers de login/registro para reducir errores de entrada y mejorar consistencia.
 
-- **Whitelist de canales IPC** en `packages/main/src/preload.cjs`: `window.api.invoke` solo acepta
-  canales conocidos; cualquier otro se rechaza.
-- **Content-Security-Policy** por sesión en `packages/main/src/index.js`: estricta en producción y
-  relajada en desarrollo para el HMR de Vite; habilita solo los orígenes usados.
-- **Fallo de BD no fatal**: `connectDB` ya no llama `process.exit(1)`; la ventana se abre y las
-  vistas muestran el error en lugar de cerrar el proceso.
-- **Identidad desde la sesión del proceso main** (`packages/main/src/session.js`): los handlers
-  privilegiados derivan el usuario de la sesión fijada en `auth:login`/`auth:register`, no del id
-  que envía el renderer. `instructor:resumen` además exige `tipo === 'instructor'`. Un renderer
-  comprometido solo puede actuar como el usuario en sesión, no suplantar a otro.
+### Limitaciones actuales
 
-Limitaciones conocidas (aceptables para esta entrega de escritorio local):
+- La sesión vive en memoria del proceso main y está pensada para una sola ventana; no hay tokens firmados ni persistencia de sesión.
+- El arranque actual aborta si MongoDB no está disponible al iniciar la app. Esto es un punto de mejora para un modo degradado más robusto.
+- La validación de payloads se realiza mayormente en los handlers IPC, pero no existe una capa central de sanitización ni un esquema formal para todos los mensajes entrantes.
+- En desarrollo se habilitan DevTools; en producción no se abren automáticamente, pero la configuración de empaquetado debe revisarse antes de lanzar una build final.
 
-- La sesión vive en memoria del proceso main y es de una sola ventana; un despliegue
-  multiusuario/multiventana o cliente-servidor requeriría tokens firmados por petición.
-- Sin persistencia de sesión: al recargar el renderer hay que volver a iniciar sesión.
+## 3. Hashing de contraseñas
 
----
+Las contraseñas se almacenan con `bcryptjs` usando 10 rondas de salt. La verificación ocurre en el método `comparePassword` del modelo y la longitud mínima se valida tanto en el modelo como en el flujo de registro.
 
-## Checklist de seguridad pre-producción
+## 4. Checklist de seguridad pre-producción
 
-- [x] Whitelist de canales IPC en `preload.cjs`
-- [x] CSP (Content Security Policy) por sesión en Electron
-- [x] Sesión en el proceso main para no confiar en el id que envía el renderer (`session.js`);
-  tokens firmados por petición quedan pendientes solo para un despliegue multiusuario/cliente-servidor
-- [ ] Validar/sanitizar todo input en los handlers IPC (Main Process)
-- [ ] Configurar autenticación de MongoDB con credenciales fuertes
-- [ ] Deshabilitar dev tools en builds de producción: `webPreferences: { devTools: false }`
-- [ ] Auditoría de código de seguridad
+- [x] Whitelist de canales IPC.
+- [x] CSP por sesión en Electron.
+- [x] Sesión en el proceso main para evitar suplantación de identidad.
+- [ ] Reforzar validación de todos los payloads IPC y errores de entrada.
+- [ ] Usar credenciales fuertes para MongoDB en entornos no locales.
+- [ ] Revisar y documentar el empaquetado final para deshabilitar DevTools en builds de producción si fuera necesario.
+- [ ] Ejecutar auditoría de dependencias y revisar alertas de seguridad.
 
----
+## 5. Reporte de vulnerabilidades
 
-## Hashing de contraseñas
+1. No abras un issue público para problemas de seguridad.
+2. Contacta al mantenedor principal por GitHub en [@dozelix](https://github.com/dozelix).
+3. Incluye descripción, pasos de reproducción, impacto estimado y, si aplica, una sugerencia de corrección.
 
-Se usa **bcryptjs** con salt rounds 10 (ver `packages/main/src/db/models/Usuario.js`).
-El hash se aplica en un hook `pre('save')` del esquema; la verificación usa
-`userSchema.methods.comparePassword`. Longitud mínima de contraseña: 6 caracteres
-(validada en el modelo y en `auth:register`).
+## 6. Buenas prácticas para contribuidores
 
----
-
-## Reporte de vulnerabilidades
-
-1. **No abras un issue público** — los problemas de seguridad se comunican en privado.
-2. Escribe al mantenedor principal: [@dozelix](https://github.com/dozelix) vía GitHub.
-3. Incluye: descripción, pasos para reproducir, impacto estimado y, opcionalmente,
-   sugerencia de corrección.
-
-Recibirás confirmación en menos de 72 horas.
-
----
-
-## Buenas prácticas para contribuidores
-
-- Nunca guardes credenciales, tokens o URIs de base de datos en el código. Usa `.env.local`
-  (ignorado por git).
-- No deshabilites `contextIsolation` ni actives `nodeIntegration` bajo ninguna circunstancia.
-- Los canales IPC nuevos deben añadirse a la whitelist de `packages/main/src/preload.cjs` y
-  registrarse con su `ipcMain.handle` en `packages/main/src/ipc/`; documentarlos en este archivo.
-- Toda validación de datos debe hacerse en el Main Process, nunca confiar solo en el renderer.
+- Nunca guardar secretos ni URIs de bases de datos en el código fuente; usar `.env.local` y mantenerlo fuera de Git.
+- No desactivar `contextIsolation` ni activar `nodeIntegration`.
+- Cualquier canal IPC nuevo debe añadirse a la whitelist del preload y registrarse con su `ipcMain.handle` en el proceso main.
+- La validación y normalización de datos debe hacerse en el proceso main, nunca confiar solamente en el renderer.

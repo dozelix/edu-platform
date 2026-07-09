@@ -1,97 +1,118 @@
 # Arquitectura — EduPlatform
 
-Monorepo Electron + React + MongoDB. El proceso principal de Electron actúa como pseudo-backend:
-la interfaz React (renderer) pide datos por IPC a través de un puente seguro (`window.api`), y los
-handlers del proceso main consultan MongoDB con Mongoose.
+EduPlatform es un monorepo de escritorio que combina Electron, React/Vite y MongoDB. El proceso principal de Electron actúa como backend local para la UI, y el renderer accede a los datos a través de un puente IPC muy restringido. La navegación no usa router: la aplicación alterna entre catálogo, aprendizaje, lección y panel de instructor mediante estado local en el componente principal.
 
-## Estructura
+## 1. Visión general
 
+- Frontend: React 18 + Vite 8 + Tailwind v4.
+- Escritorio: Electron 39 con un proceso principal que controla la ventana y la sesión.
+- Persistencia: MongoDB con Mongoose 8.
+- Autenticación: bcryptjs sobre la colección `usuarios`.
+- Datos: el caso de uso se implementa sobre colecciones MongoDB con referencias, usando el seed de volumen para reproducir un entorno realista.
+
+## 2. Estructura del proyecto
+
+```text
+packages/
+  frontend/
+    src/
+      App.jsx                  # navegación por estado y estado global de la UI
+      components/              # sidebar, topbar, login/register, etc.
+      features/                # catálogo, aprendizaje, lección, instructor
+      css/                     # estilos legacy + Tailwind
+  main/
+    src/
+      index.js                # arranque de Electron, CSP, conexión a MongoDB
+      preload.cjs             # puente IPC con whitelist
+      session.js              # identidad de sesión del proceso main
+      db/
+        connection.js         # conexión a MongoDB (MONGODB_URI)
+        models/Usuario.js     # modelo de usuarios con bcrypt
+      ipc/
+        authHandlers.js       # login, registro, logout
+        courseHandlers.js     # catálogo y matrícula
+        learningHandlers.js   # progreso y cursos del usuario
+        lessonHandlers.js     # lecciones, comentarios y completado
+        instructorHandlers.js # resumen del instructor
+        dbHandlers.js         # estado de la conexión
+scripts/
+  seed-docker.sh              # seed via Docker
+seeds/
+  eduplatform.volume.seed.js  # seed de volumen con datos de prueba
 ```
-packages/frontend/src/
-├── main.jsx                 monta <App>; importa tailwind.css y main.css
-├── app.jsx                  navegación por estado (login / shell / panel instructor)
-├── components/
-│   ├── LoginRegister.jsx    Vista 1 (auth:login / auth:register)
-│   ├── Sidebar.jsx          navegación e indicador de estado de BD
-│   └── Topbar.jsx           barra superior (login / usuario)
-└── features/
-    ├── courses/Catalog.jsx          Vista 2 (catálogo + conversor de monedas)
-    ├── learning/MyLearning.jsx      Vista 3 (progreso)
-    ├── lesson/Lesson.jsx            Vista 4 (reproductor + comentarios)
-    ├── lesson/Markdown.jsx          render de Markdown seguro (sin HTML crudo)
-    └── instructor/InstructorDashboard.jsx   panel del instructor
 
-packages/main/src/
-├── index.js                 arranque: CSP, connectDB, ventana y carga de handlers
-├── preload.cjs              puente IPC (window.api) con lista blanca de canales
-├── db/connection.js         conexión a .env.local
-├── db/models/Usuario.js     colección `usuarios` (bcrypt)
-├── session.js               sesión del proceso main (identidad para los handlers)
-└── ipc/                     authHandlers, courseHandlers, learningHandlers,
-                             lessonHandlers, instructorHandlers, dbHandlers
+## 3. Flujo de ejecución
 
-seeds/                                eduplatform.seed.js (mínimo/huérfanos), eduplatform.volume.seed.js
-```
+1. El comando `npm run dev` levanta Vite en `http://localhost:5173` y luego lanza Electron.
+2. El proceso principal de Electron carga el archivo `.env.local`, define la CSP por sesión, conecta a MongoDB y registra los handlers IPC.
+3. El renderer carga la interfaz y consulta al proceso principal mediante `window.api.invoke(...)`.
+4. El preload valida que el canal esté permitido y reenvía la llamada al proceso main.
+5. Los handlers del proceso main consultan MongoDB con Mongoose y usan la sesión persistida en memoria para decidir la identidad del usuario activo.
 
-## Canales IPC
+## 4. Capa de frontend
 
-El renderer solo puede invocar los canales de la lista blanca (`preload.cjs`); cualquier otro se
-rechaza. Cada canal responde `{ success, data }` o `{ success: false, error }`.
+La UI está implementada en React y no usa router. El componente principal en [packages/frontend/src/App.jsx](../packages/frontend/src/App.jsx) mantiene:
+
+- `currentUser` para la sesión autenticada.
+- `activeNav` para alternar entre catálogo, aprendizaje y lección.
+- `activeLeccionId` para abrir una lección en contexto.
+- `dbStatus` para mostrar si la base de datos está disponible.
+
+La navegación para instructores se deriva del tipo de usuario: si el usuario autenticado es instructor, la app muestra el panel correspondiente en lugar de la experiencia de estudiante.
+
+## 5. Capa de proceso principal
+
+El proceso principal es responsable de:
+
+- crear y gestionar la ventana principal de Electron;
+- aplicar la Content-Security-Policy por sesión;
+- cargar variables de entorno desde `.env.local`;
+- abrir la conexión a MongoDB;
+- registrar los handlers IPC;
+- mantener la sesión del usuario activo en memoria.
+
+El archivo [packages/main/src/index.js](../packages/main/src/index.js) concentra el arranque, mientras que [packages/main/src/preload.cjs](../packages/main/src/preload.cjs) actúa como único puente seguro hacia el renderer.
+
+## 6. Canales IPC
+
+El renderer solo puede invocar canales autorizados. Cada respuesta sigue el patrón `{ success, data }` o `{ success: false, error }`.
 
 | Canal | Propósito |
-|---|---|
-| `auth:login`, `auth:register`, `auth:logout` | Autenticación (bcrypt). |
-| `curso:listar` | Catálogo, con marca de inscripción para el usuario. |
-| `inscripcion:crear` | Inscribir a un curso. |
-| `aprendizaje:listar` | Cursos del usuario con progreso y última lección. |
-| `leccion:obtener`, `leccion:completar` | Lección y avance (recalcula progreso). |
-| `comentario:listar`, `comentario:crear` | Últimos 5 comentarios y alta de comentario. |
-| `instructor:resumen` | Cursos, estudiantes y progreso del instructor. |
-| `db:estado` | Estado real de la conexión a MongoDB (para el indicador del sidebar). |
+| --- | --- |
+| `auth:login`, `auth:register`, `auth:logout` | Autenticación y cierre de sesión. |
+| `curso:listar` | Catálogo de cursos y marca de inscripción por usuario. |
+| `inscripcion:crear` | Crear una inscripción en un curso. |
+| `aprendizaje:listar` | Cursos, progreso y siguiente lección para el usuario actual. |
+| `leccion:obtener`, `leccion:completar` | Obtener una lección y marcarla como completada. |
+| `comentario:listar`, `comentario:crear` | Comentarios asociados a una lección. |
+| `instructor:resumen` | Resumen para un instructor autenticado. |
+| `db:estado` | Estado real de la conexión a MongoDB. |
 
-## Modelo de datos (NoSQL por referencias)
+## 7. Modelo de datos
 
-Transformación del esquema relacional de origen (`docs/docs_ev/CASO_3_EduPlatform_schema.sql`)
-a documentos con referencias (no embebidos) por la alta cardinalidad (100 cursos, ~1000 usuarios).
+El caso se modela con colecciones MongoDB por referencias, siguiendo la transformación del esquema relacional original.
 
-```
-usuarios:      { _id, email, nombre, tipo: 'estudiante'|'instructor', password (bcrypt),
-                 fecha_registro, bio, especialidades }   // bio/especialidades solo instructores
-cursos:        { _id, nombre, descripcion, instructor_id -> usuarios._id, fecha_inicio,
-                 precio, portada_url, estado, calificacion }
-lecciones:     { _id, curso_id -> cursos._id, numero, orden, titulo, contenido_text (Markdown),
-                 video_url, duracion_minutos }
-inscripciones: { _id, usuario_id, curso_id, fecha_inscripcion, estado, progreso,
-                 lecciones_completadas: [leccion._id] }
-comentarios:   { _id, leccion_id, usuario_id, texto, fecha }
-calificaciones:{ _id, usuario_id, leccion_id, puntaje, fecha }
-```
+- `usuarios`: datos de usuarios, con `tipo` (`estudiante` o `instructor`) y password hasheado con bcrypt.
+- `cursos`: curso, instructor asociado y precio/calificación.
+- `lecciones`: contenido en Markdown, video y duración.
+- `inscripciones`: matrícula de un estudiante en un curso y progreso.
+- `comentarios`: comentarios por lección.
+- `calificaciones`: puntajes por lección (si se usan en el seed).
 
-`progreso` se deriva de `lecciones_completadas` / total de lecciones del curso, consistente con lo
-que recalcula `leccion:completar`.
+La lógica de progreso se deriva de `lecciones_completadas` y del total de lecciones del curso. Los índices principales incluyen `usuarios.email`, `cursos.instructor_id`, `lecciones.curso_id`, `inscripciones.usuario_id` y el compuesto `{ usuario_id, curso_id }`.
 
-Índices: `usuarios.email` (único), `cursos.instructor_id`, `lecciones.curso_id`,
-`inscripciones.usuario_id` y `{usuario_id, curso_id}` (único), `comentarios.leccion_id`,
-`calificaciones.{usuario_id, leccion_id}`.
+## 8. Decisiones de diseño relevantes
 
-## Decisiones de diseño
+- Se evita confiar en el renderer para identificar al usuario activo: la identidad real se toma de la sesión del proceso main.
+- Se usa acceso directo a `mongoose.connection.db.collection(...)` para leer datos del seed y mantener compatibilidad con campos legacy del caso.
+- Las lecciones se presentan como Markdown renderizado en la UI, sin usar `dangerouslySetInnerHTML`.
+- La experiencia es de una sola ventana y la sesión vive en memoria del proceso main, lo que es suficiente para el uso local de escritorio pero no para un despliegue multiusuario/servidor.
 
-- **Tema tipo Udemy.** Tokens `--color-*` en `styles/index.css` (primario `#3b1c8c`, acento
-  `#a435f0`, fondo `#f7f9fa`, texto `#1c1d1f`, borde `#d1d7dc`, fuente Inter).
-- **Tailwind v4 + CSS heredado en capas.** El CSS plano va en la capa `legacy`; las utilidades de
-  Tailwind ganan en las vistas nuevas. Preflight activo.
-- **Navegación por estado.** `app.jsx` usa `useState` (`activeNav`, `activeLeccionId`); sin router.
-- **Lectura null-safe.** El seed mínimo trae datos huérfanos a propósito; los handlers resuelven los
-  joins de forma defensiva ("Instructor desconocido", "Curso no disponible") para no romper la UI.
+## 9. Build y empaquetado
 
-## Seguridad
+- Desarrollo: `npm run dev`.
+- Frontend standalone: `npm run dev:frontend`.
+- Build web: `npm run build`.
+- Empaquetado Electron: el proyecto está preparado para generar un bundle con Electron Builder usando la configuración del archivo [package.json](../package.json).
 
-- **Lista blanca de canales IPC** en `preload.cjs`: el renderer solo llama canales conocidos.
-- **Content-Security-Policy** por sesión (`index.js`): estricta en producción; en desarrollo se
-  relaja para el HMR de Vite. Habilita solo los orígenes usados (Google Fonts, imágenes de Unsplash,
-  API de monedas, media https).
-- **Fallo de BD no fatal:** si MongoDB no conecta, la ventana se abre y las vistas muestran el error,
-  en lugar de cerrar el proceso.
-- El contenido de lección (dato externo) se renderiza como Markdown sin `dangerouslySetInnerHTML`.
-
-Detalle y limitaciones conocidas en [../SECURITY.md](../SECURITY.md).
+La política de seguridad y las limitaciones actuales se documentan en [SECURITY.md](../SECURITY.md).
