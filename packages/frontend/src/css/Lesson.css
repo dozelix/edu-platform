@@ -16,6 +16,26 @@
   }
 }
 
+@media (max-width: 480px) {
+  .les-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .les-content {
+    padding: 12px;
+  }
+  .les-comments {
+    padding: 12px;
+  }
+  .les-actions {
+    flex-direction: column;
+  }
+  .les-actions .btn {
+    width: 100%;
+  }
+}
+
 .les-player {
   display: flex;
   flex-direction: column;
@@ -251,4 +271,13 @@
 .les-comment__text {
   font-size: 14px;
   color: var(--color-text);
+}
+
+/* ── Status messages ───────────────────────────────── */
+.les-msg {
+  padding: 24px 0;
+  color: var(--color-text-muted);
+}
+.les-msg--error {
+  color: var(--color-danger);
 }

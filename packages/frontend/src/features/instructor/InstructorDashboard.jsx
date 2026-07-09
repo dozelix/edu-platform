@@ -9,14 +9,13 @@ function EstadoBadge({ estado }) {
   const activo = estado === 'activo'
   return (
     <span
-      className="inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full"
+      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full ${activo ? 'bg-primary-soft' : 'bg-body'}`}
       style={{
-        background: activo ? 'var(--color-success-soft)' : '#f7f9fa',
         color: activo ? 'var(--color-success)' : 'var(--color-text-muted)',
       }}
     >
       <span
-        className="w-1.5 h-1.5 rounded-full"
+        className={`w-1.5 h-1.5 rounded-full ${activo ? '' : ''}`}
         style={{ background: activo ? 'var(--color-success)' : 'var(--color-text-subtle)' }}
         aria-hidden="true"
       />
@@ -113,7 +112,7 @@ export default function InstructorDashboard({ user, onLogout }) {
       </header>
 
       <main className="flex-1 w-full max-w-[1100px] mx-auto px-6 py-8 space-y-8">
-        <section className="bg-gradient-to-r from-[#3b1c8c] to-[#5a2db8] text-white p-6 flex items-center gap-4">
+        <section className="text-white p-6 flex items-center gap-4" style={{ background: 'var(--gradient-brand)' }}>
           <span className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
             <GraduationCap size={24} />
           </span>
@@ -159,9 +158,9 @@ export default function InstructorDashboard({ user, onLogout }) {
                 <p className="text-muted-color">Aún no tienes cursos publicados.</p>
               ) : (
                 data.cursos.map((curso) => (
-                  <article key={curso.id} className="bg-white border border-[#d1d7dc]">
-                    <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 border-b border-[#d1d7dc]">
-                      <h3 className="text-base font-bold text-[#1c1d1f]">{curso.nombre}</h3>
+                  <article key={curso.id} className="bg-white border border-default">
+                    <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 border-b border-default">
+                      <h3 className="text-base font-bold text-body">{curso.nombre}</h3>
                       <Estrellas valor={curso.calificacion} className="inline-flex items-center gap-1" />
                       <EstadoBadge estado={curso.estado} />
                       <span className="ml-auto flex items-center gap-2 text-sm text-muted-color">
@@ -190,8 +189,8 @@ export default function InstructorDashboard({ user, onLogout }) {
                         </thead>
                         <tbody>
                           {curso.estudiantes.map((e) => (
-                            <tr key={e.id || e.nombre} className="border-b border-[#f7f9fa] last:border-0">
-                              <td className="px-5 py-2.5 text-[#1c1d1f]">{e.nombre}</td>
+                            <tr key={e.id || e.nombre} className="border-b border-default last:border-0">
+                              <td className="px-5 py-2.5 text-body">{e.nombre}</td>
                               <td className="px-5 py-2.5">
                                 <Barra valor={e.progreso} />
                               </td>
