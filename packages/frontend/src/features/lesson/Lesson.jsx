@@ -202,7 +202,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
 
             <div className="les-actions">
               <button
-                className="les-btn les-btn--ghost"
+                className="btn btn--ghost"
                 onClick={() => onNavigate?.(leccion.anteriorId)}
                 disabled={!leccion.anteriorId}
                 title={leccion.anteriorId ? '' : 'No hay lección anterior'}
@@ -210,7 +210,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
               >
                 ← Volver a la lección anterior
               </button>
-              <button className="les-btn" onClick={completar} disabled={leccion.completada || completando}>
+              <button className="btn" onClick={completar} disabled={leccion.completada || completando}>
                 {leccion.completada
                   ? 'Completada'
                   : completando
@@ -218,7 +218,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
                     : 'Marcar como completada'}
               </button>
               <button
-                className="les-btn les-btn--ghost"
+                className="btn btn--ghost"
                 onClick={() => onNavigate?.(leccion.siguienteId)}
                 disabled={!leccion.siguienteId}
                 title={leccion.siguienteId ? '' : 'No hay más lecciones'}
@@ -241,7 +241,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
                 rows={3}
                 disabled={enviando || !user?.id}
               />
-              <button className="les-btn" type="submit" disabled={enviando || !nuevo.trim()}>
+              <button className="btn" type="submit" disabled={enviando || !nuevo.trim()}>
                 {enviando ? 'Enviando...' : 'Comentar'}
               </button>
             </form>
