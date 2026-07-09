@@ -54,13 +54,15 @@ function App() {
   const handleBack = () => {
     setNavHistory((prevHistory) => {
       if (prevHistory.length <= 1) {
-        if (typeof window !== 'undefined' && window.history?.length > 1) {
-          window.history.back()
-        }
-        return prevHistory
+        setActiveLeccionId(null)
+        setActiveNav('courses')
+        return ['courses']
       }
       const nextHistory = prevHistory.slice(0, -1)
       setActiveNav(nextHistory[nextHistory.length - 1])
+      if (nextHistory[nextHistory.length - 1] !== 'lesson') {
+        setActiveLeccionId(null)
+      }
       return nextHistory
     })
   }
@@ -159,6 +161,9 @@ function App() {
             onContinue={(leccionId) => {
               setActiveLeccionId(leccionId)
               setActiveNav('lesson')
+              setNavHistory((prevHistory) =>
+                prevHistory[prevHistory.length - 1] === 'lesson' ? prevHistory : [...prevHistory, 'lesson']
+              )
             }}
           />
         )
