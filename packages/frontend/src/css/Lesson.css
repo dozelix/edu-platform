@@ -3,15 +3,6 @@
    Prefijo: .les-
    ========================================================================== */
 
-.les-msg {
-  color: var(--color-text-muted);
-  padding: 16px 0;
-}
-
-.les-msg--error {
-  color: var(--color-danger);
-}
-
 .les-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -22,6 +13,26 @@
 @media (max-width: 900px) {
   .les-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .les-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .les-content {
+    padding: 12px;
+  }
+  .les-comments {
+    padding: 12px;
+  }
+  .les-actions {
+    flex-direction: column;
+  }
+  .les-actions .btn {
+    width: 100%;
   }
 }
 
@@ -64,7 +75,6 @@
   color: var(--color-text-muted);
 }
 
-/* Estado de la leccion: pildora neutra; verde cuando esta completada */
 .les-status {
   display: inline-flex;
   align-items: center;
@@ -95,7 +105,6 @@
   margin-bottom: 10px;
 }
 
-/* Contenido de la leccion renderizado desde Markdown (Vista 4). */
 .les-content__body {
   font-size: 15px;
   line-height: 1.7;
@@ -131,7 +140,6 @@
   margin: 0 0 12px;
 }
 
-/* El preflight de Tailwind quita los marcadores; se reponen para el contenido markdown. */
 .les-content__body ul {
   margin: 0 0 12px;
   padding-left: 22px;
@@ -192,35 +200,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.les-btn {
-  height: 38px;
-  padding: 0 16px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--gradient-brand);
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity var(--transition);
-}
-
-.les-btn:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.les-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.les-btn--ghost {
-  background: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
 }
 
 .les-comments {
@@ -292,4 +271,13 @@
 .les-comment__text {
   font-size: 14px;
   color: var(--color-text);
+}
+
+/* ── Status messages ───────────────────────────────── */
+.les-msg {
+  padding: 24px 0;
+  color: var(--color-text-muted);
+}
+.les-msg--error {
+  color: var(--color-danger);
 }

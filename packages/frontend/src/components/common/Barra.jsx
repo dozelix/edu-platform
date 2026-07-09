@@ -29,10 +29,10 @@ export default function Barra({ valor, isCustomCss = false }) {
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      <span className="block w-28 h-2 bg-[#f0ebff] rounded-full overflow-hidden">
-        <span className="block h-full bg-[#3b1c8c] rounded-full" style={{ width: `${valor}%` }} />
+      <span className="block w-28 h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-primary-soft)' }}>
+        <span className="block h-full rounded-full" style={{ width: `${valor}%`, background: 'var(--color-primary)' }} />
       </span>
-      <span className="text-xs font-semibold text-[#3e4143] w-9 text-right">{valor}%</span>
+      <span className="text-xs font-semibold w-9 text-right" style={{ color: 'var(--color-text)' }}>{valor}%</span>
     </span>
   )
 }

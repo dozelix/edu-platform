@@ -40,7 +40,7 @@ function urlEmbed(url) {
   return `https://www.youtube.com/embed/${id}?${params}`
 }
 
-export default function Lesson({ leccionId, user, onNavigate, onBack }) {
+export default function Lesson({ leccionId, user, onNavigate }) {
   const [leccion, setLeccion] = useState(null)
   const [comentarios, setComentarios] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
@@ -143,17 +143,14 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
   return (
     <>
       <header className="db-page-header">
-        <hgroup>
-          <h1 className="db-page-header__title">
-            {leccion ? leccion.titulo : 'Lección'}
-          </h1>
-          <p className="db-page-header__sub">{leccion ? leccion.cursoNombre : ''}</p>
-        </hgroup>
-        {onBack && (
-          <button className="db-link-btn" onClick={onBack}>
-            ← Mi Aprendizaje
-          </button>
-        )}
+        <div className="db-page-header__left">
+          <hgroup>
+            <h1 className="db-page-header__title">
+              {leccion ? leccion.titulo : 'Lección'}
+            </h1>
+            <p className="db-page-header__sub">{leccion ? leccion.cursoNombre : ''}</p>
+          </hgroup>
+        </div>
       </header>
 
       {estado === 'loading' && <p className="les-msg">Cargando...</p>}
@@ -204,7 +201,16 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
             </section>
 
             <div className="les-actions">
-              <button className="les-btn" onClick={completar} disabled={leccion.completada || completando}>
+              <button
+                className="btn btn--ghost"
+                onClick={() => onNavigate?.(leccion.anteriorId)}
+                disabled={!leccion.anteriorId}
+                title={leccion.anteriorId ? '' : 'No hay lección anterior'}
+                type="button"
+              >
+                ← Volver a la lección anterior
+              </button>
+              <button className="btn btn--primary" onClick={completar} disabled={leccion.completada || completando}>
                 {leccion.completada
                   ? 'Completada'
                   : completando
@@ -212,10 +218,11 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
                     : 'Marcar como completada'}
               </button>
               <button
-                className="les-btn les-btn--ghost"
+                className="btn btn--ghost"
                 onClick={() => onNavigate?.(leccion.siguienteId)}
                 disabled={!leccion.siguienteId}
                 title={leccion.siguienteId ? '' : 'No hay más lecciones'}
+                type="button"
               >
                 Siguiente lección →
               </button>
@@ -234,7 +241,7 @@ export default function Lesson({ leccionId, user, onNavigate, onBack }) {
                 rows={3}
                 disabled={enviando || !user?.id}
               />
-              <button className="les-btn" type="submit" disabled={enviando || !nuevo.trim()}>
+              <button className="btn btn--primary" type="submit" disabled={enviando || !nuevo.trim()}>
                 {enviando ? 'Enviando...' : 'Comentar'}
               </button>
             </form>

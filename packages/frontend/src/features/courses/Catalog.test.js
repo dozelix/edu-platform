@@ -11,15 +11,22 @@ describe('formatearPrecio', () => {
     expect(formatearPrecio(49.99, 'EUR', {})).toBe('49.99 USD')
   })
 
-  it('formatea en la moneda pedida cuando hay tasa', () => {
-    const salida = formatearPrecio(10, 'USD', {})
+  it('formatea en USD con formato local cuando la moneda es USD', () => {
+    const salida = formatearPrecio(49.99, 'USD', {})
     expect(typeof salida).toBe('string')
-    expect(salida).toMatch(/10/)
+    expect(salida).toMatch(/49[.,]?99/)
+    expect(salida).toMatch(/\$|USD/)
   })
 
   it('aplica la tasa de cambio al convertir', () => {
     const salida = formatearPrecio(10, 'CLP', { CLP: 900 })
     expect(salida).toMatch(/9[.,]?000/)
+  })
+
+  it('convierte correctamente a EUR cuando hay tasa', () => {
+    const salida = formatearPrecio(10, 'EUR', { EUR: 0.92 })
+    expect(salida).toMatch(/9[.,]?2/)
+    expect(salida).toMatch(/€|EUR/)
   })
 })
 

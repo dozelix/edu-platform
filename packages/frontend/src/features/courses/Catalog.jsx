@@ -3,6 +3,15 @@ import { Search } from 'lucide-react'
 import Estrellas from '../../components/common/Estrellas.jsx'
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
+const MONEDA_LOCALES = {
+  USD: 'en-US',
+  EUR: 'de-DE',
+  CLP: 'es-CL',
+  MXN: 'es-MX',
+  GBP: 'en-GB',
+  BRL: 'pt-BR',
+}
+const DEFAULT_EXCHANGE_RATE_API_URL = 'https://open.er-api.com/v6/latest/USD'
 
 // Palabras de nivel que no aportan al tema del curso (se omiten en el monograma).
 const NIVELES = new Set([
@@ -40,10 +49,22 @@ const COVER_IMAGES = [
 // Convierte el precio en USD a la moneda elegida con las tasas de la API publica.
 export function formatearPrecio(precioUSD, moneda, tasas) {
   if (precioUSD == null) return 'Sin precio'
-  const tasa = moneda === 'USD' ? 1 : tasas[moneda]
-  if (!tasa) return `${precioUSD.toFixed(2)} USD`
+
+  if (moneda === 'USD') {
+    return precioUSD.toLocaleString(MONEDA_LOCALES.USD, {
+      style: 'currency',
+      currency: 'USD',
+    })
+  }
+
+  const tasa = Number(tasas?.[moneda])
+  if (!tasa || Number.isNaN(tasa)) {
+    return `${precioUSD.toFixed(2)} USD`
+  }
+
+  const locale = MONEDA_LOCALES[moneda] || 'en-US'
   const convertido = precioUSD * tasa
-  return convertido.toLocaleString('es-CL', { style: 'currency', currency: moneda })
+  return convertido.toLocaleString(locale, { style: 'currency', currency: moneda })
 }
 
 // Portada generada a partir del nombre: monograma, tema y un gradiente estable por curso.
@@ -62,7 +83,7 @@ export function portadaDeCurso(nombre) {
   return { iniciales: iniciales || '?', tema, gradiente, imagen }
 }
 
-export default function Catalog({ user, onRequireLogin }) {
+export default function Catalog({ user, onRequireLogin, onBack }) {
   const [cursos, setCursos] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
   const [error, setError] = useState('')
@@ -101,10 +122,13 @@ export default function Catalog({ user, onRequireLogin }) {
   // 🛠️ Issue #29: Modificado el useEffect para leer el endpoint desde variables de entorno.
   useEffect(() => {
     let activo = true
-    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL;
+    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL || DEFAULT_EXCHANGE_RATE_API_URL
 
     fetch(apiUrl)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`Exchange rate API returned ${r.status}`)
+        return r.json()
+      })
       .then((d) => {
         if (activo && d && d.rates) setTasas(d.rates)
       })
@@ -149,11 +173,18 @@ export default function Catalog({ user, onRequireLogin }) {
   return (
     <>
       <header className="cat-header">
-        <h1 className="cat-header__title">Catálogo de Cursos</h1>
-        <p className="cat-header__sub">Explora los cursos disponibles y avanza a tu ritmo</p>
+        <div>
+          <h1 className="cat-header__title">Catálogo de Cursos</h1>
+          <p className="cat-header__sub">Explora los cursos disponibles y avanza a tu ritmo</p>
+        </div>
+        {onBack && (
+          <button type="button" className="cat-back-btn" onClick={onBack}>
+            ← Volver
+          </button>
+        )}
       </header>
 
-      <search className="cat-toolbar">
+      <div className="cat-toolbar" role="search">
         <label className="cat-search">
           <Search size={16} className="cat-search__icon" aria-hidden="true" />
           <span className="sr-only">Buscar curso por nombre</span>
@@ -186,7 +217,7 @@ export default function Catalog({ user, onRequireLogin }) {
             ))}
           </select>
         </label>
-      </search>
+      </div>
 
       {estado === 'loading' && <p className="cat-msg">Cargando cursos...</p>}
       {estado === 'no-api' && (
