@@ -11,7 +11,7 @@ const MONEDA_LOCALES = {
   GBP: 'en-GB',
   BRL: 'pt-BR',
 }
-const DEFAULT_EXCHANGE_RATE_API_URL = 'https://api.exchangerate-api.com/v4/latest/USD'
+const DEFAULT_EXCHANGE_RATE_API_URL = 'https://open.er-api.com/v6/latest/USD'
 
 // Palabras de nivel que no aportan al tema del curso (se omiten en el monograma).
 const NIVELES = new Set([
@@ -83,7 +83,7 @@ export function portadaDeCurso(nombre) {
   return { iniciales: iniciales || '?', tema, gradiente, imagen }
 }
 
-export default function Catalog({ user, onRequireLogin }) {
+export default function Catalog({ user, onRequireLogin, onBack }) {
   const [cursos, setCursos] = useState([])
   const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
   const [error, setError] = useState('')
@@ -173,8 +173,15 @@ export default function Catalog({ user, onRequireLogin }) {
   return (
     <>
       <header className="cat-header">
-        <h1 className="cat-header__title">Catálogo de Cursos</h1>
-        <p className="cat-header__sub">Explora los cursos disponibles y avanza a tu ritmo</p>
+        <div>
+          <h1 className="cat-header__title">Catálogo de Cursos</h1>
+          <p className="cat-header__sub">Explora los cursos disponibles y avanza a tu ritmo</p>
+        </div>
+        {onBack && (
+          <button type="button" className="cat-back-btn" onClick={onBack}>
+            ← Volver
+          </button>
+        )}
       </header>
 
       <search className="cat-toolbar">
