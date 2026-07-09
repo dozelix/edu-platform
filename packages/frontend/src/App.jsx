@@ -53,7 +53,12 @@ function App() {
 
   const handleBack = () => {
     setNavHistory((prevHistory) => {
-      if (prevHistory.length <= 1) return prevHistory
+      if (prevHistory.length <= 1) {
+        if (typeof window !== 'undefined' && window.history?.length > 1) {
+          window.history.back()
+        }
+        return prevHistory
+      }
       const nextHistory = prevHistory.slice(0, -1)
       setActiveNav(nextHistory[nextHistory.length - 1])
       return nextHistory
@@ -146,7 +151,7 @@ function App() {
   const renderContent = () => {
     switch (activeNav) {
       case 'courses':
-        return <Catalog user={currentUser} onRequireLogin={requireLogin} onBack={navHistory.length > 1 ? handleBack : undefined} />
+        return <Catalog user={currentUser} onRequireLogin={requireLogin} onBack={handleBack} />
       case 'learning':
         return (
           <MyLearning
