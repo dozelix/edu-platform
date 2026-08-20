@@ -8,8 +8,9 @@
   },
   "packageManager": "pnpm@11.22.0",
   "scripts": {
+    "postinstall": "node node_modules/electron/install.js || true",
     "dev:frontend": "pnpm --filter frontend dev",
-    "dev:main": "cross-env NODE_ENV=development pnpm exec electron --import tsx packages/main/src/index.ts",
+    "dev:main": "cross-env NODE_ENV=development NODE_OPTIONS=\"--import tsx\" pnpm exec electron packages/main/src/index.ts",
     "dev": "concurrently \"pnpm dev:frontend\" \"wait-on http://localhost:5173 && pnpm dev:main\"",
     "build:frontend": "pnpm --filter frontend build",
     "build:main": "pnpm --filter main build",
