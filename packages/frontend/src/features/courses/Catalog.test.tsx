@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatearPrecio, portadaDeCurso } from './Catalog.jsx'
+import { formatearPrecio, portadaDeCurso } from './Catalog'
 
 describe('formatearPrecio', () => {
   it('devuelve "Sin precio" cuando el precio es null o undefined', () => {

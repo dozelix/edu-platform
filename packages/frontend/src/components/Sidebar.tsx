@@ -13,6 +13,16 @@ const NAV_ITEMS = [
   { id: 'learning', icon: <IconBarChart />, label: 'Mi Aprendizaje' },
 ]
 
+interface SidebarProps {
+  activeNav: string
+  sidebarOpen: boolean
+  setSidebarOpen: (open: boolean) => void
+  handleNav: (id: string) => void
+  isAuthenticated: boolean
+  onLogout: () => void
+  dbStatus: string
+}
+
 export default function Sidebar({
   activeNav,
   sidebarOpen,
@@ -21,7 +31,7 @@ export default function Sidebar({
   isAuthenticated,
   onLogout,
   dbStatus,
-}) {
+}: SidebarProps) {
   return (
     <>
       {sidebarOpen && (
@@ -44,6 +54,7 @@ export default function Sidebar({
             className="db-sidebar__close"
             onClick={() => setSidebarOpen(false)}
             aria-label="Cerrar menú"
+            type="button"
           >
             <IconClose />
           </button>
@@ -57,6 +68,7 @@ export default function Sidebar({
               className={`db-sidebar__nav-item${activeNav === item.id ? ' active' : ''}`}
               onClick={() => handleNav(item.id)}
               aria-current={activeNav === item.id ? 'page' : undefined}
+              type="button"
             >
               <span className="db-sidebar__nav-icon" aria-hidden="true">
                 {item.icon}
@@ -86,7 +98,7 @@ export default function Sidebar({
             </p>
           )}
           {isAuthenticated && (
-            <button className="db-sidebar__logout" onClick={onLogout}>
+            <button className="db-sidebar__logout" onClick={onLogout} type="button">
               <IconLogOut />
               Cerrar sesión
             </button>

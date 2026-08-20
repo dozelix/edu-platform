@@ -1,8 +1,3 @@
-import React from 'react'
-
-// Iconos SVG propios usados por el shell (Sidebar y Topbar). El resto de las vistas
-// usa lucide-react. Mantener aqui solo los que se importan de verdad.
-
 export const IconGraduationCap = () => (
   <svg
     width="18"

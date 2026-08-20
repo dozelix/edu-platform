@@ -1,28 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, FormEvent } from 'react'
 import Markdown from './Markdown'
 
-// Vista 4 del Caso 3: Lección (Reproductor).
-// Muestra el video (si existe), contenido y duración (con fallback porque el seed
-// no los trae), los últimos 5 comentarios, permite agregar uno, marcar la lección
-// como completada y avanzar a la siguiente.
-
-function formatearFecha(iso) {
+function formatearFecha(iso?: string): string {
   if (!iso) return ''
   const d = new Date(iso)
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
-// Construye la URL de incrustacion de YouTube en modo privado (youtube-nocookie.com):
-// evita las cookies de rastreo y la mayoria de las llamadas a anuncios que la CSP bloquea.
-// Pasa el parametro origin, que YouTube exige para validar el sitio que incrusta y reproducir.
-function urlEmbed(url) {
+function urlEmbed(url?: string): string {
   if (!url) return ''
 
   const rawOrigin = typeof globalThis.location !== 'undefined' ? globalThis.location.origin : ''
   const origin = rawOrigin && /^https?:\/\//.test(rawOrigin) ? rawOrigin : ''
   const params = `rel=0&playsinline=1${origin ? `&origin=${encodeURIComponent(origin)}` : ''}`
 
-  const extractIdFromYoutube = (input) => {
+  const extractIdFromYoutube = (input: string): string | null => {
     const embedMatch = /(?:youtube-nocookie\.com|youtube\.com)\/embed\/([\w-]+)/.exec(input)
     if (embedMatch) return embedMatch[1]
 
@@ -40,16 +32,40 @@ function urlEmbed(url) {
   return `https://www.youtube.com/embed/${id}?${params}`
 }
 
-export default function Lesson({ leccionId, user, onNavigate }) {
-  const [leccion, setLeccion] = useState(null)
-  const [comentarios, setComentarios] = useState([])
-  const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
+interface LeccionData {
+  id: string
+  titulo: string
+  cursoNombre: string
+  videoUrl?: string
+  numero?: number
+  duracion?: number
+  completada?: boolean
+  contenido?: string
+  anteriorId?: string
+  siguienteId?: string
+}
+
+interface ComentarioData {
+  id: string
+  autor: string
+  fecha?: string
+  texto: string
+}
+
+interface LessonProps {
+  leccionId: string | null
+  user: { id?: string; nombre: string; tipo: string } | null
+  onNavigate: (leccionId: string) => void
+}
+
+export default function Lesson({ leccionId, user, onNavigate }: LessonProps) {
+  const [leccion, setLeccion] = useState<LeccionData | null>(null)
+  const [comentarios, setComentarios] = useState<ComentarioData[]>([])
+  const [estado, setEstado] = useState<'loading' | 'ready' | 'error' | 'no-api'>('loading')
   const [error, setError] = useState('')
   const [nuevo, setNuevo] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [completando, setCompletando] = useState(false)
-  // El video se incrusta desde YouTube, que necesita conexion. La leccion funciona
-  // igual sin red: si esta offline, el reproductor muestra un aviso en vez del iframe.
   const [online, setOnline] = useState(() =>
     typeof navigator !== 'undefined' ? navigator.onLine : true
   )
@@ -65,7 +81,8 @@ export default function Lesson({ leccionId, user, onNavigate }) {
   }, [])
 
   async function cargar() {
-    if (!globalThis.window?.api) {
+    const win = globalThis.window as any
+    if (!win?.api) {
       setEstado('no-api')
       return
     }
@@ -76,8 +93,8 @@ export default function Lesson({ leccionId, user, onNavigate }) {
     }
     try {
       const [lecRes, comRes] = await Promise.all([
-        globalThis.window.api.invoke('leccion:obtener', { leccionId }),
-        globalThis.window.api.invoke('comentario:listar', leccionId),
+        win.api.invoke('leccion:obtener', { leccionId }),
+        win.api.invoke('comentario:listar', leccionId),
       ])
       if (lecRes.success) {
         setLeccion(lecRes.data)
@@ -87,7 +104,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
         setError(lecRes.error)
         setEstado('error')
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
       setEstado('error')
     }
@@ -98,24 +115,25 @@ export default function Lesson({ leccionId, user, onNavigate }) {
     cargar()
   }, [leccionId])
 
-  const agregarComentario = async (e) => {
+  const agregarComentario = async (e: FormEvent) => {
     e.preventDefault()
     if (!nuevo.trim() || !user?.id) return
     setEnviando(true)
     setError('')
     try {
-      const res = await globalThis.window.api.invoke('comentario:crear', {
+      const win = globalThis.window as any
+      const res = await win.api.invoke('comentario:crear', {
         leccionId,
         texto: nuevo,
       })
       if (res.success) {
         setNuevo('')
-        const comRes = await globalThis.window.api.invoke('comentario:listar', leccionId)
+        const comRes = await win.api.invoke('comentario:listar', leccionId)
         if (comRes.success) setComentarios(comRes.data)
       } else {
         setError(res.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
     } finally {
       setEnviando(false)
@@ -127,13 +145,14 @@ export default function Lesson({ leccionId, user, onNavigate }) {
     setCompletando(true)
     setError('')
     try {
-      const res = await globalThis.window.api.invoke('leccion:completar', { leccionId })
+      const win = globalThis.window as any
+      const res = await win.api.invoke('leccion:completar', { leccionId })
       if (res.success) {
-        setLeccion((prev) => ({ ...prev, completada: true }))
+        setLeccion((prev) => (prev ? { ...prev, completada: true } : null))
       } else {
         setError(res.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
     } finally {
       setCompletando(false)
@@ -203,14 +222,14 @@ export default function Lesson({ leccionId, user, onNavigate }) {
             <div className="les-actions">
               <button
                 className="btn btn--ghost"
-                onClick={() => onNavigate?.(leccion.anteriorId)}
+                onClick={() => leccion.anteriorId && onNavigate?.(leccion.anteriorId)}
                 disabled={!leccion.anteriorId}
                 title={leccion.anteriorId ? '' : 'No hay lección anterior'}
                 type="button"
               >
                 ← Volver a la lección anterior
               </button>
-              <button className="btn btn--primary" onClick={completar} disabled={leccion.completada || completando}>
+              <button className="btn btn--primary" onClick={completar} disabled={leccion.completada || completando} type="button">
                 {leccion.completada
                   ? 'Completada'
                   : completando
@@ -219,7 +238,7 @@ export default function Lesson({ leccionId, user, onNavigate }) {
               </button>
               <button
                 className="btn btn--ghost"
-                onClick={() => onNavigate?.(leccion.siguienteId)}
+                onClick={() => leccion.siguienteId && onNavigate?.(leccion.siguienteId)}
                 disabled={!leccion.siguienteId}
                 title={leccion.siguienteId ? '' : 'No hay más lecciones'}
                 type="button"

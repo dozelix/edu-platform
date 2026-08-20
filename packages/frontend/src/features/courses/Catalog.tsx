@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, useCallback } from 'react' // 👈 Issue #12: Añadido useCallback
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
-import Estrellas from '../../components/common/Estrellas.jsx'
+import Estrellas from '../../components/common/Estrellas'
 
 const MONEDAS = ['USD', 'EUR', 'CLP', 'MXN', 'GBP', 'BRL']
-const MONEDA_LOCALES = {
+const MONEDA_LOCALES: Record<string, string> = {
   USD: 'en-US',
   EUR: 'de-DE',
   CLP: 'es-CL',
@@ -13,13 +13,11 @@ const MONEDA_LOCALES = {
 }
 const DEFAULT_EXCHANGE_RATE_API_URL = 'https://open.er-api.com/v6/latest/USD'
 
-// Palabras de nivel que no aportan al tema del curso (se omiten en el monograma).
 const NIVELES = new Set([
   'basico', 'básico', 'intermedio', 'avanzado', 'profesional', 'practico', 'práctico',
   'completo', 'esencial', 'moderno', 'inicial', 'experto',
 ])
 
-// Gradientes de portada (fallback si la imagen no carga), dentro de la identidad de marca.
 const COVER_GRADIENTS = [
   'linear-gradient(135deg,#3b1c8c,#a435f0)',
   'linear-gradient(135deg,#1e1b4b,#4338ca)',
@@ -31,8 +29,6 @@ const COVER_GRADIENTS = [
   'linear-gradient(135deg,#4c1d95,#6d28d9)',
 ]
 
-// Fotos de portada (stock decorativo, no la portada real del curso): se elige una
-// de forma determinista por curso. Si una no carga, queda el gradiente de fallback.
 const COVER_IMAGES = [
   'https://images.unsplash.com/photo-1542831371-29b0f74f9713',
   'https://images.unsplash.com/photo-1619410283995-43d9134e7656',
@@ -46,8 +42,7 @@ const COVER_IMAGES = [
   'https://images.unsplash.com/photo-1579389083078-4e7018379f7e',
 ]
 
-// Convierte el precio en USD a la moneda elegida con las tasas de la API publica.
-export function formatearPrecio(precioUSD, moneda, tasas) {
+export function formatearPrecio(precioUSD: number | null | undefined, moneda: string, tasas: Record<string, number>): string {
   if (precioUSD == null) return 'Sin precio'
 
   if (moneda === 'USD') {
@@ -67,8 +62,7 @@ export function formatearPrecio(precioUSD, moneda, tasas) {
   return convertido.toLocaleString(locale, { style: 'currency', currency: moneda })
 }
 
-// Portada generada a partir del nombre: monograma, tema y un gradiente estable por curso.
-export function portadaDeCurso(nombre) {
+export function portadaDeCurso(nombre: string) {
   const palabras = (nombre || '').split(/\s+/).filter(Boolean)
   const signif = palabras.filter((p) => !NIVELES.has(p.toLowerCase()))
   const base = signif.length ? signif : palabras
@@ -83,24 +77,39 @@ export function portadaDeCurso(nombre) {
   return { iniciales: iniciales || '?', tema, gradiente, imagen }
 }
 
-export default function Catalog({ user, onRequireLogin, onBack }) {
-  const [cursos, setCursos] = useState([])
-  const [estado, setEstado] = useState('loading') // loading | ready | error | no-api
+interface CursoItem {
+  id: string
+  nombre: string
+  instructor: string
+  calificacion?: number
+  precio?: number
+  inscrito?: boolean
+}
+
+interface CatalogProps {
+  user: { id?: string; nombre: string; tipo: string } | null
+  onRequireLogin: (cursoId?: string) => void
+  onBack?: () => void
+}
+
+export default function Catalog({ user, onRequireLogin, onBack }: CatalogProps) {
+  const [cursos, setCursos] = useState<CursoItem[]>([])
+  const [estado, setEstado] = useState<'loading' | 'ready' | 'error' | 'no-api'>('loading')
   const [error, setError] = useState('')
   const [busqueda, setBusqueda] = useState('')
   const [instructor, setInstructor] = useState('Todos')
   const [moneda, setMoneda] = useState('USD')
-  const [tasas, setTasas] = useState({})
-  const [inscribiendo, setInscribiendo] = useState(null)
+  const [tasas, setTasas] = useState<Record<string, number>>({})
+  const [inscribiendo, setInscribiendo] = useState<string | null>(null)
 
-  // 🛠️ Issue #12: Memorización de la función con useCallback para estabilizar su referencia
   const cargar = useCallback(async () => {
-    if (!globalThis.window?.api) {
+    const win = globalThis.window as any
+    if (!win?.api) {
       setEstado('no-api')
       return
     }
     try {
-      const res = await globalThis.window.api.invoke('curso:listar')
+      const res = await win.api.invoke('curso:listar')
       if (res.success) {
         setCursos(res.data)
         setEstado('ready')
@@ -108,28 +117,26 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
         setError(res.error)
         setEstado('error')
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
       setEstado('error')
     }
   }, [])
 
-  // 🛠️ Issue #12: Ahora el array de dependencias incluye de forma segura todas sus llamadas reactivas
   useEffect(() => {
     cargar()
   }, [user, cargar])
 
-  // 🛠️ Issue #29: Modificado el useEffect para leer el endpoint desde variables de entorno.
   useEffect(() => {
     let activo = true
-    const apiUrl = import.meta.env.VITE_EXCHANGE_RATE_API_URL || DEFAULT_EXCHANGE_RATE_API_URL
+    const apiUrl = (import.meta as any).env?.VITE_EXCHANGE_RATE_API_URL || DEFAULT_EXCHANGE_RATE_API_URL
 
     fetch(apiUrl)
       .then((r) => {
         if (!r.ok) throw new Error(`Exchange rate API returned ${r.status}`)
         return r.json()
       })
-      .then((d) => {
+      .then((d: any) => {
         if (activo && d && d.rates) setTasas(d.rates)
       })
       .catch((err) => {
@@ -151,19 +158,19 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
     return coincideNombre && coincideInstructor
   })
 
-  // Optimizada también con useCallback por consistencia estructural
-  const inscribir = useCallback(async (cursoId) => {
-    if (!globalThis.window?.api || !user?.id) return
+  const inscribir = useCallback(async (cursoId: string) => {
+    const win = globalThis.window as any
+    if (!win?.api || !user?.id) return
     setInscribiendo(cursoId)
     setError('')
     try {
-      const res = await globalThis.window.api.invoke('inscripcion:crear', { cursoId })
+      const res = await win.api.invoke('inscripcion:crear', { cursoId })
       if (res.success) {
         await cargar()
       } else {
         setError(res.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
     } finally {
       setInscribiendo(null)
@@ -250,7 +257,7 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
                         alt=""
                         loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none'
+                          (e.currentTarget as HTMLElement).style.display = 'none'
                         }}
                       />
                     </figure>
@@ -266,7 +273,7 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
                       </p>
                       <p className="cat-card__price">{formatearPrecio(c.precio, moneda, tasas)}</p>
                       {c.inscrito ? (
-                        <button className="cat-card__enroll cat-card__enroll--done" disabled>
+                        <button className="cat-card__enroll cat-card__enroll--done" disabled type="button">
                           Inscrito
                         </button>
                       ) : (
@@ -274,6 +281,7 @@ export default function Catalog({ user, onRequireLogin, onBack }) {
                           className="cat-card__enroll"
                           onClick={() => (user?.id ? inscribir(c.id) : onRequireLogin?.(c.id))}
                           disabled={inscribiendo === c.id}
+                          type="button"
                         >
                           {inscribiendo === c.id ? 'Inscribiendo...' : 'Inscribirse'}
                         </button>

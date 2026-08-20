@@ -1,5 +1,9 @@
-export default function Barra({ valor, isCustomCss = false }) {
-  // Si usa los estilos CSS nativos de MyLearning.jsx
+interface BarraProps {
+  valor: number
+  isCustomCss?: boolean
+}
+
+export default function Barra({ valor, isCustomCss = false }: BarraProps) {
   if (isCustomCss) {
     return (
       <div className="lrn-progress">
@@ -20,7 +24,6 @@ export default function Barra({ valor, isCustomCss = false }) {
     )
   }
 
-  // Fallback para los estilos inline de InstructorDashboard.jsx
   return (
     <span
       className="inline-flex items-center gap-2"

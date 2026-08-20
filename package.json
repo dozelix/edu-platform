@@ -6,29 +6,34 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "packageManager": "pnpm@11.22.0",
   "scripts": {
-    "dev:frontend": "vite --config packages/frontend/vite.config.js",
-    "dev:main": "cross-env NODE_ENV=development electron packages/main/src/index.js",
-    "dev": "concurrently \"npm run dev:frontend\" \"wait-on http://localhost:5173 && npm run dev:main\"",
-    "build:frontend": "vite build --config packages/frontend/vite.config.js",
-    "build": "npm run build:frontend",
-    "electron": "cross-env NODE_ENV=production electron packages/main/src/index.js",
-    "electron:dev": "npm run dev",
-    "shot": "concurrently -k -s first \"npm run dev:frontend\" \"wait-on http://localhost:5173 && node scripts/shot-electron.cjs\"",
-    "lint": "eslint \"packages/*/src/**/*.{js,cjs,jsx}\" \"scripts/**/*.{js,cjs}\"",
-    "format": "prettier --write \"packages/*/src/**/*.{js,cjs,jsx,json,css}\"",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:main": "cross-env NODE_ENV=development pnpm exec electron --import tsx packages/main/src/index.ts",
+    "dev": "concurrently \"pnpm dev:frontend\" \"wait-on http://localhost:5173 && pnpm dev:main\"",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:main": "pnpm --filter main build",
+    "build": "pnpm build:main && pnpm build:frontend",
+    "electron": "cross-env NODE_ENV=production pnpm exec electron packages/main/dist/index.js",
+    "electron:dev": "pnpm dev",
+    "shot": "concurrently -k -s first \"pnpm dev:frontend\" \"wait-on http://localhost:5173 && node scripts/shot-electron.cjs\"",
+    "lint": "eslint \"packages/*/src/**/*.{js,cjs,jsx,ts,tsx}\" \"scripts/**/*.{js,cjs}\"",
+    "format": "prettier --write \"packages/*/src/**/*.{js,cjs,jsx,ts,tsx,json,css}\"",
     "seed:docker": "bash scripts/seed-docker.sh",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "test": "vitest",
-    "predeploy": "vite build --config packages/frontend/vite.config.js --outDir ../../dist-gh",
+    "predeploy": "pnpm build:frontend --outDir ../../dist-gh",
     "deploy": "gh-pages -d dist-gh"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.6.0",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.2",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.0",
@@ -37,13 +42,13 @@
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.7.0",
+    "jsdom": "^30.0.1",
     "playwright-core": "^1.61.1",
     "prettier": "^3.0.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2",
     "vite": "^8.0.16",
     "vitest": "^4.1.8",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.6.0",
-    "@testing-library/jest-dom": "^6.0.0",
     "wait-on": "^7.2.0"
   },
   "build": {
@@ -53,12 +58,12 @@
       "output": "release"
     },
     "files": [
-      "packages/main/src/**/*",
+      "packages/main/dist/**/*",
       "packages/frontend/dist/**/*",
       "package.json"
     ],
     "extraMetadata": {
-      "main": "packages/main/src/index.js"
+      "main": "packages/main/dist/index.js"
     }
   }
 }

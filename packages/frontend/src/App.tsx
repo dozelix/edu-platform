@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react' // 👈 Quitamos 'React' por el issue #27
+import { useState, useEffect } from 'react'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -8,32 +8,35 @@ import Lesson from './features/lesson/Lesson'
 import InstructorDashboard from './features/instructor/InstructorDashboard'
 import { LoginRegister } from './components/LoginRegister'
 
-// 👈 DECLARACIÓN FUERA DEL COMPONENTE: 
-// Se evalúa una sola vez al cargar el archivo, liberando al componente de esta carga.
-const isElectron = typeof globalThis.window !== 'undefined' && !!globalThis.window.api;
+const isElectron = typeof globalThis.window !== 'undefined' && !!(globalThis.window as any).api
 
-function App() {
-  const [currentUser, setCurrentUser] = useState(null)
+interface UserData {
+  id?: string
+  nombre: string
+  email: string
+  tipo: string
+}
+
+export default function App() {
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null)
   const isAuthenticated = !!currentUser
 
   const [dbStatus, setDbStatus] = useState('idle')
   const [activeNav, setActiveNav] = useState('courses')
   const [navHistory, setNavHistory] = useState(['courses'])
-  const [activeLeccionId, setActiveLeccionId] = useState(null)
+  const [activeLeccionId, setActiveLeccionId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const [showLogin, setShowLogin] = useState(false)
-  const [pendingCourseId, setPendingCourseId] = useState(null)
+  const [pendingCourseId, setPendingCourseId] = useState<string | null>(null)
 
-  // ❌ Se eliminó el useState de isElectron que estaba aquí
-
-  // Estado real de la BD (no decorativo): consulta db:estado al proceso main.
   useEffect(() => {
     if (!isElectron) return
     let activo = true
-    globalThis.window.api
+    const win = globalThis.window as any
+    win.api
       .invoke('db:estado')
-      .then((res) => {
+      .then((res: any) => {
         if (activo) setDbStatus(res?.data?.conectado ? 'connected' : 'error')
       })
       .catch(() => {
@@ -42,10 +45,9 @@ function App() {
     return () => {
       activo = false
     }
-  }, []) // 👈 Ahora puedes dejar el array de dependencias vacío [], ya que isElectron es una constante externa
+  }, [])
 
-  // Abre el login recordando (opcional) el curso que el usuario intentaba inscribir.
-  const requireLogin = (cursoId = null) => {
+  const requireLogin = (cursoId: string | null = null) => {
     setPendingCourseId(cursoId)
     setShowLogin(true)
     setSidebarOpen(false)
@@ -67,19 +69,17 @@ function App() {
     })
   }
 
-  // Inscribe al usuario en un curso; no bloquea el post-login si ya estaba inscrito o falla.
-  const enrollCourse = async (cursoId) => {
-    // 🛠️ Issue #11: Corregido. Se utiliza el patrón unificado 'isElectron' en lugar del bypass directo a window.
+  const enrollCourse = async (cursoId: string) => {
     if (!isElectron) return
     try {
-      await globalThis.window.api.invoke('inscripcion:crear', { cursoId })
+      const win = globalThis.window as any
+      await win.api.invoke('inscripcion:crear', { cursoId })
     } catch {
-      // Un fallo de inscripcion no debe impedir que el usuario entre a la app.
+      // Ignorar fallo
     }
   }
 
-  // Tras un login/registro exitoso
-  const handleLoginSuccess = async (user) => {
+  const handleLoginSuccess = async (user: UserData) => {
     setCurrentUser(user)
     setShowLogin(false)
     if (pendingCourseId) {
@@ -92,14 +92,13 @@ function App() {
     )
   }
 
-  // Cierra la sesion y devuelve la app al catalogo publico.
   const handleLogout = async () => {
-    // 🛠️ Corrección por extensión: Se unifica también el flujo de logout usando 'isElectron'.
     if (isElectron) {
       try {
-        await globalThis.window.api.invoke('auth:logout')
+        const win = globalThis.window as any
+        await win.api.invoke('auth:logout')
       } catch {
-        // Un fallo al notificar el logout no debe bloquear el cierre en el renderer.
+        // Ignorar fallo
       }
     }
     setCurrentUser(null)
@@ -108,7 +107,6 @@ function App() {
     setSidebarOpen(false)
   }
 
-  // ── Pantalla de login ──
   if (showLogin) {
     return (
       <LoginRegister
@@ -121,8 +119,7 @@ function App() {
     )
   }
 
-  // Los instructores tienen su propio panel
-  if (isAuthenticated && currentUser.tipo === 'instructor') {
+  if (isAuthenticated && currentUser && currentUser.tipo === 'instructor') {
     return <InstructorDashboard user={currentUser} onLogout={handleLogout} />
   }
 
@@ -138,7 +135,7 @@ function App() {
       }
     : null
 
-  const handleNav = (id) => {
+  const handleNav = (id: string) => {
     if (!isAuthenticated && (id === 'learning' || id === 'lesson')) {
       requireLogin()
       return
@@ -153,7 +150,7 @@ function App() {
   const renderContent = () => {
     switch (activeNav) {
       case 'courses':
-        return <Catalog user={currentUser} onRequireLogin={requireLogin} onBack={handleBack} />
+        return <Catalog user={currentUser} onRequireLogin={(id) => requireLogin(id || null)} onBack={handleBack} />
       case 'learning':
         return (
           <MyLearning
@@ -205,5 +202,3 @@ function App() {
     </div>
   )
 }
-
-export default App

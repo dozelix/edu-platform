@@ -5,30 +5,21 @@ import * as dotenv from 'dotenv'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Si el proceso padre cierra la tuberia de stdout/stderr (p. ej. al terminar el
-// arnes de dev), escribir un log lanza EPIPE. Sin este guard esa escritura durante
-// el cierre tumba el proceso main con una excepcion no capturada y su dialogo.
-process.stdout.on('error', (err) => {
+process.stdout.on('error', (err: any) => {
   if (err.code === 'EPIPE') process.exit(0)
 })
 process.stderr.on('error', () => {})
 
-// 🛠️ Issue #14: Resolución dinámica de entornos ultra-limpia basada en CWD (desarrollo) y AppPath (producción)
 const isDev = process.env.NODE_ENV === 'development'
 
-// ⚡ FIX: Usar process.cwd() en desarrollo apunta directo a la raíz del monorrepo sin importar el comportamiento de Electron
 const envPath = isDev 
   ? path.join(process.cwd(), '.env.local') 
   : path.join(app.getAppPath(), '.env.local')
 
 dotenv.config({ path: envPath })
 
-let mainWindow = null
+let mainWindow: BrowserWindow | null = null
 
-// Aplica una Content-Security-Policy a las respuestas de la sesion. En dev se relaja
-// (inline/eval y ws) para no romper el HMR de Vite; en prod queda estricta y solo
-// habilita los origenes que la app usa: Google Fonts, imagenes de Unsplash y la API
-// de tipos de cambio.
 function aplicarCSP() {
   const script = isDev ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self'"
   const ytData = 'https://*.googlevideo.com https://www.gstatic.com https://fonts.gstatic.com'
@@ -50,7 +41,7 @@ function aplicarCSP() {
 
   session.defaultSession.webRequest.onHeadersReceived(null)
 
-  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+  session.defaultSession.webRequest.onHeadersReceived((details: any, callback: any) => {
     callback({
       responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [csp] },
     })
@@ -90,8 +81,7 @@ function createWindow() {
   })
 }
 
-// Global reference to disconnectDB for the lifecycle events
-let disconnectDatabaseFn = null
+let disconnectDatabaseFn: (() => Promise<void>) | null = null
 
 app.on('ready', async () => {
   const sanitizedUA = (app.userAgentFallback || '')
@@ -104,7 +94,6 @@ app.on('ready', async () => {
 
   aplicarCSP()
 
-  // ⚡ FIX: Carga diferida y dinámica de la DB una vez que dotenv está inicializado de forma garantizada
   const { connectDB, disconnectDB } = await import('./db/connection.js')
   disconnectDatabaseFn = disconnectDB
 
@@ -115,7 +104,6 @@ app.on('ready', async () => {
     return
   }
 
-  // Carga dinámica de handlers IPC nativos
   await import('./ipc/authHandlers.js')
   await import('./ipc/courseHandlers.js')
   await import('./ipc/learningHandlers.js')

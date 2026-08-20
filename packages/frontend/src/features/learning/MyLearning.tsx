@@ -1,9 +1,24 @@
-import { useEffect, useState } from 'react' // 👈 Issue #27: Eliminado 'React'
-import Barra from '../../components/common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
+import { useEffect, useState } from 'react'
+import Barra from '../../components/common/Barra'
 
-export default function MyLearning({ user, onContinue }) {
-  const [filas, setFilas] = useState([])
-  const [estado, setEstado] = useState('loading') // loading | ready | error | no-api | no-user
+interface LearningRow {
+  inscripcionId: string
+  curso: string
+  instructor: string
+  progreso: number
+  ultimaLeccion: string
+  disponible: boolean
+  continuarLeccionId?: string
+}
+
+interface MyLearningProps {
+  user: { id?: string; nombre: string; tipo: string } | null
+  onContinue: (leccionId: string) => void
+}
+
+export default function MyLearning({ user, onContinue }: MyLearningProps) {
+  const [filas, setFilas] = useState<LearningRow[]>([])
+  const [estado, setEstado] = useState<'loading' | 'ready' | 'error' | 'no-api' | 'no-user'>('loading')
   const [error, setError] = useState('')
 
   const primerNombre = user?.nombre ? user.nombre.split(' ')[0] : ''
@@ -17,7 +32,8 @@ export default function MyLearning({ user, onContinue }) {
     let activo = true
 
     async function cargar() {
-      if (!globalThis.window?.api) {
+      const win = globalThis.window as any
+      if (!win?.api) {
         setEstado('no-api')
         return
       }
@@ -26,7 +42,7 @@ export default function MyLearning({ user, onContinue }) {
         return
       }
       try {
-        const res = await globalThis.window.api.invoke('aprendizaje:listar')
+        const res = await win.api.invoke('aprendizaje:listar')
         if (!activo) return
         if (res.success) {
           setFilas(res.data)
@@ -35,7 +51,7 @@ export default function MyLearning({ user, onContinue }) {
           setError(res.error)
           setEstado('error')
         }
-      } catch (err) {
+      } catch (err: any) {
         if (!activo) return
         setError(err.message)
         setEstado('error')
@@ -112,7 +128,7 @@ export default function MyLearning({ user, onContinue }) {
                   <td>
                     <button
                       className="lrn-continue"
-                      onClick={() => onContinue?.(f.continuarLeccionId)}
+                      onClick={() => f.continuarLeccionId && onContinue?.(f.continuarLeccionId)}
                       disabled={!f.disponible || !f.continuarLeccionId}
                       title={
                         f.disponible
@@ -121,6 +137,7 @@ export default function MyLearning({ user, onContinue }) {
                             : 'El curso no tiene lecciones'
                           : 'Curso no disponible'
                       }
+                      type="button"
                     >
                       Continuar aprendiendo
                     </button>
