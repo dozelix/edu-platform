@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { BookOpen, Users, Star, LogOut, GraduationCap } from 'lucide-react'
-import Estrellas from '../../components/common/Estrellas.jsx'
-import Barra from '../../components/common/Barra.jsx' // 🛠️ Issue #20: Barra de progreso unificada
+import Estrellas from '../../components/common/Estrellas'
+import Barra from '../../components/common/Barra'
 
-// Se elimina la función local 'function Barra({ valor }) { ... }' ya que se usa el import
+interface EstadoBadgeProps {
+  estado: string
+}
 
-function EstadoBadge({ estado }) {
+function EstadoBadge({ estado }: EstadoBadgeProps) {
   const activo = estado === 'activo'
   return (
     <span
@@ -15,7 +17,7 @@ function EstadoBadge({ estado }) {
       }}
     >
       <span
-        className={`w-1.5 h-1.5 rounded-full ${activo ? '' : ''}`}
+        className="w-1.5 h-1.5 rounded-full"
         style={{ background: activo ? 'var(--color-success)' : 'var(--color-text-subtle)' }}
         aria-hidden="true"
       />
@@ -24,15 +26,52 @@ function EstadoBadge({ estado }) {
   )
 }
 
-export default function InstructorDashboard({ user, onLogout }) {
-  const [data, setData] = useState(null)
-  const [estado, setEstado] = useState('loading')
+interface InstructorUser {
+  id?: string
+  nombre: string
+  tipo: string
+}
+
+interface InstructorDashboardProps {
+  user: InstructorUser | null
+  onLogout: () => void
+}
+
+interface EstudianteData {
+  id?: string
+  nombre: string
+  progreso: number
+}
+
+interface CursoInstructor {
+  id: string
+  nombre: string
+  calificacion?: number
+  estado: string
+  nEstudiantes: number
+  progresoPromedio: number
+  estudiantes: EstudianteData[]
+}
+
+interface InstructorData {
+  totales: {
+    cursos: number
+    estudiantes: number
+    calificacionPromedio?: number
+  }
+  cursos: CursoInstructor[]
+}
+
+export default function InstructorDashboard({ user, onLogout }: InstructorDashboardProps) {
+  const [data, setData] = useState<InstructorData | null>(null)
+  const [estado, setEstado] = useState<'loading' | 'ready' | 'error' | 'no-api' | 'no-user'>('loading')
   const [error, setError] = useState('')
 
   useEffect(() => {
     let activo = true
     async function cargar() {
-      if (!globalThis.window?.api) {
+      const win = globalThis.window as any
+      if (!win?.api) {
         setEstado('no-api')
         return
       }
@@ -41,7 +80,7 @@ export default function InstructorDashboard({ user, onLogout }) {
         return
       }
       try {
-        const res = await globalThis.window.api.invoke('instructor:resumen')
+        const res = await win.api.invoke('instructor:resumen')
         if (!activo) return
         if (res.success) {
           setData(res.data)
@@ -50,7 +89,7 @@ export default function InstructorDashboard({ user, onLogout }) {
           setError(res.error)
           setEstado('error')
         }
-      } catch (err) {
+      } catch (err: any) {
         if (!activo) return
         setError(err.message)
         setEstado('error')
@@ -104,7 +143,8 @@ export default function InstructorDashboard({ user, onLogout }) {
           </span>
           <button
             onClick={onLogout}
-            className="ml-auto inline-flex items-center gap-1.5 text-sm text-muted-color hover:text-danger border border-default hover:border-danger px-3 py-1.5 transition-colors"
+            className="ml-auto inline-flex items-center gap-1.5 text-sm text-muted-color hover:text-danger border border-default hover:border-danger px-3 py-1.5 transition-colors cursor-pointer"
+            type="button"
           >
             <LogOut size={14} /> Cerrar sesión
           </button>

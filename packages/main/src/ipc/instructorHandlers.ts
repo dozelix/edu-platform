@@ -2,17 +2,8 @@ import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
 import { getUsuario } from '../session.js'
 
-// ======================================================
-// IPC Instructor Handlers (Caso 3 — visibilidad del instructor)
-// El PDF pide que el instructor "vea quien esta aprendiendo": sus cursos con los
-// estudiantes inscritos y su progreso. Scopeado por instructor_id: cada instructor
-// solo ve SUS cursos y sus estudiantes. Null-safe ante nombres/datos faltantes.
-// Canal: instructor:resumen
-// ======================================================
-
 ipcMain.handle('instructor:resumen', async () => {
   try {
-    // Solo el instructor en sesion ve su resumen; el renderer no elige de quien.
     const usuario = getUsuario()
     if (!usuario) return { success: false, error: 'No hay sesión iniciada' }
     if (usuario.tipo !== 'instructor') {
@@ -26,18 +17,21 @@ ipcMain.handle('instructor:resumen', async () => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     const cursos = await db.collection('cursos').find({ instructor_id: uid }).toArray()
     const cursoIds = cursos.map((c) => c._id)
     const inscripciones = cursoIds.length
       ? await db.collection('inscripciones').find({ curso_id: { $in: cursoIds } }).toArray()
       : []
-    // Traer solo los usuarios que aparecen en las inscripciones (evita cargar toda la coleccion)
+
     const usuarioIds = Array.from(
-      new Set(inscripciones.map((i) => i.usuario_id?.toString()).filter(Boolean))
+      new Set(inscripciones.map((i: any) => i.usuario_id?.toString()).filter(Boolean))
     )
-    const nombrePorId = new Map()
+    const nombrePorId = new Map<string, string>()
     if (usuarioIds.length) {
-      const ids = usuarioIds.map((s) => new mongoose.Types.ObjectId(s))
+      const ids = usuarioIds.map((s: any) => new mongoose.Types.ObjectId(s))
       const usuarios = await db
         .collection('usuarios')
         .find({ _id: { $in: ids } }, { projection: { nombre: 1 } })
@@ -47,19 +41,18 @@ ipcMain.handle('instructor:resumen', async () => {
       }
     }
 
-    // Inscripciones agrupadas por curso para resolver estudiantes y progreso.
-    const inscPorCurso = new Map()
+    const inscPorCurso = new Map<string, any[]>()
     for (const ins of inscripciones) {
-      const k = ins.curso_id?.toString()
+      const k = (ins as any).curso_id?.toString()
       if (!k) continue
       if (!inscPorCurso.has(k)) inscPorCurso.set(k, [])
-      inscPorCurso.get(k).push(ins)
+      inscPorCurso.get(k)!.push(ins)
     }
 
-    const cursosData = cursos.map((c) => {
+    const cursosData = cursos.map((c: any) => {
       const insc = inscPorCurso.get(c._id.toString()) || []
       const estudiantes = insc
-        .map((i) => ({
+        .map((i: any) => ({
           nombre: nombrePorId.get(i.usuario_id?.toString()) || 'Estudiante desconocido',
           progreso: typeof i.progreso === 'number' ? i.progreso : 0,
         }))
@@ -78,13 +71,12 @@ ipcMain.handle('instructor:resumen', async () => {
       }
     })
 
-    // Estudiantes unicos entre todos sus cursos (un alumno puede estar en varios).
     const totalEstudiantes = new Set(
-      inscripciones.map((i) => i.usuario_id?.toString()).filter(Boolean)
+      inscripciones.map((i: any) => i.usuario_id?.toString()).filter(Boolean)
     ).size
-    const conCalif = cursos.filter((c) => typeof c.calificacion === 'number')
+    const conCalif = cursos.filter((c: any) => typeof c.calificacion === 'number')
     const calificacionPromedio = conCalif.length
-      ? (conCalif.reduce((a, c) => a + c.calificacion, 0) / conCalif.length).toFixed(1)
+      ? (conCalif.reduce((a, c: any) => a + c.calificacion, 0) / conCalif.length).toFixed(1)
       : null
 
     return {
@@ -98,7 +90,7 @@ ipcMain.handle('instructor:resumen', async () => {
         },
       },
     }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })

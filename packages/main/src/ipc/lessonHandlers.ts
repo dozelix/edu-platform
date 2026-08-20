@@ -2,24 +2,13 @@ import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
 import { getUsuarioId } from '../session.js'
 
-// ======================================================
-// IPC Lesson Handlers (Caso 3 — Vista 4: Lección)
-// Reproductor de lección + comentarios. Lectura directa de las colecciones
-// del seed (lecciones, comentarios, cursos, inscripciones).
-// Null-safe ante datos faltantes (el seed no trae contenido/duración) y
-// autores huérfanos en comentarios.
-// Canales: leccion:*, comentario:*
-// ======================================================
-
-function toObjectId(id) {
+function toObjectId(id: string) {
   return new mongoose.Types.ObjectId(id)
 }
 
-// Obtener una lección con datos de navegación (siguiente) y estado de completada.
 ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
   try {
     if (!leccionId) return { success: false, error: 'leccionId requerido' }
-    // El estado "completada" es del usuario en sesion, no del id del renderer.
     const usuarioId = getUsuarioId()
     let lid
     try {
@@ -29,18 +18,20 @@ ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     const leccion = await db.collection('lecciones').findOne({ _id: lid })
     if (!leccion) return { success: false, error: 'La lección no existe' }
 
     const curso = await db.collection('cursos').findOne({ _id: leccion.curso_id })
 
-    // Hermanas del mismo curso, ordenadas por número, para resolver "siguiente".
     const hermanas = await db
       .collection('lecciones')
       .find({ curso_id: leccion.curso_id })
       .sort({ numero: 1 })
       .toArray()
-    const idx = hermanas.findIndex((l) => l._id.toString() === lid.toString())
+    const idx = hermanas.findIndex((l: any) => l._id.toString() === lid.toString())
     const anterior = idx > 0 ? hermanas[idx - 1] : null
     const siguiente = idx >= 0 && idx < hermanas.length - 1 ? hermanas[idx + 1] : null
 
@@ -53,10 +44,10 @@ ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
           .findOne({ usuario_id: uid, curso_id: leccion.curso_id })
         completada = !!(
           insc &&
-          (insc.lecciones_completadas || []).some((x) => x.toString() === lid.toString())
+          (insc.lecciones_completadas || []).some((x: any) => x.toString() === lid.toString())
         )
       } catch {
-        // usuarioId inválido: se ignora, completada queda en false.
+        // usuarioId inválido
       }
     }
 
@@ -67,23 +58,20 @@ ipcMain.handle('leccion:obtener', async (_, { leccionId } = {}) => {
         numero: leccion.numero ?? null,
         titulo: leccion.titulo,
         videoUrl: leccion.video_url || null,
-        // El seed no trae estos campos; van con fallback (límite del dato del caso).
         contenido: leccion.contenido_text || leccion.contenido || null,
         duracion: typeof leccion.duracion_minutos === 'number' ? leccion.duracion_minutos : null,
         cursoId: leccion.curso_id ? leccion.curso_id.toString() : null,
         cursoNombre: curso ? curso.nombre : 'Curso no disponible',
-        anteriorId: anterior ? anterior._id.toString() : null,
-        siguienteId: siguiente ? siguiente._id.toString() : null,
+        anteriorId: anterior ? (anterior as any)._id.toString() : null,
+        siguienteId: siguiente ? (siguiente as any)._id.toString() : null,
         completada,
       },
     }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })
 
-// Marcar una lección como completada para el usuario y recalcular el progreso
-// del curso = lecciones completadas / total de lecciones.
 ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
   try {
     const usuarioId = getUsuarioId()
@@ -102,6 +90,9 @@ ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     const leccion = await db.collection('lecciones').findOne({ _id: lid })
     if (!leccion) return { success: false, error: 'La lección no existe' }
 
@@ -110,7 +101,6 @@ ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
       .findOne({ usuario_id: uid, curso_id: leccion.curso_id })
     if (!insc) return { success: false, error: 'No estás inscrito en este curso' }
 
-    // Recalculo atómico: añadir la lección al set y calcular progreso en una sola operación
     const total = await db.collection('lecciones').countDocuments({ curso_id: leccion.curso_id })
     if (total <= 0) {
       await db.collection('inscripciones').updateOne(
@@ -118,7 +108,6 @@ ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
         { $addToSet: { lecciones_completadas: lid }, $set: { progreso: 0 } }
       )
     } else {
-      // Update usando pipeline para evitar condiciones de carrera
       await db.collection('inscripciones').updateOne(
         { _id: insc._id },
         [
@@ -141,13 +130,15 @@ ipcMain.handle('leccion:completar', async (_, { leccionId } = {}) => {
       )
     }
 
+    const inscActualizada = await db.collection('inscripciones').findOne({ _id: insc._id })
+    const progreso = inscActualizada?.progreso || 0
+
     return { success: true, data: { progreso, completada: true } }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })
 
-// Últimos 5 comentarios de una lección, con el nombre del autor (null-safe).
 ipcMain.handle('comentario:listar', async (_, leccionId) => {
   try {
     if (!leccionId) return { success: false, error: 'leccionId requerido' }
@@ -159,6 +150,9 @@ ipcMain.handle('comentario:listar', async (_, leccionId) => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     const docs = await db
       .collection('comentarios')
       .find({ leccion_id: lid })
@@ -166,11 +160,10 @@ ipcMain.handle('comentario:listar', async (_, leccionId) => {
       .limit(5)
       .toArray()
 
-    // Traer solo los autores de los comentarios listados para evitar cargar toda la coleccion
-    const autorIds = Array.from(new Set(docs.map((d) => d.usuario_id?.toString()).filter(Boolean)))
-    const nombrePorId = new Map()
+    const autorIds = Array.from(new Set(docs.map((d: any) => d.usuario_id?.toString()).filter(Boolean)))
+    const nombrePorId = new Map<string, string>()
     if (autorIds.length) {
-      const ids = autorIds.map((s) => new mongoose.Types.ObjectId(s))
+      const ids = autorIds.map((s: any) => new mongoose.Types.ObjectId(s))
       const usuarios = await db
         .collection('usuarios')
         .find({ _id: { $in: ids } }, { projection: { nombre: 1 } })
@@ -178,7 +171,7 @@ ipcMain.handle('comentario:listar', async (_, leccionId) => {
       for (const u of usuarios) nombrePorId.set(u._id.toString(), u.nombre)
     }
 
-    const data = docs.map((c) => ({
+    const data = docs.map((c: any) => ({
       id: c._id.toString(),
       texto: c.texto,
       autor: nombrePorId.get(c.usuario_id?.toString()) || 'Usuario desconocido',
@@ -186,12 +179,11 @@ ipcMain.handle('comentario:listar', async (_, leccionId) => {
     }))
 
     return { success: true, data }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })
 
-// Crear un comentario en una lección.
 ipcMain.handle('comentario:crear', async (_, { leccionId, texto } = {}) => {
   try {
     const usuarioId = getUsuarioId()
@@ -210,6 +202,9 @@ ipcMain.handle('comentario:crear', async (_, { leccionId, texto } = {}) => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     if (!(await db.collection('lecciones').findOne({ _id: lid }))) {
       return { success: false, error: 'La lección no existe' }
     }
@@ -221,7 +216,7 @@ ipcMain.handle('comentario:crear', async (_, { leccionId, texto } = {}) => {
       fecha: new Date(),
     })
     return { success: true, data: { id: r.insertedId.toString() } }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })

@@ -1,20 +1,31 @@
 # Dependencies
 node_modules/
+.pnpm-store/
 
 # Environment
 .env
 .env.local
 .env.*.local
 
-# Build output
+# Build output & caches
 dist/
+packages/*/dist/
 dist-gh/
 out/
 build/
 release/
+*.tsbuildinfo
+
+# Test & Coverage
+coverage/
+.nyc_output/
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 logs/
 
 # IDE
@@ -30,25 +41,13 @@ Thumbs.db
 # Electron
 electron-builder-effective-config.yaml
 
-# Claude Code
+# AI & Personal notes
 claude.md
-
-# Backlog interno (no lo ve el resto del equipo)
 TAREAS.md
 
-# Word / informes
+# Office & temp files
 *.docx
 ~$*.docx
 
-# TypeScript cache
-*.tsbuildinfo
-
-# Package locks (decidir en equipo si commitear o no)
-# package-lock.json
-
 # Database
 *.db
-
-# Package managers (usamos npm)
-yarn.lock
-

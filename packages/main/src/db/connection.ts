@@ -2,10 +2,8 @@ import mongoose from 'mongoose'
 
 mongoose.set('strictQuery', true)
 
-// Conecta a MongoDB. Devuelve true/false segun el resultado.
-export async function connectDB() {
+export async function connectDB(): Promise<boolean> {
   try {
-    // ⚡ FIX: Cambiado de process.env.local.MONGODB_URI a process.env.MONGODB_URI
     const mongoUri = process.env.MONGODB_URI
     
     if (!mongoUri) {
@@ -19,19 +17,19 @@ export async function connectDB() {
     })
     console.log('MongoDB conectado exitosamente')
     return true
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error conectando a MongoDB:', error.message)
     return false
   }
 }
 
-export async function disconnectDB() {
+export async function disconnectDB(): Promise<void> {
   try {
     if (mongoose.connection.readyState !== 0) {
       await mongoose.disconnect()
       console.log('MongoDB desconectado')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error desconectando de MongoDB:', error.message)
   }
 }

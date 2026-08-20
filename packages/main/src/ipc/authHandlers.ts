@@ -2,14 +2,7 @@ import { ipcMain } from 'electron'
 import { Usuario } from '../db/models/Usuario.js'
 import { setUsuario, limpiarSesion } from '../session.js'
 
-// ======================================================
-// IPC Auth Handlers (Caso 3)
-// Autentica contra la colección `usuarios` (estudiantes e instructores).
-// Mantiene bcrypt; devuelve el usuario con vocabulario del caso: nombre, tipo.
-// Canales: auth:login, auth:register, auth:logout
-// ======================================================
-
-function publico(usuario) {
+function publico(usuario: any) {
   return {
     id: usuario._id.toString(),
     nombre: usuario.nombre,
@@ -18,15 +11,10 @@ function publico(usuario) {
   }
 }
 
-// Normaliza credenciales para que login y registro coincidan: el email es
-// insensible a mayusculas y a espacios de borde (como se guarda), y la contraseña
-// se recorta en los extremos para que un espacio accidental (copiar/pegar,
-// autocompletar) no impida entrar. Los espacios internos de la contraseña se
-// respetan; solo se quitan los de los extremos.
-function normalizarEmail(v) {
+function normalizarEmail(v: any): string {
   return typeof v === 'string' ? v.trim().toLowerCase() : ''
 }
-function normalizarPassword(v) {
+function normalizarPassword(v: any): string {
   return typeof v === 'string' ? v.trim() : ''
 }
 
@@ -37,7 +25,7 @@ ipcMain.handle('auth:login', async (_, { email, password } = {}) => {
     if (!emailNorm || !passNorm) {
       return { success: false, error: 'Email y contraseña requeridos' }
     }
-    const usuario = await Usuario.findOne({ email: emailNorm }).select('+password')
+    const usuario: any = await Usuario.findOne({ email: emailNorm }).select('+password')
     if (!usuario || !usuario.password) {
       return { success: false, error: 'Email o contraseña incorrectos' }
     }
@@ -48,16 +36,15 @@ ipcMain.handle('auth:login', async (_, { email, password } = {}) => {
     const datos = publico(usuario)
     setUsuario(datos)
     return { success: true, data: datos }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message || 'Error en el login' }
   }
 })
 
 ipcMain.handle('auth:register', async (_, data = {}) => {
   try {
-    const { nombre, email, password, confirmPassword, tipo = 'estudiante' } = data
+    const { nombre, email, password, confirmPassword, tipo = 'estudiante' } = data as any
 
-    // Misma normalizacion que auth:login para que el registro y el acceso coincidan.
     const nombreNorm = typeof nombre === 'string' ? nombre.trim() : ''
     const emailNorm = normalizarEmail(email)
     const passNorm = normalizarPassword(password)
@@ -92,7 +79,7 @@ ipcMain.handle('auth:register', async (_, data = {}) => {
     const datos = publico(usuario)
     setUsuario(datos)
     return { success: true, data: datos }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message || 'Error en el registro' }
   }
 })

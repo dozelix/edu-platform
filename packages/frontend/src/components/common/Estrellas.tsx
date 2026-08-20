@@ -1,6 +1,12 @@
 import { Star } from 'lucide-react'
 
-export default function Estrellas({ valor, className = 'inline-flex items-center gap-1', starSize = 13 }) {
+interface EstrellasProps {
+  valor: number | null | undefined
+  className?: string
+  starSize?: number
+}
+
+export default function Estrellas({ valor, className = 'inline-flex items-center gap-1', starSize = 13 }: EstrellasProps) {
   if (valor == null) return <span className="text-sm text-subtle">Sin calificación</span>
   const llenas = Math.round(valor)
   const valorFormateado = valor.toFixed(1)

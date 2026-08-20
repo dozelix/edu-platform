@@ -2,17 +2,8 @@ import { ipcMain } from 'electron'
 import mongoose from 'mongoose'
 import { getUsuarioId } from '../session.js'
 
-// ======================================================
-// IPC Learning Handlers (Caso 3 — Vista 3: Mi Aprendizaje)
-// Cruza inscripciones + cursos + lecciones del usuario en sesión.
-// Null-safe: una inscripción puede apuntar a un curso inexistente
-// (dato huérfano del seed); en ese caso la fila se marca como no disponible.
-// Canales: aprendizaje:*
-// ======================================================
-
 ipcMain.handle('aprendizaje:listar', async () => {
   try {
-    // La identidad sale de la sesion del main, no del renderer.
     const usuarioId = getUsuarioId()
     if (!usuarioId) {
       return { success: false, error: 'No hay sesión iniciada' }
@@ -25,36 +16,38 @@ ipcMain.handle('aprendizaje:listar', async () => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     const inscripciones = await db.collection('inscripciones').find({ usuario_id: uid }).toArray()
 
-    // Limitar consultas: solo traer cursos, instructores y lecciones relacionados
-    const cursoIds = Array.from(new Set(inscripciones.map((i) => i.curso_id?.toString()).filter(Boolean)))
+    const cursoIds = Array.from(new Set(inscripciones.map((i: any) => i.curso_id?.toString()).filter(Boolean)))
     const cursos = cursoIds.length
       ? await db
           .collection('cursos')
-          .find({ _id: { $in: cursoIds.map((s) => new mongoose.Types.ObjectId(s)) } })
+          .find({ _id: { $in: cursoIds.map((s: any) => new mongoose.Types.ObjectId(s)) } })
           .toArray()
       : []
 
-    const instructorIds = Array.from(new Set(cursos.map((c) => c.instructor_id?.toString()).filter(Boolean)))
+    const instructorIds = Array.from(new Set(cursos.map((c: any) => c.instructor_id?.toString()).filter(Boolean)))
     const instructores = instructorIds.length
       ? await db
           .collection('usuarios')
-          .find({ _id: { $in: instructorIds.map((s) => new mongoose.Types.ObjectId(s)) } }, { projection: { nombre: 1 } })
+          .find({ _id: { $in: instructorIds.map((s: any) => new mongoose.Types.ObjectId(s)) } }, { projection: { nombre: 1 } })
           .toArray()
       : []
 
     const lecciones = cursoIds.length
       ? await db
           .collection('lecciones')
-          .find({ curso_id: { $in: cursoIds.map((s) => new mongoose.Types.ObjectId(s)) } })
+          .find({ curso_id: { $in: cursoIds.map((s: any) => new mongoose.Types.ObjectId(s)) } })
           .toArray()
       : []
 
-    const cursoPorId = new Map(cursos.map((c) => [c._id.toString(), c]))
-    const instructorPorId = new Map(instructores.map((u) => [u._id.toString(), u.nombre]))
+    const cursoPorId = new Map(cursos.map((c: any) => [c._id.toString(), c]))
+    const instructorPorId = new Map(instructores.map((u: any) => [u._id.toString(), u.nombre]))
 
-    const data = inscripciones.map((ins) => {
+    const data = inscripciones.map((ins: any) => {
       const progreso = typeof ins.progreso === 'number' ? ins.progreso : 0
       const curso = cursoPorId.get(ins.curso_id?.toString())
 
@@ -71,18 +64,14 @@ ipcMain.handle('aprendizaje:listar', async () => {
         }
       }
 
-      // Lecciones del curso ordenadas por número.
       const lecsCurso = lecciones
-        .filter((l) => l.curso_id?.toString() === curso._id.toString())
-        .sort((a, b) => (a.numero || 0) - (b.numero || 0))
+        .filter((l: any) => l.curso_id?.toString() === curso._id.toString())
+        .sort((a: any, b: any) => (a.numero || 0) - (b.numero || 0))
 
-      // Progreso real: lecciones que el usuario ya marcó como completadas.
-      const completadas = new Set((ins.lecciones_completadas || []).map((x) => x.toString()))
-      const completadasEnOrden = lecsCurso.filter((l) => completadas.has(l._id.toString()))
+      const completadas = new Set((ins.lecciones_completadas || []).map((x: any) => x.toString()))
+      const completadasEnOrden = lecsCurso.filter((l: any) => completadas.has(l._id.toString()))
 
-      // "Continuar" lleva a la primera lección pendiente; si ya completó todas, a la
-      // última (repaso). "Última lección" es la última que efectivamente completó.
-      const pendiente = lecsCurso.find((l) => !completadas.has(l._id.toString()))
+      const pendiente = lecsCurso.find((l: any) => !completadas.has(l._id.toString()))
       const continuar = pendiente || lecsCurso[lecsCurso.length - 1] || null
       const ultima = completadasEnOrden[completadasEnOrden.length - 1] || null
 
@@ -92,23 +81,20 @@ ipcMain.handle('aprendizaje:listar', async () => {
         curso: curso.nombre,
         instructor: instructorPorId.get(curso.instructor_id?.toString()) || 'Instructor desconocido',
         progreso,
-        ultimaLeccion: ultima ? ultima.titulo : 'Sin empezar',
-        continuarLeccionId: continuar ? continuar._id.toString() : null,
+        ultimaLeccion: ultima ? (ultima as any).titulo : 'Sin empezar',
+        continuarLeccionId: continuar ? (continuar as any)._id.toString() : null,
         disponible: true,
       }
     })
 
     return { success: true, data }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })
 
-// Inscribir al usuario en un curso. Valida que el curso exista (no se permite
-// inscribir a un curso inexistente) y evita inscripciones duplicadas.
 ipcMain.handle('inscripcion:crear', async (_, { cursoId } = {}) => {
   try {
-    // El usuario a inscribir es el de la sesion; el renderer solo elige el curso.
     const usuarioId = getUsuarioId()
     if (!usuarioId) {
       return { success: false, error: 'No hay sesión iniciada' }
@@ -125,6 +111,9 @@ ipcMain.handle('inscripcion:crear', async (_, { cursoId } = {}) => {
     }
 
     const db = mongoose.connection.db
+    if (!db) {
+      return { success: false, error: 'DB no conectada' }
+    }
     const curso = await db.collection('cursos').findOne({ _id: cid })
     if (!curso) {
       return { success: false, error: 'El curso no existe' }
@@ -141,7 +130,7 @@ ipcMain.handle('inscripcion:crear', async (_, { cursoId } = {}) => {
       progreso: 0,
     })
     return { success: true, data: { id: r.insertedId.toString() } }
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 })

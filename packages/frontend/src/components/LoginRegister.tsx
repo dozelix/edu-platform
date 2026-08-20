@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, FormEvent } from 'react'
 import {
   BookOpen,
   Mail,
@@ -11,29 +11,34 @@ import {
   User,
 } from 'lucide-react'
 
-// ======================================================
-// LoginRegister — Vista 1 (Caso 3), diseno tipo Udemy con Tailwind.
-// Reproduce Login.tsx / Register.tsx del diseno de referencia, cableado a la
-// coleccion `usuarios` via auth:login / auth:register (nombre, tipo).
-// ======================================================
-
 const FIELD_WRAP =
   'flex items-center gap-2 border bg-white px-3 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[var(--color-primary)] border-default focus-within:border-[var(--color-primary)]'
 const FIELD = 'flex-1 text-sm text-body outline-none bg-transparent placeholder:text-subtle'
 const FIELD_LABEL = 'text-sm font-semibold text-body'
 
-export function LoginRegister({ onSuccess, onCancel }) {
-  const [mode, setMode] = useState('login')
+interface UserData {
+  id?: string
+  nombre: string
+  email: string
+  tipo: string
+}
+
+interface LoginRegisterProps {
+  onSuccess: (user: UserData) => void
+  onCancel?: () => void
+}
+
+export function LoginRegister({ onSuccess, onCancel }: LoginRegisterProps) {
+  const [mode, setMode] = useState<'login' | 'register'>('login')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [currentUser, setCurrentUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const _timeouts = useRef([])
+  const _timeouts = useRef<ReturnType<typeof setTimeout>[]>([])
 
   useEffect(() => {
     return () => {
-      // Limpiar todos los timeouts pendientes al desmontar
       for (const t of _timeouts.current) {
         try {
           clearTimeout(t)
@@ -43,11 +48,9 @@ export function LoginRegister({ onSuccess, onCancel }) {
     }
   }, [])
 
-  // Login
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
 
-  // Register
   const [regNombre, setRegNombre] = useState('')
   const [regEmail, setRegEmail] = useState('')
   const [regPassword, setRegPassword] = useState('')
@@ -60,17 +63,18 @@ export function LoginRegister({ onSuccess, onCancel }) {
     setSuccess('')
   }
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess('')
     setLoading(true)
     try {
-      if (!globalThis.window?.api) {
+      const win = globalThis.window as any
+      if (!win?.api) {
         setError('API no disponible')
         return
       }
-      const res = await globalThis.window.api.invoke('auth:login', {
+      const res = await win.api.invoke('auth:login', {
         email: loginEmail,
         password: loginPassword,
       })
@@ -82,24 +86,25 @@ export function LoginRegister({ onSuccess, onCancel }) {
       } else {
         setError(res.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(`Error: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleRegister = async (e) => {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
     setSuccess('')
     setLoading(true)
     try {
-      if (!globalThis.window?.api) {
+      const win = globalThis.window as any
+      if (!win?.api) {
         setError('API no disponible')
         return
       }
-      const res = await globalThis.window.api.invoke('auth:register', {
+      const res = await win.api.invoke('auth:register', {
         nombre: regNombre,
         email: regEmail,
         password: regPassword,
@@ -120,34 +125,32 @@ export function LoginRegister({ onSuccess, onCancel }) {
       } else {
         setError(res.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(`Error: ${err.message}`)
     } finally {
       setLoading(false)
     }
   }
 
-  // Confirmacion breve antes de entrar
   if (currentUser) {
     return (
-      <div className="min-h-screen bg-body flex items-center justify-center px-4">
-        <div className="bg-white border border-default shadow-lg p-10 max-w-sm w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-5">
+      <main className="min-h-screen bg-body flex items-center justify-center px-4">
+        <section className="bg-white border border-default shadow-lg p-10 max-w-sm w-full text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto">
             <Check size={30} className="text-white" />
           </div>
-          <h2 className="text-2xl font-extrabold text-body mb-2">Bienvenido de vuelta</h2>
+          <h1 className="text-2xl font-extrabold text-body">Bienvenido de vuelta</h1>
           <p className="text-sm text-muted-color">
             Sesión iniciada como{' '}
             <strong className="text-body">{currentUser.nombre}</strong> ({currentUser.tipo}).
           </p>
-        </div>
-      </div>
+        </section>
+      </main>
     )
   }
 
   return (
     <div className="min-h-screen bg-body flex flex-col">
-      {/* Header */}
       <header className="bg-white border-b border-default px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen size={22} className="text-primary" />
@@ -157,14 +160,15 @@ export function LoginRegister({ onSuccess, onCancel }) {
           {onCancel && (
             <button
               onClick={onCancel}
-              className="text-sm text-muted-color font-medium hover:text-body hover:underline"
+              className="text-sm text-muted-color font-medium hover:text-body hover:underline cursor-pointer"
+              type="button"
             >
               Volver al catálogo
             </button>
           )}
           <p className="text-sm text-muted-color">
             {mode === 'login' ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
-            <button onClick={switchMode} className="text-primary font-semibold hover:underline">
+            <button onClick={switchMode} className="text-primary font-semibold hover:underline cursor-pointer" type="button">
               {mode === 'login' ? 'Regístrate gratis' : 'Inicia sesión'}
             </button>
           </p>
@@ -172,14 +176,13 @@ export function LoginRegister({ onSuccess, onCancel }) {
       </header>
 
       <div className="flex flex-1">
-        {/* Panel lateral */}
         {mode === 'login' ? (
           <aside className="hidden lg:flex flex-col justify-between bg-[#1c1d1f] text-white p-10 w-[420px] flex-shrink-0">
-            <div>
-              <p className="text-xs font-semibold tracking-widest text-on-primary uppercase mb-4">
+            <div className="space-y-4">
+              <p className="text-xs font-semibold tracking-widest text-on-primary uppercase">
                 Continúa aprendiendo
               </p>
-              <h2 className="text-3xl font-extrabold leading-tight mb-4 text-white">
+              <h2 className="text-3xl font-extrabold leading-tight text-white">
                 Tu próxima
                 <br />
                 habilidad te
@@ -210,8 +213,8 @@ export function LoginRegister({ onSuccess, onCancel }) {
           </aside>
         ) : (
           <aside className="hidden lg:flex flex-col justify-between bg-primary text-white p-10 w-[420px] flex-shrink-0">
-            <div>
-              <h2 className="text-3xl font-extrabold leading-tight mb-4 text-white">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-extrabold leading-tight text-white">
                 Únete a<br />
                 <span className="text-on-primary">EduPlatform</span>
               </h2>
@@ -243,31 +246,30 @@ export function LoginRegister({ onSuccess, onCancel }) {
           </aside>
         )}
 
-        {/* Formulario */}
         <main className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="w-full max-w-md">
+          <section className="w-full max-w-md">
             <div className="bg-white border border-default shadow-sm p-8 flex flex-col gap-5">
-              <div>
+              <header className="space-y-1">
                 <h1 className="text-2xl font-extrabold text-body">
                   {mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
                 </h1>
-                <p className="text-sm text-muted-color mt-1">
+                <p className="text-sm text-muted-color">
                   {mode === 'login'
                     ? 'Bienvenido de vuelta. Accede a tu cuenta.'
                     : 'Regístrate como estudiante o instructor.'}
                 </p>
-              </div>
+              </header>
 
               {error && (
                 <div className="flex items-start gap-2.5 px-4 py-3 text-sm" style={{ background: '#fff3f3', border: '1px solid #fca5a5', color: 'var(--color-danger)' }}>
                   <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
-                  {error}
+                  <span>{error}</span>
                 </div>
               )}
               {success && (
                 <div className="flex items-start gap-2.5 px-4 py-3 text-sm" style={{ background: '#eafaf1', border: '1px solid #86e3b4', color: 'var(--color-success)' }}>
                   <Check size={15} className="flex-shrink-0 mt-0.5" />
-                  {success}
+                  <span>{success}</span>
                 </div>
               )}
 
@@ -311,7 +313,7 @@ export function LoginRegister({ onSuccess, onCancel }) {
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
-                        className="text-muted-color hover:text-primary"
+                        className="text-muted-color hover:text-primary cursor-pointer"
                         aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -421,17 +423,22 @@ export function LoginRegister({ onSuccess, onCancel }) {
               )}
             </div>
 
-            <p className="text-center text-xs text-subtle mt-5">
+            <footer className="text-center text-xs text-subtle mt-5">
               EduPlatform · Plataforma Educativa
-            </p>
-          </div>
+            </footer>
+          </section>
         </main>
       </div>
     </div>
   )
 }
 
-function SubmitButton({ loading, label }) {
+interface SubmitButtonProps {
+  loading: boolean
+  label: string
+}
+
+function SubmitButton({ loading, label }: SubmitButtonProps) {
   return (
     <button
       type="submit"
